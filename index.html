@@ -306,6 +306,20 @@ footer a { color:#52617a; }
 
     <div class="filter-more">
       <div class="field">
+        <label for="postcode">Your UK postcode</label>
+        <input id="postcode" type="text" placeholder="e.g. EH21 7AB" autocomplete="postal-code">
+      </div>
+      <div class="field">
+        <label for="radius">Distance radius</label>
+        <select id="radius">
+          <option value="5">Within 5 miles</option>
+          <option value="10" selected>Within 10 miles</option>
+          <option value="25">Within 25 miles</option>
+          <option value="50">Within 50 miles</option>
+          <option value="100">Within 100 miles</option>
+        </select>
+      </div>
+      <div class="field">
         <label for="workplace">Workplace</label>
         <select id="workplace">
           <option value="all">All types</option>
@@ -343,6 +357,7 @@ footer a { color:#52617a; }
         Hide jobs outside selected date range
       </label>
       <div>
+        <button class="btn quiet" id="nearMeBtn" type="button">Use my location</button>
         <button class="btn quiet" id="resetBtn" type="button">Reset</button>
         <button class="btn primary" id="searchBtn" type="button">Apply filters</button>
       </div>
@@ -474,9 +489,14 @@ function normaliseJob(raw) {
  */
 function isSponsorVerified(job) {
   const match = String(job.sponsorRegisterMatch || "").trim().toLowerCase();
-  if (match.startsWith("matched:")) return true;
   const status = String(job.sponsorshipStatus || "").toLowerCase();
-  return status.includes("confirmed sponsorship") || status.includes("licensed sponsor");
+  const evidence = String(job.sponsorshipEvidence || "").toLowerCase();
+  const positiveEvidence =
+    status.includes("confirmed sponsorship") ||
+    status.includes("mentions sponsorship") ||
+    status.includes("employer unverified") ||
+    evidence.startsWith("positive sponsorship wording found");
+  return match.startsWith("matched:") && positiveEvidence;
 }
 
 /*
@@ -582,9 +602,37 @@ async function loadJobs() {
   }
 }
 
+/* ---------------- POSTCODE / DISTANCE ---------------- */
+let searchOrigin = null;
+
+async function postcodeToCoords(postcode) {
+  const clean = String(postcode || "").trim().toUpperCase();
+  if (!clean) throw new Error("Enter a UK postcode first.");
+  const response = await fetch("https://api.postcodes.io/postcodes/" + encodeURIComponent(clean));
+  const data = await response.json();
+  if (!response.ok || !data || data.status !== 200 || !data.result) {
+    throw new Error("That postcode was not found. Check it and try again.");
+  }
+  return { lat: Number(data.result.latitude), lon: Number(data.result.longitude), postcode: clean };
+}
+
+function distanceMiles(a, b) {
+  const rad = n => n * Math.PI / 180;
+  const dLat = rad(b.lat - a.lat), dLon = rad(b.lon - a.lon);
+  const x = Math.sin(dLat / 2) ** 2 +
+    Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLon / 2) ** 2;
+  return 3958.7613 * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1 - x));
+}
+
+async function jobCoords(job) {
+  const pc = job.postcode || (String(job.location || "").match(/\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b/i) || [])[0] || "";
+  if (!pc) return null;
+  try { return await postcodeToCoords(pc); } catch (_) { return null; }
+}
+
 /* ---------------- FILTERING ---------------- */
 
-function applyFilters() {
+async function applyFilters() {
   const query = $("q").value.trim().toLowerCase();
   const city = $("city").value.trim().toLowerCase();
   const selectedSponsorship = $("sponsorship").value; // verified | provided | none | all
@@ -592,8 +640,21 @@ function applyFilters() {
   const source = $("source").value;
   const days = Number($("posted").value) || MAX_AGE_DAYS;
   const hideOld = $("hideOld").checked;
+  const radius = Number($("radius").value) || 10;
+  const postcodeText = $("postcode").value.trim();
 
-  filteredJobs = allJobs.filter(job => {
+  let origin = searchOrigin;
+  if (postcodeText) {
+    try {
+      origin = await postcodeToCoords(postcodeText);
+      searchOrigin = origin;
+    } catch (err) {
+      setStatus(err.message);
+      return;
+    }
+  }
+
+  const candidates = allJobs.filter(job => {
     const searchable = [job.title, job.employer, job.location, job.description, job.workplaceType]
       .join(" ").toLowerCase();
 
@@ -615,6 +676,20 @@ function applyFilters() {
     if (hideOld && !isRecent(job.date, days)) return false;
     return true;
   });
+
+  if (origin) {
+    setStatus("Checking postcode distances…");
+    const withDistances = await Promise.all(candidates.map(async job => {
+      const coords = await jobCoords(job);
+      return coords ? { job, distance: distanceMiles(origin, coords) } : null;
+    }));
+    filteredJobs = withDistances
+      .filter(item => item && item.distance <= radius)
+      .sort((a, b) => a.distance - b.distance)
+      .map(item => item.job);
+  } else {
+    filteredJobs = candidates;
+  }
 
   page = 1;
   renderJobs();
@@ -739,6 +814,9 @@ function renderJobs() {
     const detail = document.createElement("div");
     if (!feedLoaded) {
       detail.textContent = "Check your Apps Script deployment, Jobs sheet and RunLog.";
+    } else if ($("postcode").value.trim() || searchOrigin) {
+      detail.textContent = "No jobs with a known postcode were found within " + $("radius").value +
+        " miles. Try a wider radius or another postcode.";
     } else if ($("city").value.trim()) {
       detail.textContent = "No matching jobs were found for " + $("city").value.trim() +
         ". Try another UK location or clear the location search.";
@@ -776,6 +854,22 @@ function debouncedApply() {
 $("searchBtn").addEventListener("click", applyFilters);
 $("q").addEventListener("input", debouncedApply);
 $("city").addEventListener("input", debouncedApply);
+$("postcode").addEventListener("change", applyFilters);
+$("radius").addEventListener("change", applyFilters);
+
+$("nearMeBtn").addEventListener("click", () => {
+  if (!navigator.geolocation) {
+    setStatus("Your browser does not support location. Enter a postcode instead.");
+    return;
+  }
+  setStatus("Requesting your location…");
+  navigator.geolocation.getCurrentPosition(async position => {
+    searchOrigin = { lat: position.coords.latitude, lon: position.coords.longitude, postcode: "" };
+    $("postcode").value = "";
+    await applyFilters();
+  }, () => setStatus("Location permission was not granted. Enter a postcode instead."),
+  { enableHighAccuracy: true, timeout: 12000, maximumAge: 300000 });
+});
 
 ["sponsorship", "workplace", "posted", "hideOld", "source"].forEach(id => {
   $(id).addEventListener("change", applyFilters);
@@ -784,6 +878,9 @@ $("city").addEventListener("input", debouncedApply);
 $("resetBtn").addEventListener("click", () => {
   $("q").value = "";
   $("city").value = "";
+  $("postcode").value = "";
+  $("radius").value = "10";
+  searchOrigin = null;
   $("sponsorship").value = "verified";
   $("workplace").value = "all";
   $("posted").value = "28";
