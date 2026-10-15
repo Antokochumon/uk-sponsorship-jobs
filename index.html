@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,35 +8,21 @@
 <title>UK Visa Sponsorship Jobs</title>
 <style>
 :root {
-  --navy:#101c35;
-  --blue:#315cf5;
-  --ink:#17243b;
-  --muted:#65738a;
-  --line:#e2e8f0;
-  --bg:#f4f7fb;
-  --green:#087443;
-  --greenbg:#e8f8ef;
-  --amber:#8a4b08;
-  --amberbg:#fff5df;
-  --red:#a72d36;
-  --redbg:#fff0f0;
+  --navy:#101c35; --blue:#315cf5; --ink:#17243b; --muted:#65738a;
+  --line:#e2e8f0; --bg:#f4f7fb;
+  --green:#087443; --greenbg:#e8f8ef;
+  --amber:#8a4b08; --amberbg:#fff5df;
+  --red:#a72d36; --redbg:#fff0f0;
 }
 * { box-sizing:border-box }
-body {
-  margin:0;
-  background:var(--bg);
-  color:var(--ink);
-  font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
-}
+body { margin:0; background:var(--bg); color:var(--ink);
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif; }
 button,input,select { font:inherit }
 button,a { -webkit-tap-highlight-color:transparent }
 .wrap { width:min(1180px,calc(100% - 32px));margin:auto }
-.hero {
-  color:#fff;
-  padding:38px 0 75px;
+.hero { color:#fff; padding:38px 0 75px;
   background:radial-gradient(ellipse at 85% 10%,#263f7e,transparent 38%),
-             linear-gradient(120deg,#101c35,#182d55);
-}
+             linear-gradient(120deg,#101c35,#182d55); }
 .top { display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:35px }
 .brand { font-size:21px;font-weight:800 }
 .brand span { color:#9db7ff }
@@ -59,8 +44,7 @@ h2.section { font-size:17px;margin:0 0 16px }
 .field label { font-size:12px;font-weight:700;color:#4a5870 }
 .field input,.field select {
   width:100%;height:44px;min-width:0;padding:0 11px;
-  border:1px solid #d8e0eb;border-radius:9px;background:white;color:var(--ink);
-  font-size:13px;
+  border:1px solid #d8e0eb;border-radius:9px;background:white;color:var(--ink);font-size:13px;
 }
 .field input:focus,.field select:focus { outline:2px solid #315cf530;border-color:var(--blue) }
 .filter-more { display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:13px }
@@ -157,7 +141,8 @@ footer a { color:#52617a }
         <label for="sponsorship">Job type</label>
         <select id="sponsorship">
           <option value="provided">Sponsorship provided</option>
-          <option value="none">No sponsorship</option>
+          <option value="none">No sponsorship / not stated</option>
+          <option value="all">All jobs</option>
         </select>
       </div>
       <div class="field">
@@ -230,6 +215,7 @@ footer a { color:#52617a }
 /* Keep this URL aligned with your deployed Google Apps Script web app. */
 const API_URL = "https://script.google.com/macros/s/AKfycby4z6jIADjcy5H9n0RQZUGjh-6K0arvczvdrCB-0zUyS6kuIT4DCSGkxIB94gxsvqNG/exec";
 const PAGE_SIZE = 20;
+const MAX_AGE_DAYS = 28;
 
 let allJobs = [];
 let filteredJobs = [];
@@ -238,9 +224,7 @@ let feedLoaded = false;
 
 const $ = id => document.getElementById(id);
 
-function setStatus(message) {
-  $("status").textContent = message;
-}
+function setStatus(message) { $("status").textContent = message; }
 
 function normaliseText(value) {
   return String(value == null ? "" : value).trim();
@@ -250,19 +234,15 @@ function normaliseKey(value) {
   return String(value || "").toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
-/* Supports both Apps Script JSON keys and Google Sheet column headings. */
+/* Read from either camelCase JSON keys or Google Sheet column headings. */
 function field(job, names) {
   if (!job || typeof job !== "object") return "";
   const keys = Object.keys(job);
   for (const name of names) {
-    if (job[name] !== undefined && job[name] !== null && job[name] !== "") {
-      return job[name];
-    }
+    if (job[name] !== undefined && job[name] !== null && job[name] !== "") return job[name];
     const wanted = normaliseKey(name);
     const actual = keys.find(key => normaliseKey(key) === wanted);
-    if (actual && job[actual] !== undefined && job[actual] !== null && job[actual] !== "") {
-      return job[actual];
-    }
+    if (actual && job[actual] !== undefined && job[actual] !== null && job[actual] !== "") return job[actual];
   }
   return "";
 }
@@ -273,7 +253,6 @@ function getOriginalVacancyUrl(job) {
     field(job, ["directApplyUrl", "direct_apply_url", "applyUrl", "apply_url"]),
     field(job, ["jobUrl", "job_url", "originalUrl", "original_url", "sourceUrl", "link"])
   ];
-
   for (let raw of candidates) {
     if (typeof raw !== "string") continue;
     raw = raw.trim();
@@ -283,32 +262,27 @@ function getOriginalVacancyUrl(job) {
       if ((url.protocol === "https:" || url.protocol === "http:") && url.hostname.includes(".")) {
         return url.href;
       }
-    } catch (_) {
-      // Ignore invalid URL values. Never use sponsor-register text as a URL.
-    }
+    } catch (_) { /* ignore */ }
   }
   return "";
 }
 
 function normaliseJob(raw) {
-  const title = normaliseText(field(raw, ["title", "Job Title", "jobTitle"]));
-  const employer = normaliseText(field(raw, ["employer", "Employer", "company", "companyName"]));
-  const location = normaliseText(field(raw, ["location", "Location", "jobLocation"]));
-  const description = normaliseText(field(raw, ["description", "Description", "snippet", "summary"]));
-  const date = field(raw, ["date", "Source Date", "sourceDate", "publishedAt", "postedAt"]);
-  const status = normaliseText(field(raw, ["sponsorshipStatus", "Sponsorship Status", "status"])) || "Not specified";
-  const evidence = normaliseText(field(raw, ["sponsorshipEvidence", "Sponsorship Evidence", "evidence"]));
-  const source = normaliseText(field(raw, ["source", "Source"])) || "Other";
-  const workplaceType = normaliseText(field(raw, ["workplaceType", "Workplace Type"])) || "Not specified";
-  const postcode = normaliseText(field(raw, ["postcode", "Postcode"]));
-  const dateType = normaliseText(field(raw, ["dateType", "Date Type"]));
-
   return {
     id: normaliseText(field(raw, ["id", "ID"])),
-    title, employer, location, description, date, dateType,
-    sponsorshipStatus: status,
-    sponsorshipEvidence: evidence || "No explicit sponsorship statement found in the collected advert.",
-    source, workplaceType, postcode,
+    title: normaliseText(field(raw, ["title", "Job Title", "jobTitle"])),
+    employer: normaliseText(field(raw, ["employer", "Employer", "company", "companyName"])),
+    location: normaliseText(field(raw, ["location", "Location", "jobLocation"])),
+    description: normaliseText(field(raw, ["description", "Description", "snippet", "summary"])),
+    date: field(raw, ["date", "Source Date", "sourceDate", "publishedAt", "postedAt"]),
+    dateType: normaliseText(field(raw, ["dateType", "Date Type"])),
+    sponsorshipStatus: normaliseText(field(raw, ["sponsorshipStatus", "Sponsorship Status", "status"])) || "Not specified",
+    sponsorshipEvidence: normaliseText(field(raw, ["sponsorshipEvidence", "Sponsorship Evidence", "evidence"]))
+      || "No explicit sponsorship statement found in the collected advert.",
+    sponsorRegisterMatch: normaliseText(field(raw, ["sponsorRegisterMatch", "Sponsor Register Match"])) || "",
+    source: normaliseText(field(raw, ["source", "Source"])) || "Other",
+    workplaceType: normaliseText(field(raw, ["workplaceType", "Workplace Type"])) || "Not specified",
+    postcode: normaliseText(field(raw, ["postcode", "Postcode"])),
     url: getOriginalVacancyUrl(raw)
   };
 }
@@ -328,19 +302,75 @@ function jsonpLoad() {
       try { delete window[callbackName]; } catch (_) { window[callbackName] = undefined; }
     }
 
-    window[callbackName] = data => {
-      cleanup();
-      resolve(data);
-    };
-
+    window[callbackName] = data => { cleanup(); resolve(data); };
     script.onerror = () => {
       cleanup();
-      reject(new Error("Could not reach Apps Script. Check that the web app is deployed and accessible."));
+      reject(new Error("Could not reach Apps Script. Check that the web app is deployed and accessible to 'Anyone'."));
     };
 
     script.src = API_URL + "?callback=" + encodeURIComponent(callbackName) + "&_=" + Date.now();
     document.body.appendChild(script);
   });
+}
+
+function isValidJobUrl(value) {
+  try {
+    const u = new URL(value);
+    return (u.protocol === "https:" || u.protocol === "http:") && u.hostname.includes(".");
+  } catch (_) { return false; }
+}
+
+function isRecent(value, days) {
+  if (!value) return false;
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return false;
+  const age = Date.now() - d.getTime();
+  return age <= days * 86400000 && age >= -86400000;
+}
+
+/*
+ * Backend already filters for UK vacancies. We only reject a job here if the
+ * LOCATION field is clearly non-UK. We do NOT scan the description for country
+ * names, because UK companies often mention overseas offices in their adverts.
+ */
+function isUKJob(job) {
+  const location = String(job.location || "").toLowerCase();
+  if (!location) return true; // let it through; backend already validated
+
+  const overseas = /\b(united states|usa|u\.s\.a\.|canada|australia|new zealand|india|singapore|germany|france|spain|italy|poland|portugal|netherlands|switzerland|sweden|denmark|norway|finland|japan|china|brazil|mexico|dubai|uae|emea|apac)\b/i;
+  return !overseas.test(location);
+}
+
+/*
+ * Aligns with Apps Script's status values:
+ *   "Confirmed sponsorship"
+ *   "Licensed sponsor — unconfirmed"
+ *   "Advert mentions sponsorship — employer unverified"
+ *   "No sponsorship"
+ *   "Not specified"
+ *
+ * "provided" = any positive sponsorship signal (confirmed, licensed sponsor, or advert mentions).
+ * "none"     = explicit "No sponsorship" OR "Not specified".
+ */
+function sponsorshipGroup(job) {
+  const status = String(job.sponsorshipStatus || "").toLowerCase();
+  const evidence = String(job.sponsorshipEvidence || "").toLowerCase();
+
+  // Explicit negative first — wins even if evidence text contains stray words.
+  if (status.includes("no sponsorship")) return "none";
+
+  if (status.includes("confirmed sponsorship") ||
+      status.includes("licensed sponsor") ||
+      status.includes("mentions sponsorship") ||
+      status.includes("employer unverified")) {
+    return "provided";
+  }
+
+  // Fallback: positive wording in stored evidence
+  if (evidence.startsWith("positive sponsorship wording")) return "provided";
+  if (evidence.startsWith("advert states sponsorship is unavailable")) return "none";
+
+  return "none";
 }
 
 async function loadJobs() {
@@ -351,17 +381,26 @@ async function loadJobs() {
       throw new Error("The Apps Script response does not contain a jobs array.");
     }
 
-    allJobs = data.jobs.map(normaliseJob).filter(job =>
-      job.title && job.employer && job.url && isValidJobUrl(job.url) && isRecent(job.date, 28) && isUKJob(job)
-    );
+    allJobs = data.jobs
+      .map(normaliseJob)
+      .filter(job =>
+        job.title && job.employer && job.url &&
+        isValidJobUrl(job.url) &&
+        isRecent(job.date, MAX_AGE_DAYS) &&
+        isUKJob(job)
+      );
 
     feedLoaded = true;
+
     const register = data.sponsorRegister || {};
     $("registerStatus").textContent = register.rowCount
       ? "Sponsor register rows: " + Number(register.rowCount).toLocaleString()
       : "Sponsor register status not supplied by feed";
 
-    $("confirmedStat").textContent = allJobs.filter(j => sponsorshipGroup(j) === "provided").length.toLocaleString();
+    $("confirmedStat").textContent = allJobs
+      .filter(j => sponsorshipGroup(j) === "provided")
+      .length.toLocaleString();
+
     applyFilters();
     setStatus("Loaded " + allJobs.length + " recent UK jobs.");
   } catch (error) {
@@ -373,71 +412,13 @@ async function loadJobs() {
   }
 }
 
-function isValidJobUrl(value) {
-  try {
-    const u = new URL(value);
-    return ["https:", "http:"].includes(u.protocol) && u.hostname.includes(".");
-  } catch (_) {
-    return false;
-  }
-}
-
-function isRecent(value, days) {
-  if (!value) return false;
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return false;
-  const age = Date.now() - d.getTime();
-  return age <= days * 86400000 && age >= -86400000;
-}
-
-/* Restrict results to UK listings; reject explicit overseas locations. */
-function isUKJob(job) {
-  const location = String(job.location || "").toLowerCase();
-  const description = String(job.description || "").toLowerCase();
-
-  const overseas = /\b(united states|usa|u\.s\.a\.|canada|australia|new zealand|india|singapore|germany|france|spain|italy|poland|portugal|netherlands|switzerland|sweden|denmark|norway|finland|japan|china|brazil|mexico|dubai|uae)\b/i;
-  const ukSignals = /\b(united kingdom|great britain|england|scotland|wales|northern ireland|uk-based|uk based|london|edinburgh|glasgow|perth|dundee|aberdeen|inverness|stirling|manchester|birmingham|leeds|bristol|cardiff|belfast|liverpool|newcastle|oxford|cambridge|nottingham|sheffield|leicester|reading|coventry|brighton|york|bath|derby|exeter|plymouth|southampton|portsmouth|norwich|ipswich|lincoln|preston|chester|watford|luton|dunfermline|livingston|falkirk|kirkcaldy|paisley|st andrews|newport|swansea|remote within the uk|remote in the uk|remote from the uk|anywhere in the uk)\b/i;
-  const postcode = /\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b/i;
-
-  if (overseas.test(location)) return false;
-  if (ukSignals.test(location) || postcode.test(location)) return true;
-
-  // Only allow remote jobs when the listing itself indicates UK eligibility.
-  if (/\b(remote|work from home|home-based|home based)\b/i.test(location)) {
-    return ukSignals.test(description) || /\b(remote.*\b(uk|united kingdom)\b|\b(uk|united kingdom)\b.*remote)/i.test(description);
-  }
-  return false;
-}
-
-/*
- * "provided" means the advert mentions positive sponsorship wording.
- * "none" deliberately includes jobs with no sponsorship information as well.
- * It does NOT claim those adverts have been proven sponsorship-free.
- */
-function sponsorshipGroup(job) {
-  const status = String(job.sponsorshipStatus || "").toLowerCase();
-  const evidence = String(job.sponsorshipEvidence || "").toLowerCase();
-  const description = String(job.description || "").toLowerCase();
-
-  if (
-    status.includes("confirmed sponsorship") ||
-    status.includes("mentions sponsorship") ||
-    status.includes("employer unverified") ||
-    /\b(visa sponsorship available|visa sponsorship is available|we offer visa sponsorship|sponsorship will be provided|skilled worker visa sponsorship|certificate of sponsorship|eligible for visa sponsorship|visa sponsorship offered|we can sponsor|we provide visa sponsorship)\b/i.test(description)
-  ) return "provided";
-
-  // If the advert expressly says sponsorship is unavailable, keep it in the
-  // general/no-sponsorship selection. Unknown statuses are included too.
-  return "none";
-}
-
 function applyFilters() {
   const query = $("q").value.trim().toLowerCase();
   const city = $("city").value.trim().toLowerCase();
-  const selectedSponsorship = $("sponsorship").value;
+  const selectedSponsorship = $("sponsorship").value; // "provided" | "none" | "all"
   const workplace = $("workplace").value;
   const source = $("source").value;
-  const days = Number($("posted").value) || 28;
+  const days = Number($("posted").value) || MAX_AGE_DAYS;
   const hideOld = $("hideOld").checked;
 
   filteredJobs = allJobs.filter(job => {
@@ -446,7 +427,7 @@ function applyFilters() {
 
     if (query && !searchable.includes(query)) return false;
     if (city && !String(job.location || "").toLowerCase().includes(city)) return false;
-    if (selectedSponsorship !== sponsorshipGroup(job)) return false;
+    if (selectedSponsorship !== "all" && sponsorshipGroup(job) !== selectedSponsorship) return false;
     if (workplace !== "all" && job.workplaceType !== workplace) return false;
     if (source !== "all" && job.source.toLowerCase() !== source.toLowerCase()) return false;
     if (hideOld && !isRecent(job.date, days)) return false;
@@ -459,11 +440,12 @@ function applyFilters() {
 
 function badgeClass(job) {
   const group = sponsorshipGroup(job);
+  const status = String(job.sponsorshipStatus).toLowerCase();
   if (group === "provided") {
-    return String(job.sponsorshipStatus).toLowerCase().includes("confirmed")
+    return status.includes("confirmed") || status.includes("licensed sponsor")
       ? "confirmed" : "mentioned";
   }
-  if (String(job.sponsorshipStatus).toLowerCase().includes("no sponsorship")) return "negative";
+  if (status.includes("no sponsorship")) return "negative";
   return "neutral";
 }
 
@@ -501,7 +483,6 @@ function createJobCard(job) {
 
   const chips = document.createElement("div");
   chips.className = "chips";
-
   [job.location, job.workplaceType, job.source].filter(Boolean).forEach(value => {
     const chip = document.createElement("span");
     chip.className = "chip";
@@ -533,9 +514,8 @@ function createJobCard(job) {
   apply.rel = "noopener noreferrer";
   apply.referrerPolicy = "no-referrer";
 
-  const originalUrl = getOriginalVacancyUrl(job);
-  if (originalUrl && isValidJobUrl(originalUrl)) {
-    apply.href = originalUrl;
+  if (job.url && isValidJobUrl(job.url)) {
+    apply.href = job.url;
     apply.setAttribute("aria-label", "Apply for " + job.title);
   } else {
     apply.removeAttribute("href");
@@ -567,7 +547,7 @@ function renderJobs() {
       detail.textContent = "No matching jobs were found for " + $("city").value.trim() +
         ". Try another UK location or clear the location search.";
     } else {
-      detail.textContent = "Try the other sponsorship option or widen the date range.";
+      detail.textContent = "Try changing the job type or widening the date range.";
     }
 
     empty.append(strong, detail);
@@ -590,9 +570,16 @@ function renderJobs() {
   $("nextBtn").disabled = page >= pageCount;
 }
 
+/* Wire up events */
 $("searchBtn").addEventListener("click", applyFilters);
-$("q").addEventListener("input", applyFilters);
-$("city").addEventListener("input", applyFilters);
+
+let debounceTimer;
+function debouncedApply() {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(applyFilters, 180);
+}
+$("q").addEventListener("input", debouncedApply);
+$("city").addEventListener("input", debouncedApply);
 
 ["sponsorship", "workplace", "posted", "hideOld", "source"].forEach(id => {
   $(id).addEventListener("change", applyFilters);
@@ -613,7 +600,7 @@ $("prevBtn").addEventListener("click", () => {
   if (page > 1) {
     page--;
     renderJobs();
-    window.scrollTo({top:$("jobs").getBoundingClientRect().top + window.scrollY - 20,behavior:"smooth"});
+    window.scrollTo({top:$("jobs").getBoundingClientRect().top + window.scrollY - 20, behavior:"smooth"});
   }
 });
 
@@ -621,7 +608,7 @@ $("nextBtn").addEventListener("click", () => {
   if (page < Math.ceil(filteredJobs.length / PAGE_SIZE)) {
     page++;
     renderJobs();
-    window.scrollTo({top:$("jobs").getBoundingClientRect().top + window.scrollY - 20,behavior:"smooth"});
+    window.scrollTo({top:$("jobs").getBoundingClientRect().top + window.scrollY - 20, behavior:"smooth"});
   }
 });
 
