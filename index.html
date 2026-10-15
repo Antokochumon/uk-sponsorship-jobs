@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#101c35">
 <meta name="description" content="Search recent UK vacancies with sponsorship information and original application links.">
 <title>UK Visa Sponsorship Jobs</title>
@@ -12,101 +12,253 @@
   --line:#e2e8f0; --bg:#f4f7fb;
   --green:#087443; --greenbg:#e8f8ef;
   --amber:#8a4b08; --amberbg:#fff5df;
-  --red:#a72d36; --redbg:#fff0f0;
+  --red:#a72d36;   --redbg:#fff0f0;
+  --radius:15px;
 }
-* { box-sizing:border-box }
-body { margin:0; background:var(--bg); color:var(--ink);
-  font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif; }
-button,input,select { font:inherit }
-button,a { -webkit-tap-highlight-color:transparent }
-.wrap { width:min(1180px,calc(100% - 32px));margin:auto }
-.hero { color:#fff; padding:38px 0 75px;
-  background:radial-gradient(ellipse at 85% 10%,#263f7e,transparent 38%),
-             linear-gradient(120deg,#101c35,#182d55); }
-.top { display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:35px }
-.brand { font-size:21px;font-weight:800 }
-.brand span { color:#9db7ff }
-.pill { font-size:12px;color:#d6e5ff;border:1px solid #ffffff30;padding:8px 12px;border-radius:30px }
-h1 { font-size:clamp(32px,5vw,52px);line-height:1.08;letter-spacing:-1.5px;margin:0 0 16px }
-.hero p { color:#c6d3e9;max-width:700px;line-height:1.7;margin:0 }
-.trust { display:flex;flex-wrap:wrap;gap:9px;margin-top:22px }
-.trust span { font-size:12px;padding:8px 10px;border-radius:8px;background:#ffffff12;border:1px solid #ffffff20 }
-main { margin-top:-40px;padding-bottom:30px }
-.stats { display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px }
-.stat,.panel,.card { background:white;border:1px solid var(--line);border-radius:15px;box-shadow:0 10px 30px #1526480b }
-.stat { padding:17px }
-.stat strong { display:block;font-size:26px }
-.stat span { font-size:12px;color:var(--muted) }
-.panel { padding:20px;margin-bottom:18px }
-h2.section { font-size:17px;margin:0 0 16px }
-.filters { display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px }
-.field { display:flex;flex-direction:column;gap:7px;min-width:0 }
-.field label { font-size:12px;font-weight:700;color:#4a5870 }
-.field input,.field select {
-  width:100%;height:44px;min-width:0;padding:0 11px;
-  border:1px solid #d8e0eb;border-radius:9px;background:white;color:var(--ink);font-size:13px;
+* { box-sizing:border-box; -webkit-text-size-adjust:100%; }
+html { scroll-behavior:smooth; }
+body {
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  line-height:1.5;
+  overflow-x:hidden;
 }
-.field input:focus,.field select:focus { outline:2px solid #315cf530;border-color:var(--blue) }
-.filter-more { display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:13px }
-.actions { display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:17px }
-.check { display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px }
-.check input { accent-color:var(--blue) }
-.btn { border:0;border-radius:9px;padding:11px 15px;font-size:13px;font-weight:750;cursor:pointer }
-.primary { background:var(--blue);color:white }
-.primary:hover { background:#2448cf }
-.quiet { background:#eef2f8;color:#40516d }
-.statusbar { display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:17px 2px }
-.jobs { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px }
-.card { padding:19px;display:flex;flex-direction:column;min-width:0 }
-.card-top { display:flex;justify-content:space-between;align-items:flex-start;gap:12px }
-.company { font-size:12px;font-weight:700;color:var(--muted);margin-bottom:7px }
-.job-title { font-size:19px;line-height:1.35;margin:0;overflow-wrap:anywhere }
-.badge { font-size:10px;line-height:1.4;font-weight:800;padding:7px 9px;border-radius:8px;flex-shrink:0;max-width:175px }
-.confirmed { color:var(--green);background:var(--greenbg) }
-.mentioned { color:var(--amber);background:var(--amberbg) }
-.negative { color:var(--red);background:var(--redbg) }
-.neutral { color:#56657c;background:#edf1f6 }
-.chips { display:flex;flex-wrap:wrap;gap:7px;margin:14px 0 11px }
-.chip { font-size:11px;color:#52617a;background:#f1f4f8;padding:6px 8px;border-radius:7px;overflow-wrap:anywhere }
-.evidence,.description { font-size:12px;line-height:1.6;color:#53637a;margin:0 0 11px }
-.description { font-size:13px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:18px }
-.bottom { display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:auto;padding-top:13px;border-top:1px solid #edf0f5 }
-.date { white-space:pre-line;font-size:11px;line-height:1.5;color:#758198 }
-.apply { display:inline-flex;align-items:center;justify-content:center;gap:7px;background:var(--navy);color:white;text-decoration:none;font-size:12px;font-weight:750;padding:11px 13px;border-radius:9px;white-space:nowrap }
-.apply:hover { background:#263d68 }
-.disabled-link { opacity:.6;cursor:not-allowed }
-.empty { grid-column:1/-1;padding:38px 22px;background:white;border:1px dashed #cbd5e1;border-radius:15px;text-align:center;color:var(--muted);line-height:1.7 }
-.empty strong { display:block;color:var(--ink);font-size:17px;margin-bottom:6px }
-.pagination { display:flex;justify-content:center;align-items:center;gap:12px;padding:22px }
-.page-label { font-size:12px;color:var(--muted) }
-footer { padding:20px 0 35px;color:#788398;font-size:11px;line-height:1.8 }
-footer a { color:#52617a }
-@media(max-width:800px) {
-  .filters { grid-template-columns:1fr 1fr }
-  .filters .field:first-child { grid-column:1/-1 }
-  .filter-more { grid-template-columns:1fr 1fr }
-  .jobs { grid-template-columns:1fr }
+img, svg { max-width:100%; height:auto; display:block; }
+button,input,select,textarea { font:inherit; color:inherit; }
+button,a { -webkit-tap-highlight-color:transparent; }
+a { color:var(--blue); }
+
+.wrap { width:min(1180px, calc(100% - 32px)); margin:auto; }
+
+/* ---------- HERO ---------- */
+.hero {
+  color:#fff; padding:38px 0 75px;
+  background:
+    radial-gradient(ellipse at 85% 10%, #263f7e, transparent 38%),
+    linear-gradient(120deg,#101c35,#182d55);
 }
-@media(max-width:520px) {
-  .wrap { width:calc(100% - 22px) }
-  .hero { padding:27px 0 65px }
-  .top { margin-bottom:26px }
-  .pill { display:none }
-  .stats { gap:7px }
-  .stat { padding:12px 9px }
-  .stat strong { font-size:21px }
-  .stat span { font-size:10px }
-  .panel { padding:14px }
-  .filters,.filter-more { grid-template-columns:1fr 1fr }
-  .actions { align-items:flex-start;flex-direction:column }
-  .card { padding:15px }
-  .card-top { flex-direction:column-reverse }
-  .bottom { align-items:stretch;flex-direction:column }
-  .apply { width:100% }
+.top { display:flex; justify-content:space-between; align-items:center; gap:15px; margin-bottom:35px; flex-wrap:wrap; }
+.brand { font-size:21px; font-weight:800; letter-spacing:-.3px; }
+.brand span { color:#9db7ff; }
+.pill {
+  font-size:12px; color:#d6e5ff; border:1px solid #ffffff30;
+  padding:8px 12px; border-radius:30px; white-space:nowrap;
+}
+h1 { font-size:clamp(28px, 5vw, 52px); line-height:1.08; letter-spacing:-1.2px; margin:0 0 16px; }
+.hero p { color:#c6d3e9; max-width:700px; line-height:1.7; margin:0; font-size:clamp(14px,1.6vw,16px); }
+.trust { display:flex; flex-wrap:wrap; gap:9px; margin-top:22px; }
+.trust span {
+  font-size:12px; padding:8px 10px; border-radius:8px;
+  background:#ffffff12; border:1px solid #ffffff20;
+}
+
+/* ---------- MAIN ---------- */
+main { margin-top:-40px; padding-bottom:30px; }
+
+.stats {
+  display:grid; grid-template-columns:repeat(3, minmax(0,1fr));
+  gap:12px; margin-bottom:18px;
+}
+.stat, .panel, .card {
+  background:#fff; border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:0 10px 30px #1526480b;
+}
+.stat { padding:17px; min-width:0; }
+.stat strong { display:block; font-size:clamp(20px,3vw,26px); line-height:1.15; word-break:break-word; }
+.stat span { font-size:12px; color:var(--muted); display:block; margin-top:2px; }
+
+.panel { padding:20px; margin-bottom:18px; }
+h2.section { font-size:17px; margin:0 0 16px; }
+
+/* ---------- FILTERS ---------- */
+.filters {
+  display:grid; grid-template-columns:2fr 1fr 1fr;
+  gap:12px;
+}
+.filter-more {
+  display:grid; grid-template-columns:1fr 1fr 1fr;
+  gap:12px; margin-top:13px;
+}
+.field { display:flex; flex-direction:column; gap:7px; min-width:0; }
+.field label { font-size:12px; font-weight:700; color:#4a5870; }
+.field input, .field select {
+  width:100%; height:44px; min-width:0; padding:0 11px;
+  border:1px solid #d8e0eb; border-radius:9px;
+  background:#fff; color:var(--ink); font-size:13px;
+  appearance:none; -webkit-appearance:none;
+}
+.field select {
+  background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3e%3cpath fill='%23657c8f' d='M6 8 0 0h12z'/%3e%3c/svg%3e");
+  background-repeat:no-repeat; background-position:right 12px center;
+  padding-right:32px;
+}
+.field input:focus, .field select:focus {
+  outline:2px solid #315cf530; border-color:var(--blue);
+}
+
+.actions {
+  display:flex; justify-content:space-between; align-items:center;
+  gap:12px; margin-top:17px; flex-wrap:wrap;
+}
+.check { display:flex; align-items:center; gap:8px; color:var(--muted); font-size:12px; }
+.check input { accent-color:var(--blue); width:16px; height:16px; }
+
+.btn {
+  border:0; border-radius:9px; padding:11px 15px;
+  font-size:13px; font-weight:750; cursor:pointer;
+  transition:background .15s, transform .05s;
+  white-space:nowrap;
+}
+.btn:active { transform:translateY(1px); }
+.btn:disabled { opacity:.5; cursor:not-allowed; }
+.primary { background:var(--blue); color:#fff; }
+.primary:hover { background:#2448cf; }
+.quiet { background:#eef2f8; color:#40516d; }
+.quiet:hover { background:#e2e8f2; }
+
+/* ---------- STATUS BAR ---------- */
+.statusbar {
+  display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  font-size:12px; color:var(--muted); margin:17px 2px;
+  word-break:break-word;
+}
+.statusbar > span { min-width:0; }
+
+/* ---------- JOB CARDS ---------- */
+.jobs {
+  display:grid; grid-template-columns:repeat(2, minmax(0,1fr));
+  gap:15px;
+}
+.card {
+  padding:19px; display:flex; flex-direction:column;
+  min-width:0; overflow-wrap:anywhere;
+}
+.card-top {
+  display:flex; justify-content:space-between;
+  align-items:flex-start; gap:12px;
+}
+.card-top > div { min-width:0; flex:1 1 auto; }
+.company {
+  font-size:12px; font-weight:700; color:var(--muted);
+  margin-bottom:7px; text-transform:uppercase; letter-spacing:.3px;
+}
+.job-title {
+  font-size:clamp(16px,2vw,19px);
+  line-height:1.35; margin:0; overflow-wrap:anywhere;
+}
+.badge {
+  font-size:10px; line-height:1.4; font-weight:800;
+  padding:7px 9px; border-radius:8px;
+  flex-shrink:0; max-width:180px;
+  text-align:center; white-space:normal;
+}
+.confirmed { color:var(--green); background:var(--greenbg); }
+.mentioned { color:var(--amber); background:var(--amberbg); }
+.negative  { color:var(--red);   background:var(--redbg); }
+.neutral   { color:#56657c;      background:#edf1f6; }
+
+.chips { display:flex; flex-wrap:wrap; gap:7px; margin:14px 0 11px; }
+.chip {
+  font-size:11px; color:#52617a; background:#f1f4f8;
+  padding:6px 8px; border-radius:7px;
+  overflow-wrap:anywhere; max-width:100%;
+}
+.evidence, .description {
+  font-size:12px; line-height:1.6; color:#53637a;
+  margin:0 0 11px; overflow-wrap:anywhere;
+}
+.evidence.match { color:var(--green); font-weight:700; }
+.description {
+  font-size:13px;
+  display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical;
+  overflow:hidden; margin-bottom:18px;
+}
+.bottom {
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; margin-top:auto;
+  padding-top:13px; border-top:1px solid #edf0f5;
+}
+.date { white-space:pre-line; font-size:11px; line-height:1.5; color:#758198; }
+.apply {
+  display:inline-flex; align-items:center; justify-content:center;
+  gap:7px; background:var(--navy); color:#fff; text-decoration:none;
+  font-size:12px; font-weight:750; padding:11px 13px;
+  border-radius:9px; white-space:nowrap;
+  transition:background .15s;
+}
+.apply:hover { background:#263d68; }
+.disabled-link { opacity:.6; cursor:not-allowed; pointer-events:none; }
+
+/* ---------- EMPTY / PAGINATION ---------- */
+.empty {
+  grid-column:1/-1; padding:38px 22px; background:#fff;
+  border:1px dashed #cbd5e1; border-radius:var(--radius);
+  text-align:center; color:var(--muted); line-height:1.7;
+}
+.empty strong { display:block; color:var(--ink); font-size:17px; margin-bottom:6px; }
+.pagination {
+  display:flex; justify-content:center; align-items:center;
+  gap:12px; padding:22px; flex-wrap:wrap;
+}
+.page-label { font-size:12px; color:var(--muted); }
+
+/* ---------- FOOTER ---------- */
+footer { padding:20px 0 35px; color:#788398; font-size:11px; line-height:1.8; }
+footer a { color:#52617a; }
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width:900px) {
+  .filters { grid-template-columns:1fr 1fr; }
+  .filters .field:first-child { grid-column:1/-1; }
+  .filter-more { grid-template-columns:1fr 1fr; }
+  .jobs { grid-template-columns:1fr; }
+}
+
+@media (max-width:640px) {
+  .wrap { width:calc(100% - 22px); }
+  .hero { padding:26px 0 60px; }
+  .top { margin-bottom:22px; }
+  .pill { display:none; }
+  h1 { letter-spacing:-.8px; }
+
+  main { margin-top:-32px; }
+
+  .stats { grid-template-columns:repeat(3, minmax(0,1fr)); gap:7px; }
+  .stat { padding:11px 9px; border-radius:12px; }
+  .stat strong { font-size:18px; }
+  .stat span { font-size:10px; }
+
+  .panel { padding:14px; }
+  .filters, .filter-more { grid-template-columns:1fr 1fr; }
+  .filters .field:first-child { grid-column:1/-1; }
+
+  .actions { align-items:stretch; flex-direction:column; }
+  .actions > div { display:flex; gap:10px; }
+  .actions .btn { flex:1; }
+
+  .card { padding:14px; }
+  .card-top { flex-direction:column-reverse; align-items:stretch; }
+  .badge { max-width:none; align-self:flex-start; }
+  .job-title { font-size:16px; }
+
+  .bottom { align-items:stretch; flex-direction:column; }
+  .apply { width:100%; }
+
+  .pagination .btn { flex:1; min-width:110px; }
+}
+
+@media (max-width:400px) {
+  .stats { grid-template-columns:1fr 1fr; }
+  .stats .stat:nth-child(3) { grid-column:1/-1; }
+  .filters, .filter-more { grid-template-columns:1fr; }
+  .card { padding:12px; }
+  .trust span { font-size:11px; padding:6px 8px; }
 }
 </style>
 </head>
 <body>
+
 <header class="hero">
   <div class="wrap">
     <div class="top">
@@ -124,9 +276,9 @@ footer a { color:#52617a }
 </header>
 
 <main class="wrap">
-  <section class="stats">
+  <section class="stats" aria-label="Summary">
     <div class="stat"><strong id="totalStat">—</strong><span>Jobs matching filters</span></div>
-    <div class="stat"><strong id="confirmedStat">—</strong><span>Jobs mentioning sponsorship</span></div>
+    <div class="stat"><strong id="confirmedStat">—</strong><span>Licensed-sponsor verified</span></div>
     <div class="stat"><strong>28 days</strong><span>Maximum listing age</span></div>
   </section>
 
@@ -135,19 +287,20 @@ footer a { color:#52617a }
     <div class="filters">
       <div class="field">
         <label for="q">Keyword search</label>
-        <input id="q" type="search" placeholder="Job title, employer or skills">
+        <input id="q" type="search" placeholder="Job title, employer or skills" autocomplete="off">
       </div>
       <div class="field">
         <label for="sponsorship">Job type</label>
         <select id="sponsorship">
-          <option value="provided">Sponsorship provided</option>
+          <option value="verified">Licensed sponsor verified</option>
+          <option value="provided">Sponsorship provided (any)</option>
           <option value="none">No sponsorship / not stated</option>
           <option value="all">All jobs</option>
         </select>
       </div>
       <div class="field">
         <label for="city">UK location</label>
-        <input id="city" type="search" placeholder="e.g. Perth, London">
+        <input id="city" type="search" placeholder="e.g. Perth, London" autocomplete="off">
       </div>
     </div>
 
@@ -183,8 +336,12 @@ footer a { color:#52617a }
         </select>
       </div>
     </div>
+
     <div class="actions">
-      <label class="check"><input id="hideOld" type="checkbox" checked> Hide jobs outside selected date range</label>
+      <label class="check">
+        <input id="hideOld" type="checkbox" checked>
+        Hide jobs outside selected date range
+      </label>
       <div>
         <button class="btn quiet" id="resetBtn" type="button">Reset</button>
         <button class="btn primary" id="searchBtn" type="button">Apply filters</button>
@@ -196,7 +353,9 @@ footer a { color:#52617a }
     <span id="status">Loading jobs…</span>
     <span id="registerStatus"></span>
   </div>
+
   <section class="jobs" id="jobs" aria-live="polite"></section>
+
   <div class="pagination" id="pagination" hidden>
     <button class="btn quiet" id="prevBtn" type="button">Previous</button>
     <span class="page-label" id="pageLabel"></span>
@@ -221,8 +380,11 @@ let allJobs = [];
 let filteredJobs = [];
 let page = 1;
 let feedLoaded = false;
+let debounceTimer = null;
 
 const $ = id => document.getElementById(id);
+
+/* ---------------- UTILITIES ---------------- */
 
 function setStatus(message) { $("status").textContent = message; }
 
@@ -262,10 +424,27 @@ function getOriginalVacancyUrl(job) {
       if ((url.protocol === "https:" || url.protocol === "http:") && url.hostname.includes(".")) {
         return url.href;
       }
-    } catch (_) { /* ignore */ }
+    } catch (_) { /* ignore invalid URLs */ }
   }
   return "";
 }
+
+function isValidJobUrl(value) {
+  try {
+    const u = new URL(value);
+    return (u.protocol === "https:" || u.protocol === "http:") && u.hostname.includes(".");
+  } catch (_) { return false; }
+}
+
+function isRecent(value, days) {
+  if (!value) return false;
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return false;
+  const age = Date.now() - d.getTime();
+  return age <= days * 86400000 && age >= -86400000;
+}
+
+/* ---------------- JOB NORMALISATION ---------------- */
 
 function normaliseJob(raw) {
   return {
@@ -286,6 +465,57 @@ function normaliseJob(raw) {
     url: getOriginalVacancyUrl(raw)
   };
 }
+
+/*
+ * True when the Apps Script backend matched the employer against the current
+ * UK licensed-sponsor register. Backend writes e.g.
+ *   "Matched: ACME LTD (check current licence and role eligibility)"
+ *   "No exact/strong register match"
+ */
+function isSponsorVerified(job) {
+  const match = String(job.sponsorRegisterMatch || "").trim().toLowerCase();
+  if (match.startsWith("matched:")) return true;
+  const status = String(job.sponsorshipStatus || "").toLowerCase();
+  return status.includes("confirmed sponsorship") || status.includes("licensed sponsor");
+}
+
+/*
+ * Buckets:
+ *   "verified"  — employer matched the gov.uk licensed-sponsor register
+ *   "provided"  — advert mentions sponsorship but employer not matched/verified
+ *   "none"      — explicit "No sponsorship" OR "Not specified"
+ */
+function sponsorshipGroup(job) {
+  const status = String(job.sponsorshipStatus || "").toLowerCase();
+  const evidence = String(job.sponsorshipEvidence || "").toLowerCase();
+
+  if (status.includes("no sponsorship")) return "none";
+  if (isSponsorVerified(job)) return "verified";
+
+  if (status.includes("mentions sponsorship") ||
+      status.includes("employer unverified")) {
+    return "provided";
+  }
+
+  if (evidence.startsWith("positive sponsorship wording")) return "provided";
+  if (evidence.startsWith("advert states sponsorship is unavailable")) return "none";
+
+  return "none";
+}
+
+/*
+ * Backend already filters for UK vacancies. Only reject if the LOCATION field
+ * is clearly non-UK. Do NOT scan the description for country names, because
+ * UK employers often mention overseas offices in their adverts.
+ */
+function isUKJob(job) {
+  const location = String(job.location || "").toLowerCase();
+  if (!location) return true;
+  const overseas = /\b(united states|usa|u\.s\.a\.|canada|australia|new zealand|india|singapore|germany|france|spain|italy|poland|portugal|netherlands|switzerland|sweden|denmark|norway|finland|japan|china|brazil|mexico|dubai|uae|emea|apac)\b/i;
+  return !overseas.test(location);
+}
+
+/* ---------------- NETWORK ---------------- */
 
 function jsonpLoad() {
   return new Promise((resolve, reject) => {
@@ -313,66 +543,6 @@ function jsonpLoad() {
   });
 }
 
-function isValidJobUrl(value) {
-  try {
-    const u = new URL(value);
-    return (u.protocol === "https:" || u.protocol === "http:") && u.hostname.includes(".");
-  } catch (_) { return false; }
-}
-
-function isRecent(value, days) {
-  if (!value) return false;
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return false;
-  const age = Date.now() - d.getTime();
-  return age <= days * 86400000 && age >= -86400000;
-}
-
-/*
- * Backend already filters for UK vacancies. We only reject a job here if the
- * LOCATION field is clearly non-UK. We do NOT scan the description for country
- * names, because UK companies often mention overseas offices in their adverts.
- */
-function isUKJob(job) {
-  const location = String(job.location || "").toLowerCase();
-  if (!location) return true; // let it through; backend already validated
-
-  const overseas = /\b(united states|usa|u\.s\.a\.|canada|australia|new zealand|india|singapore|germany|france|spain|italy|poland|portugal|netherlands|switzerland|sweden|denmark|norway|finland|japan|china|brazil|mexico|dubai|uae|emea|apac)\b/i;
-  return !overseas.test(location);
-}
-
-/*
- * Aligns with Apps Script's status values:
- *   "Confirmed sponsorship"
- *   "Licensed sponsor — unconfirmed"
- *   "Advert mentions sponsorship — employer unverified"
- *   "No sponsorship"
- *   "Not specified"
- *
- * "provided" = any positive sponsorship signal (confirmed, licensed sponsor, or advert mentions).
- * "none"     = explicit "No sponsorship" OR "Not specified".
- */
-function sponsorshipGroup(job) {
-  const status = String(job.sponsorshipStatus || "").toLowerCase();
-  const evidence = String(job.sponsorshipEvidence || "").toLowerCase();
-
-  // Explicit negative first — wins even if evidence text contains stray words.
-  if (status.includes("no sponsorship")) return "none";
-
-  if (status.includes("confirmed sponsorship") ||
-      status.includes("licensed sponsor") ||
-      status.includes("mentions sponsorship") ||
-      status.includes("employer unverified")) {
-    return "provided";
-  }
-
-  // Fallback: positive wording in stored evidence
-  if (evidence.startsWith("positive sponsorship wording")) return "provided";
-  if (evidence.startsWith("advert states sponsorship is unavailable")) return "none";
-
-  return "none";
-}
-
 async function loadJobs() {
   setStatus("Loading the latest UK vacancies…");
   try {
@@ -398,7 +568,7 @@ async function loadJobs() {
       : "Sponsor register status not supplied by feed";
 
     $("confirmedStat").textContent = allJobs
-      .filter(j => sponsorshipGroup(j) === "provided")
+      .filter(j => isSponsorVerified(j))
       .length.toLocaleString();
 
     applyFilters();
@@ -412,10 +582,12 @@ async function loadJobs() {
   }
 }
 
+/* ---------------- FILTERING ---------------- */
+
 function applyFilters() {
   const query = $("q").value.trim().toLowerCase();
   const city = $("city").value.trim().toLowerCase();
-  const selectedSponsorship = $("sponsorship").value; // "provided" | "none" | "all"
+  const selectedSponsorship = $("sponsorship").value; // verified | provided | none | all
   const workplace = $("workplace").value;
   const source = $("source").value;
   const days = Number($("posted").value) || MAX_AGE_DAYS;
@@ -427,7 +599,17 @@ function applyFilters() {
 
     if (query && !searchable.includes(query)) return false;
     if (city && !String(job.location || "").toLowerCase().includes(city)) return false;
-    if (selectedSponsorship !== "all" && sponsorshipGroup(job) !== selectedSponsorship) return false;
+
+    if (selectedSponsorship !== "all") {
+      const group = sponsorshipGroup(job);
+      if (selectedSponsorship === "provided") {
+        // "Any sponsorship" includes verified + mentioned.
+        if (group !== "provided" && group !== "verified") return false;
+      } else if (group !== selectedSponsorship) {
+        return false;
+      }
+    }
+
     if (workplace !== "all" && job.workplaceType !== workplace) return false;
     if (source !== "all" && job.source.toLowerCase() !== source.toLowerCase()) return false;
     if (hideOld && !isRecent(job.date, days)) return false;
@@ -438,19 +620,19 @@ function applyFilters() {
   renderJobs();
 }
 
+/* ---------------- RENDERING ---------------- */
+
 function badgeClass(job) {
-  const group = sponsorshipGroup(job);
-  const status = String(job.sponsorshipStatus).toLowerCase();
-  if (group === "provided") {
-    return status.includes("confirmed") || status.includes("licensed sponsor")
-      ? "confirmed" : "mentioned";
-  }
+  const status = String(job.sponsorshipStatus || "").toLowerCase();
+  if (isSponsorVerified(job)) return "confirmed";
+  if (sponsorshipGroup(job) === "provided") return "mentioned";
   if (status.includes("no sponsorship")) return "negative";
   return "neutral";
 }
 
 function displayStatus(job) {
   const status = String(job.sponsorshipStatus || "").trim();
+  if (isSponsorVerified(job)) return "Licensed sponsor ✓";
   if (sponsorshipGroup(job) === "provided") return status || "Advert mentions sponsorship";
   if (status.toLowerCase().includes("no sponsorship")) return "No sponsorship stated";
   return "Not specified — general jobs";
@@ -464,7 +646,6 @@ function createJobCard(job) {
   top.className = "card-top";
 
   const titleBox = document.createElement("div");
-  titleBox.style.minWidth = "0";
 
   const company = document.createElement("div");
   company.className = "company";
@@ -479,6 +660,7 @@ function createJobCard(job) {
   const badge = document.createElement("span");
   badge.className = "badge " + badgeClass(job);
   badge.textContent = displayStatus(job);
+
   top.append(titleBox, badge);
 
   const chips = document.createElement("div");
@@ -493,6 +675,13 @@ function createJobCard(job) {
   const evidence = document.createElement("p");
   evidence.className = "evidence";
   evidence.textContent = job.sponsorshipEvidence;
+
+  if (job.sponsorRegisterMatch) {
+    const matchLine = document.createElement("p");
+    matchLine.className = "evidence" + (isSponsorVerified(job) ? " match" : "");
+    matchLine.textContent = job.sponsorRegisterMatch;
+    evidence.insertAdjacentElement("afterend", matchLine);
+  }
 
   const description = document.createElement("p");
   description.className = "description";
@@ -527,6 +716,12 @@ function createJobCard(job) {
 
   bottom.append(date, apply);
   card.append(top, chips, evidence, description, bottom);
+
+  // Move the match line into the right DOM order
+  if (card.querySelector(".evidence.match")) {
+    // Already inserted after evidence; nothing more to do.
+  }
+
   return card;
 }
 
@@ -537,10 +732,11 @@ function renderJobs() {
   if (!filteredJobs.length) {
     const empty = document.createElement("div");
     empty.className = "empty";
+
     const strong = document.createElement("strong");
     strong.textContent = feedLoaded ? "No vacancies match these filters" : "Job feed unavailable";
-    const detail = document.createElement("div");
 
+    const detail = document.createElement("div");
     if (!feedLoaded) {
       detail.textContent = "Check your Apps Script deployment, Jobs sheet and RunLog.";
     } else if ($("city").value.trim()) {
@@ -570,14 +766,14 @@ function renderJobs() {
   $("nextBtn").disabled = page >= pageCount;
 }
 
-/* Wire up events */
-$("searchBtn").addEventListener("click", applyFilters);
+/* ---------------- EVENTS ---------------- */
 
-let debounceTimer;
 function debouncedApply() {
   clearTimeout(debounceTimer);
   debounceTimer = setTimeout(applyFilters, 180);
 }
+
+$("searchBtn").addEventListener("click", applyFilters);
 $("q").addEventListener("input", debouncedApply);
 $("city").addEventListener("input", debouncedApply);
 
@@ -588,7 +784,7 @@ $("city").addEventListener("input", debouncedApply);
 $("resetBtn").addEventListener("click", () => {
   $("q").value = "";
   $("city").value = "";
-  $("sponsorship").value = "provided";
+  $("sponsorship").value = "verified";
   $("workplace").value = "all";
   $("posted").value = "28";
   $("source").value = "all";
@@ -600,7 +796,7 @@ $("prevBtn").addEventListener("click", () => {
   if (page > 1) {
     page--;
     renderJobs();
-    window.scrollTo({top:$("jobs").getBoundingClientRect().top + window.scrollY - 20, behavior:"smooth"});
+    window.scrollTo({ top: $("jobs").getBoundingClientRect().top + window.scrollY - 20, behavior:"smooth" });
   }
 });
 
@@ -608,10 +804,11 @@ $("nextBtn").addEventListener("click", () => {
   if (page < Math.ceil(filteredJobs.length / PAGE_SIZE)) {
     page++;
     renderJobs();
-    window.scrollTo({top:$("jobs").getBoundingClientRect().top + window.scrollY - 20, behavior:"smooth"});
+    window.scrollTo({ top: $("jobs").getBoundingClientRect().top + window.scrollY - 20, behavior:"smooth" });
   }
 });
 
+/* ---------------- BOOT ---------------- */
 loadJobs();
 </script>
 </body>
