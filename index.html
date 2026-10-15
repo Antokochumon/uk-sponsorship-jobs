@@ -126,36 +126,7 @@ function createJobCard(j){
  const evidence=document.createElement('p');evidence.className='evidence';evidence.textContent=j.sponsorshipEvidence||'No explicit sponsorship wording found in the collected advert.';
  const desc=document.createElement('p');desc.className='desc';desc.textContent=(j.description||'No description was provided by the source.').slice(0,600)+((j.description||'').length>600?'…':'');
  const bottom=document.createElement('div');bottom.className='card-bottom';const date=document.createElement('div');date.className='date';const d=j.date?new Date(j.date):null;date.textContent=(d&&!isNaN(d)?'Source date: '+d.toLocaleDateString():'Date unavailable')+(j.dateType?'\n'+j.dateType:'');date.style.whiteSpace='pre-line';
-
-const link = document.createElement('a');
-link.className = 'apply';
-link.textContent = 'View original vacancy ↗';
-
-const originalUrl = String(j.url || '').trim();
-
-try {
-  const parsedUrl = new URL(originalUrl);
-
-  if (
-    ['https:', 'http:'].includes(parsedUrl.protocol) &&
-    parsedUrl.hostname.includes('.')
-  ) {
-    link.href = parsedUrl.href;
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-  } else {
-    link.removeAttribute('href');
-    link.textContent = 'Original vacancy link unavailable';
-    link.style.opacity = '0.6';
-    link.style.cursor = 'not-allowed';
-  }
-} catch {
-  link.removeAttribute('href');
-  link.textContent = 'Original vacancy link unavailable';
-  link.style.opacity = '0.6';
-  link.style.cursor = 'not-allowed';
-}
-
+ const link=document.createElement('a');link.className='apply';link.href=j.url||'#';link.target='_blank';link.rel='noopener noreferrer';link.textContent='View original vacancy ↗';if(!/^https?:\/\//i.test(link.href))link.removeAttribute('href');
  bottom.append(date,link);card.append(top,chips,evidence,desc,bottom);return card;
 }
 function renderJobs(){
