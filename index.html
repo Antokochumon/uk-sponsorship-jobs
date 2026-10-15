@@ -1,0 +1,267 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Find recent UK job vacancies with visa sponsorship evidence and direct employer application links.">
+  <title>UK Visa Sponsorship Jobs</title>
+  <style>
+    :root {
+      font-family: Inter, system-ui, -apple-system, Segoe UI, sans-serif;
+      color: #172033;
+      background: #f5f7fb;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    header {
+      background: #102c50;
+      color: white;
+      padding: 34px 20px;
+    }
+    .wrap { width: min(1100px, 100% - 32px); margin: auto; }
+    header h1 { margin: 0 0 10px; font-size: clamp(27px, 4vw, 40px); }
+    header p { margin: 0; color: #dce8f6; line-height: 1.6; }
+    .summary {
+      display: flex; flex-wrap: wrap; gap: 12px;
+      margin: 22px 0;
+    }
+    .metric, .filters, .job {
+      background: white; border: 1px solid #e0e6ef;
+      border-radius: 14px;
+    }
+    .metric { padding: 15px 18px; flex: 1; min-width: 180px; }
+    .metric strong { display: block; font-size: 24px; }
+    .metric span { color: #637087; font-size: 13px; }
+    .filters {
+      padding: 16px; display: grid;
+      grid-template-columns: 1fr 200px; gap: 12px;
+    }
+    input, select {
+      width: 100%; min-width: 0; padding: 12px;
+      border: 1px solid #cbd5e1; border-radius: 9px;
+      font: inherit; background: white;
+    }
+    .status { color: #526078; font-size: 14px; margin: 16px 0; }
+    .jobs { display: grid; gap: 14px; margin-bottom: 35px; }
+    .job { padding: 20px; }
+    .job h2 { font-size: 19px; margin: 0 0 8px; }
+    .employer { color: #4a5d77; font-weight: 650; margin-bottom: 10px; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+    .tag {
+      background: #edf3fb; color: #23486f; padding: 5px 9px;
+      border-radius: 7px; font-size: 12px;
+    }
+    .evidence { color: #24613d; font-size: 13px; line-height: 1.5; }
+    .description {
+      color: #5d687a; font-size: 14px; line-height: 1.6;
+      margin: 10px 0 15px;
+    }
+    .apply {
+      display: inline-block; padding: 11px 15px;
+      border-radius: 9px; background: #1559a6; color: white;
+      text-decoration: none; font-weight: 650;
+    }
+    .apply:hover { background: #0d427e; }
+    .empty {
+      background: white; border: 1px dashed #cbd5e1;
+      padding: 30px; border-radius: 14px; color: #526078;
+      line-height: 1.6;
+    }
+    footer { color: #667085; padding: 10px 0 30px; font-size: 12px; }
+    @media (max-width: 620px) {
+      .filters { grid-template-columns: 1fr; }
+      .job { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>UK Visa Sponsorship Jobs</h1>
+      <p>Recent UK vacancies with explicit visa-sponsorship wording.
+         Apply directly through the employer's website.</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="summary">
+      <div class="metric">
+        <strong id="total">—</strong>
+        <span>Matching vacancies</span>
+      </div>
+      <div class="metric">
+        <strong>28 days</strong>
+        <span>Maximum source-date age</span>
+      </div>
+      <div class="metric">
+        <strong>Free</strong>
+        <span>Public data sources</span>
+      </div>
+    </section>
+
+    <section class="filters">
+      <input id="search" type="search"
+        placeholder="Search title, employer or location…"
+        aria-label="Search jobs">
+      <select id="location" aria-label="Filter by location">
+        <option value="">All UK locations</option>
+      </select>
+    </section>
+
+    <p class="status" id="status" role="status">Connecting to live job data…</p>
+    <section id="jobs" class="jobs" aria-live="polite"></section>
+
+    <footer>
+      Job details are sourced from public employer job boards.
+      Sponsorship wording is evidence from the advert, not a guarantee
+      of visa approval. Check the employer's original listing before applying.
+      Source dates may represent an update date rather than the original
+      publication date.
+    </footer>
+  </main>
+
+  <script>
+    // Replace this with your deployed Google Apps Script web app URL.
+    const API_URL = "https://script.google.com/macros/s/AKfycby4z6jIADjcy5H9n0RQZUGjh-6K0arvczvdrCB-0zUyS6kuIT4DCSGkxIB94gxsvqNG/exec";
+
+    let allJobs = [];
+
+    function loadJobs() {
+      if (API_URL.includes("PASTE_YOUR_WEB_APP_URL_HERE")) {
+        document.getElementById("status").textContent =
+          "Setup needed: paste your deployed Apps Script URL into index.html.";
+        return;
+      }
+
+      document.getElementById("status").textContent =
+        "Loading current vacancies…";
+
+      // JSONP lets this page request data from Apps Script without fetch/CORS.
+      window.receiveSponsorshipJobs = function(data) {
+        if (!data || !Array.isArray(data.jobs)) {
+          document.getElementById("status").textContent =
+            "The data endpoint returned an unexpected response.";
+          return;
+        }
+
+        allJobs = data.jobs;
+        populateLocations();
+        renderJobs();
+
+        const refreshed = data.refreshedAt
+          ? new Date(data.refreshedAt).toLocaleString()
+          : "unknown time";
+
+        document.getElementById("status").textContent =
+          "Data loaded: " + refreshed +
+          ". Only qualifying jobs saved by the collector are displayed.";
+      };
+
+      const script = document.createElement("script");
+      script.src = API_URL + "?callback=receiveSponsorshipJobs&_=" +
+        Date.now();
+      script.onerror = function() {
+        document.getElementById("status").textContent =
+          "Could not load job data. Check your Apps Script deployment URL and access settings.";
+      };
+      document.body.appendChild(script);
+    }
+
+    function populateLocations() {
+      const select = document.getElementById("location");
+      const previous = select.value;
+      select.replaceChildren(new Option("All UK locations", ""));
+
+      const locations = [...new Set(allJobs
+        .map(job => job.location)
+        .filter(Boolean))].sort();
+
+      locations.forEach(location => {
+        select.add(new Option(location, location));
+      });
+
+      if (locations.includes(previous)) select.value = previous;
+    }
+
+    function renderJobs() {
+      const query = document.getElementById("search").value
+        .trim().toLowerCase();
+      const selectedLocation = document.getElementById("location").value;
+
+      const filtered = allJobs.filter(job => {
+        const text = [
+          job.title, job.employer, job.location, job.description
+        ].join(" ").toLowerCase();
+
+        return text.includes(query) &&
+          (!selectedLocation || job.location === selectedLocation);
+      });
+
+      document.getElementById("total").textContent = filtered.length;
+
+      const container = document.getElementById("jobs");
+      container.replaceChildren();
+
+      if (!filtered.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent =
+          allJobs.length
+            ? "No jobs match your search. Try another title or location."
+            : "No vacancies currently pass all filters. Add more public employer boards in your Sources sheet, then run refreshJobs in Apps Script. The site will not invent jobs or treat a sponsor licence alone as proof of sponsorship.";
+        container.appendChild(empty);
+        return;
+      }
+
+      filtered.forEach(job => {
+        const card = document.createElement("article");
+        card.className = "job";
+
+        const title = document.createElement("h2");
+        title.textContent = job.title;
+
+        const employer = document.createElement("div");
+        employer.className = "employer";
+        employer.textContent = job.employer;
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+        [job.location, job.source,
+         job.date ? "Source date: " +
+           new Date(job.date).toLocaleDateString() : ""]
+          .filter(Boolean).forEach(value => {
+            const tag = document.createElement("span");
+            tag.className = "tag";
+            tag.textContent = value;
+            meta.appendChild(tag);
+          });
+
+        const evidence = document.createElement("p");
+        evidence.className = "evidence";
+        evidence.textContent = job.sponsorshipEvidence || "";
+
+        const description = document.createElement("p");
+        description.className = "description";
+        description.textContent = (job.description || "").slice(0, 320) +
+          ((job.description || "").length > 320 ? "…" : "");
+
+        const link = document.createElement("a");
+        link.className = "apply";
+        link.textContent = "View original vacancy";
+        link.href = job.url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+
+        card.append(title, employer, meta, evidence, description, link);
+        container.appendChild(card);
+      });
+    }
+
+    document.getElementById("search").addEventListener("input", renderJobs);
+    document.getElementById("location").addEventListener("change", renderJobs);
+
+    loadJobs();
+  </script>
+</body>
+</html>
