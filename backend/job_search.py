@@ -39,6 +39,7 @@ ROLE_EXPANSIONS = {
 SPONSOR_CACHE_SECONDS = 24 * 60 * 60
 _sponsor_cache: tuple[float, set[str], str, int] | None = None
 _sponsor_lock = threading.Lock()
+_sponsor_refreshing = False
 
 
 def correct_query(query: str) -> str:
@@ -211,33 +212,51 @@ def _sponsor_feed_url() -> str:
             or os.getenv("APP_SCRIPT_READ_URL", "").strip())
 
 
-def _load_sponsor_register() -> tuple[set[str], str, int, str]:
-    global _sponsor_cache
-    now = time.monotonic()
-    with _sponsor_lock:
-        if _sponsor_cache and now - _sponsor_cache[0] < SPONSOR_CACHE_SECONDS:
-            return _sponsor_cache[1], _sponsor_cache[2], _sponsor_cache[3], ""
+def _refresh_sponsor_register() -> None:
+    """Refresh the sponsor cache without blocking a live job search."""
+    global _sponsor_cache, _sponsor_refreshing
+    try:
         feed_url = _sponsor_feed_url()
         if not feed_url:
-            return set(), "", 0, "Google Sheets sponsor feed is not configured"
-        try:
-            response = requests.get(feed_url, params={"action": "sponsors", "_": int(time.time() * 1000)},
-                                    headers={"Accept": "application/json"}, timeout=(5, 30))
-            response.raise_for_status()
-            payload = response.json()
-            companies = payload.get("companies") if isinstance(payload, dict) else None
-            if not isinstance(companies, list):
-                raise ValueError("Google Sheets sponsor feed did not contain a companies array")
-            names = {
-                _employer_key(str(row.get("employerName")))
-                for row in companies
-                if isinstance(row, dict) and row.get("employerName")
-            }
-            names.discard("")
+            return
+        response = requests.get(feed_url, params={"action": "sponsors", "_": int(time.time() * 1000)},
+                                headers={"Accept": "application/json"}, timeout=(5, 30))
+        response.raise_for_status()
+        payload = response.json()
+        companies = payload.get("companies") if isinstance(payload, dict) else None
+        if not isinstance(companies, list):
+            raise ValueError("Google Sheets sponsor feed did not contain a companies array")
+        names = {
+            _employer_key(str(row.get("employerName")))
+            for row in companies
+            if isinstance(row, dict) and row.get("employerName")
+        }
+        names.discard("")
+        with _sponsor_lock:
             _sponsor_cache = (time.monotonic(), names, "Google Sheets Sponsors tab", len(names))
-            return names, "Google Sheets Sponsors tab", len(names), ""
-        except (requests.RequestException, ValueError) as exc:
-            return set(), "", 0, f"Google Sheets sponsor feed unavailable ({type(exc).__name__})"
+    except (requests.RequestException, ValueError):
+        # Keep the last successful cache when the background refresh fails.
+        pass
+    finally:
+        with _sponsor_lock:
+            _sponsor_refreshing = False
+
+
+def _load_sponsor_register() -> tuple[set[str], str, int, str]:
+    """Return cached sponsor data and schedule refreshes without network I/O."""
+    global _sponsor_refreshing
+    now = time.monotonic()
+    with _sponsor_lock:
+        cached = _sponsor_cache
+        cache_fresh = cached and now - cached[0] < SPONSOR_CACHE_SECONDS
+        if not cache_fresh and not _sponsor_refreshing and _sponsor_feed_url():
+            _sponsor_refreshing = True
+            threading.Thread(target=_refresh_sponsor_register, name="sponsor-refresh", daemon=True).start()
+        if cached:
+            return cached[1], cached[2], cached[3], ""
+        if not _sponsor_feed_url():
+            return set(), "", 0, "Google Sheets sponsor feed is not configured"
+        return set(), "", 0, "Google Sheets sponsor feed temporarily unavailable"
 
 
 def annotate_sponsorship(job: dict[str, Any], sponsor_names: set[str]) -> dict[str, Any]:
