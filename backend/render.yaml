@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: uk-sponsorship-jobs-api
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT app:app
+    healthCheckPath: /api/status
+    envVars:
+      - key: APPS_SCRIPT_URL
+        sync: false
+      - key: JOBSPY_IMPORT_TOKEN
+        sync: false
+      - key: ADMIN_USERNAME
+        sync: false
+      - key: ADMIN_PASSWORD_HASH
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: SESSION_COOKIE_SECURE
+        value: "1"

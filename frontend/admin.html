@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Job collection admin</title>
+  <style>
+    body{font:15px system-ui,sans-serif;max-width:760px;margin:40px auto;padding:0 20px;color:#172421;background:#f5f7f5}
+    section{background:#fff;border:1px solid #d3ded6;border-radius:8px;padding:20px;margin:16px 0} label{display:block;margin:10px 0 5px}
+    input,select,button{font:inherit;padding:9px;border:1px solid #aebeb3;border-radius:5px} input,select{width:100%;box-sizing:border-box}
+    button{cursor:pointer;background:#172421;color:#fff;margin:12px 8px 0 0}.danger{background:#8a3025}.hidden{display:none}
+    pre{white-space:pre-wrap;background:#172421;color:#eaf3ed;padding:12px;border-radius:5px;min-height:100px}
+    .ok{color:#176b43}.error{color:#9b2d21}
+  </style>
+</head>
+<body>
+  <h1>Job collection admin</h1>
+  <p>Collection and Google Sheets import are authenticated backend operations. This page contains no credentials or import tokens.</p>
+  <section id="loginPanel"><h2>Sign in</h2><form id="loginForm">
+    <label for="username">Username</label><input id="username" autocomplete="username" required>
+    <label for="password">Password</label><input id="password" type="password" autocomplete="current-password" required>
+    <button>Sign in</button><p id="loginMessage" role="alert"></p>
+  </form></section>
+  <main id="adminPanel" class="hidden">
+    <section><h2>Dashboard</h2><div id="stats">Loading statistics…</div><p id="maintenanceMessage" role="status"></p></section>
+    <section><button id="collect">Job Add</button><button id="logout" class="danger">Sign out</button>
+      <label for="maximum">Maximum jobs to collect</label><input id="maximum" type="number" min="1" max="500" value="50">
+      <p id="runStatus">Idle</p><pre id="logs">No run yet.</pre></section>
+    <section><h2>Automatic collection</h2><label for="schedule">Run every</label>
+      <select id="schedule"><option value="">Off</option><option>1</option><option>3</option><option>6</option><option>12</option><option>24</option></select> hours
+      <button id="saveSchedule">Save schedule</button><p id="nextRun"></p>
+      <small>For cloud hosting, use the host’s persistent worker/cron facility as well; this in-process scheduler runs while the backend process is alive.</small>
+    </section>
+    <section><h2>Licensed sponsor register</h2><button id="refreshSponsors">Refresh Licensed Sponsor Register</button><p id="registerRefresh"></p></section>
+    <section><h2>Job deletion</h2><p>Delete one job by its exact sheet ID, or delete all job records while preserving the Jobs header row.</p><label for="deleteId">Job ID</label><input id="deleteId"><button id="deleteOne" class="danger">Delete selected job</button><button id="deleteAll" class="danger">Delete all jobs</button></section>
+  </main>
+  <script src="frontend-config.js"></script>
+  <script>
+    "use strict";
+    const base = String(window.JOBAPI_BACKEND_URL || "").replace(/\/$/, "");
+    const api = path => `${base}${path}`;
+    const $ = id => document.getElementById(id);
+    let poll, csrfToken = "";
+    async function call(path, options={}) { if (!base) throw new Error("The backend URL is not configured for this deployment."); const headers = new Headers(options.headers || {}); if (csrfToken && options.method && options.method !== "GET") headers.set("X-CSRF-Token", csrfToken); const response = await fetch(api(path), {credentials:"include", ...options, headers, signal: AbortSignal.timeout(20000)}); const data = await response.json().catch(() => ({})); if (!response.ok) throw new Error(data.error || `Request failed (${response.status}).`); return data; }
+    function showAdmin() { $("loginPanel").classList.add("hidden"); $("adminPanel").classList.remove("hidden"); refresh(); loadStats(); }
+    async function refresh() { try { const data = await call("/api/admin/status"); const run=data.collection; $("runStatus").textContent=`${run.phase} · ${run.running ? "running" : "stopped"}`; $("logs").textContent=(run.logs||[]).join("\n") || "No run yet."; $("nextRun").textContent=data.schedule.nextRun ? `Next run: ${new Date(data.schedule.nextRun*1000).toLocaleString()}` : "Automatic collection is off."; if (data.schedule.hours) $("schedule").value=String(data.schedule.hours); if (run.running) poll=setTimeout(refresh,1500); } catch (error) { $("runStatus").textContent=error.message; } }
+    $("loginForm").addEventListener("submit", async event => { event.preventDefault(); try { const data = await call("/api/admin/login", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:$("username").value,password:$("password").value})}); csrfToken = data.csrfToken || ""; showAdmin(); } catch(error) { $("loginMessage").textContent=error.message; $("loginMessage").className="error"; } });
+    $("collect").addEventListener("click", async () => { try { await call("/api/admin/collect", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({maxJobs:$("maximum").value})}); $("runStatus").textContent="started"; refresh(); } catch(error) { $("runStatus").textContent=error.message; } });
+    $("saveSchedule").addEventListener("click", async () => { try { await call("/api/admin/schedule", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({hours:$("schedule").value || null})}); refresh(); } catch(error) { $("nextRun").textContent=error.message; } });
+    async function loadStats() { try { const data = await call("/api/admin/stats"); const s = data.stats || {}; $("stats").textContent = "Stored jobs: " + (s.storedJobs ?? 0) + " · Last 28 days: " + (s.recentJobs ?? 0) + " · Licensed employers: " + (s.licensedSponsorJobs ?? 0) + " · Advert evidence: " + (s.advertEvidenceJobs ?? 0) + " · Both requirements: " + (s.verifiedJobs ?? 0) + " · Unavailable: " + (s.unavailableJobs ?? 0) + " · Licensed companies: " + (s.licensedSponsors ?? 0); } catch (error) { $("stats").textContent = error.message; } }
+    $("refreshSponsors").addEventListener("click", async () => { try { $("registerRefresh").textContent="Refreshing…"; const data=await call("/api/admin/refresh-sponsors",{method:"POST"}); $("registerRefresh").textContent="Updated " + (data.count ?? 0) + " companies."; loadStats(); } catch(error) { $("registerRefresh").textContent=error.message; } });
+    $("deleteOne").addEventListener("click", async () => { const id=$("deleteId").value.trim(); if (!id || !confirm("Delete this exact job?")) return; try { const data=await call("/api/admin/delete",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"one",id})}); $("maintenanceMessage").textContent="Removed " + (data.removed ?? 0) + " job."; loadStats(); } catch(error) { $("maintenanceMessage").textContent=error.message; } });
+    $("deleteAll").addEventListener("click", async () => { if (!confirm("Delete every job record from the Jobs sheet? Sources, Sponsors and RunLog will be preserved.")) return; try { const data=await call("/api/admin/delete",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"all",confirm:true})}); $("maintenanceMessage").textContent="Removed " + (data.removed ?? 0) + " jobs."; loadStats(); } catch(error) { $("maintenanceMessage").textContent=error.message; } });
+    $("logout").addEventListener("click", async () => { await call("/api/admin/logout", {method:"POST"}); location.reload(); });
+    call("/api/admin/status").then(data => { csrfToken = data.csrfToken || ""; showAdmin(); }).catch(() => {});
+  </script>
+</body>
+</html>

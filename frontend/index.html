@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#172421">
+  <meta name="description" content="Search current UK vacancies with sponsorship evidence and original application links.">
+  <title>UK Job Finder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172421;
+      --muted: #687873;
+      --line: #dce5df;
+      --paper: #f4f7f3;
+      --white: #fff;
+      --forest: #1d4940;
+      --mint: #d9eee3;
+      --lime: #c5e86c;
+      --amber: #f0b950;
+      --red: #ad5146;
+      --shadow: 0 12px 30px #213a2b0d;
+      font-family: "DM Sans", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      background:
+        linear-gradient(90deg, #e8efe9 1px, transparent 1px) 0 0 / 42px 42px,
+        linear-gradient(#e8efe9 1px, transparent 1px) 0 0 / 42px 42px,
+        var(--paper);
+    }
+    button, input, select { font: inherit; }
+    button, a, input, select { -webkit-tap-highlight-color: transparent; }
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid #4c8f72; outline-offset: 2px; }
+    .shell { width: min(1240px, calc(100% - 36px)); margin: 0 auto; }
+    .masthead { padding: 23px 0; color: #fff; background: var(--ink); border-bottom: 4px solid var(--lime); }
+    .masthead-inner { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 700; }
+    .brand-mark { display: grid; place-items: center; width: 37px; height: 37px; color: var(--ink); background: var(--lime); border-radius: 9px; font-size: 18px; }
+    .brand-name { font-size: 15px; }
+    .brand-note { margin-top: 2px; color: #b9c8bf; font-size: 11px; font-weight: 500; }
+    .mast-actions { display: flex; align-items: center; gap: 9px; }
+    .button { min-height: 40px; padding: 9px 13px; border: 1px solid transparent; border-radius: 6px; color: var(--ink); background: var(--white); font-size: 12px; font-weight: 700; cursor: pointer; }
+    .button:hover { background: #e8f1e8; }
+    .button:disabled { opacity: .55; cursor: wait; }
+    .button-outline { border-color: #60766b; color: #f5faf5; background: transparent; }
+    .button-outline:hover { color: var(--ink); background: var(--lime); }
+    .intro { display: flex; justify-content: space-between; align-items: end; gap: 24px; padding: 34px 0 25px; }
+    h1 { max-width: 650px; margin: 0; font-family: Newsreader, Georgia, serif; font-size: 38px; line-height: 1.08; font-weight: 500; }
+    .intro p { max-width: 520px; margin: 11px 0 0; color: #566760; font-size: 13px; line-height: 1.65; }
+    .freshness { flex: 0 0 auto; padding: 9px 12px; border: 1px solid #cbd8cf; border-radius: 6px; color: var(--forest); background: #edf5ee; font-size: 11px; font-weight: 700; }
+    main { padding-bottom: 36px; }
+    .summary { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 11px; margin-bottom: 14px; }
+    .metric { min-height: 82px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 7px; background: var(--white); box-shadow: var(--shadow); }
+    .metric strong { display: block; font-size: 23px; line-height: 1.1; }
+    .metric span { display: block; margin-top: 5px; color: var(--muted); font-size: 11px; }
+    .filters { padding: 17px; border: 1px solid var(--line); border-radius: 7px; background: var(--white); box-shadow: var(--shadow); }
+    .filters-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 13px; }
+    .filters h2 { margin: 0; font-size: 14px; }
+    .filter-grid { display: grid; grid-template-columns: 2fr repeat(3, minmax(130px, 1fr)); gap: 11px; }
+    .filter-grid.secondary { grid-template-columns: repeat(5, minmax(120px, 1fr)); margin-top: 11px; }
+    .field { min-width: 0; }
+    .field label { display: block; margin-bottom: 5px; color: #53645b; font-size: 10px; font-weight: 700; }
+    .field input, .field select { width: 100%; height: 39px; padding: 0 10px; border: 1px solid #d3ded6; border-radius: 5px; color: var(--ink); background: #fff; font-size: 12px; }
+    .filter-actions { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 13px; }
+    .check { display: inline-flex; align-items: center; gap: 7px; color: #52645b; font-size: 11px; }
+    .check input { width: 15px; height: 15px; accent-color: var(--forest); }
+    .action-group { display: flex; flex-wrap: wrap; gap: 8px; }
+    .action-group .button { border-color: #d6e0d8; background: #f3f7f2; }
+    .action-group .button:hover { background: var(--mint); }
+    .status { min-height: 35px; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 11px 2px; color: #52645b; font-size: 11px; }
+    .status.error { color: #983e35; }
+    .status strong { color: var(--ink); }
+    .notice { display: none; margin: 0 0 13px; padding: 11px 13px; border: 1px solid #e9d19a; border-left: 4px solid var(--amber); border-radius: 5px; color: #674d1c; background: #fff8e8; font-size: 11px; line-height: 1.55; }
+    .notice.visible { display: block; }
+    .job-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .job-card { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 7px; background: var(--white); box-shadow: var(--shadow); animation: appear .28s ease both; }
+    @keyframes appear { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    .job-head { display: flex; justify-content: space-between; align-items: start; gap: 10px; }
+    .company { margin-bottom: 5px; color: #607168; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+    .job-title { margin: 0; font-size: 16px; line-height: 1.3; overflow-wrap: anywhere; }
+    .badge { flex: 0 0 auto; max-width: 175px; padding: 6px 8px; border-radius: 4px; color: #46564e; background: #edf2ee; font-size: 9px; font-weight: 700; text-align: center; }
+    .badge.verified { color: #16543a; background: #def2e5; }
+    .badge.mentioned { color: #795819; background: #fff0c8; }
+    .badge.negative { color: #873c34; background: #fae5e2; }
+    .badge.pending { color: #4b5c52; background: #e9eeeb; }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
+    .tag { max-width: 100%; padding: 5px 7px; border-radius: 4px; color: #53635b; background: #f0f4f0; font-size: 10px; overflow-wrap: anywhere; }
+    .evidence, .description { margin: 0 0 9px; color: #566760; font-size: 11px; line-height: 1.55; overflow-wrap: anywhere; }
+    .description { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+    .match { color: #246340; font-weight: 700; }
+    .job-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 12px; padding-top: 10px; border-top: 1px solid #e9efea; }
+    .date { color: #728078; font-size: 10px; line-height: 1.4; white-space: pre-line; }
+    .apply { flex: 0 0 auto; padding: 9px 11px; border-radius: 5px; color: #fff; background: var(--forest); font-size: 10px; font-weight: 700; text-decoration: none; }
+    .apply:hover { background: #286552; }
+    .apply.disabled { opacity: .5; pointer-events: none; }
+    .empty { grid-column: 1 / -1; padding: 33px 20px; border: 1px dashed #c2d0c5; border-radius: 7px; color: #627269; background: #fbfdfb; text-align: center; font-size: 12px; line-height: 1.6; }
+    .empty strong { display: block; margin-bottom: 5px; color: var(--ink); font-size: 15px; }
+    .pagination { display: flex; justify-content: center; align-items: center; gap: 11px; padding: 17px 0; }
+    .pagination[hidden] { display: none; }
+    .page-label { color: var(--muted); font-size: 11px; }
+    footer { padding: 18px 0 30px; color: #67756d; font-size: 10px; line-height: 1.7; }
+    footer strong { color: var(--ink); }
+    @media (max-width: 900px) {
+      .filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .filter-grid.secondary { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .job-list { grid-template-columns: 1fr; }
+      .intro { align-items: start; }
+    }
+    @media (max-width: 600px) {
+      .shell { width: calc(100% - 22px); }
+      .masthead { padding: 14px 0; }
+      .masthead-inner { align-items: start; flex-direction: column; gap: 12px; }
+      .mast-actions { width: 100%; }
+      .mast-actions .button { flex: 1; }
+      .intro { display: block; padding: 25px 0 18px; }
+      h1 { font-size: 32px; }
+      .freshness { display: inline-block; margin-top: 13px; }
+      .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+      .metric { min-height: 72px; padding: 11px 9px; }
+      .metric strong { font-size: 19px; }
+      .metric span { font-size: 9px; }
+      .filters { padding: 12px; }
+      .filter-grid, .filter-grid.secondary { grid-template-columns: 1fr 1fr; gap: 9px; }
+      .filter-grid .field:first-child { grid-column: 1 / -1; }
+      .filter-actions { align-items: stretch; flex-direction: column; }
+      .action-group { display: grid; grid-template-columns: 1fr 1fr; }
+      .action-group .button { width: 100%; }
+      .status { align-items: start; flex-direction: column; justify-content: center; padding: 4px 0; }
+      .job-card { padding: 13px; }
+      .job-head { flex-direction: column-reverse; align-items: start; }
+      .badge { max-width: 100%; }
+      .job-foot { align-items: stretch; flex-direction: column; }
+      .apply { text-align: center; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="masthead">
+    <div class="shell masthead-inner">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">J</div>
+        <div><div class="brand-name">UK Job Finder</div><div class="brand-note">Recent vacancies · original application links</div></div>
+      </div>
+      <div class="mast-actions"><a class="button button-outline" href="licensed-sponsors.html">Licensed Sponsor Companies</a></div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="intro">
+      <div>
+        <h1>Find the next role.<br>Check the evidence.</h1>
+        <p>Search current UK vacancies from public job sources. Sponsorship claims are checked against advert wording and the official sponsor register.</p>
+      </div>
+      <div class="freshness" id="feedStamp">Connecting to the live feed</div>
+    </section>
+
+    <section class="summary" aria-label="Job summary">
+      <div class="metric"><strong id="totalStat">—</strong><span>Listings matching filters</span></div>
+      <div class="metric"><strong id="verifiedStat">—</strong><span>Verified register match and advert evidence</span></div>
+      <div class="metric"><strong id="sourceStat">2</strong><span>Live job sources</span></div>
+      <div class="metric"><strong id="licensedStat">—</strong><span>Licensed sponsor employers</span></div>
+      <div class="metric"><strong id="evidenceStat">—</strong><span>Advert evidence</span></div>
+      <div class="metric"><strong id="sponsorCountStat">—</strong><span>Licensed sponsor companies</span></div>
+    </section>
+
+    <section class="filters" aria-labelledby="filterTitle">
+      <div class="filters-top"><h2 id="filterTitle">Search and refine</h2><button class="button" id="resetBtn" type="button">Reset filters</button></div>
+      <div class="filter-grid">
+        <div class="field"><label for="query">Job title</label><input id="query" type="search" placeholder="e.g. care assistant, data analyst" autocomplete="off"></div>
+        <div class="field"><label for="location">Town, city or UK location</label><input id="location" type="search" placeholder="City, region or postcode" autocomplete="postal-code"></div>
+        <div class="field"><label for="category">Job category</label><select id="category"><option value="all">All categories</option></select></div>
+        <div class="field"><label for="sponsorship">Sponsorship</label><select id="sponsorship"><option value="verified" selected>Licensed sponsors offering sponsorship</option><option value="none">No sponsorship offered</option><option value="all">All jobs</option></select></div>
+      </div>
+      <div class="filter-grid secondary">
+        <div class="field"><label for="postcode">UK postcode (optional)</label><input id="postcode" type="text" placeholder="e.g. EH21 7AB" autocomplete="postal-code"></div>
+        <div class="field"><label for="radius">Distance</label><select id="radius"><option value="5">Within 5 miles</option><option value="10" selected>Within 10 miles</option><option value="25">Within 25 miles</option><option value="50">Within 50 miles</option><option value="100">Within 100 miles</option></select></div>
+        <div class="field"><label for="jobType">Job type</label><select id="jobType"><option value="all">All job types</option><option value="fulltime">Full time</option><option value="parttime">Part time</option><option value="contract">Contract</option><option value="temporary">Temporary</option><option value="internship">Internship</option></select></div>
+        <div class="field"><label for="age">Posted within</label><select id="age"><option value="28">Last 28 days</option><option value="1">Last 24 hours</option><option value="3">Last 3 days</option><option value="7">Last 7 days</option><option value="14">Last 14 days</option></select></div>
+        <div class="field"><label for="salaryMin">Minimum salary (£/year)</label><input id="salaryMin" type="number" min="0" step="1000" placeholder="Any"></div>
+        <div class="field"><label for="salaryMax">Maximum salary (£/year)</label><input id="salaryMax" type="number" min="0" step="1000" placeholder="Any"></div>
+      </div>
+      <div class="filter-actions">
+        <span class="check">Results are ranked by title relevance and posting date.</span>
+        <div class="action-group"><button class="button" id="nearMeBtn" type="button">Near me</button><button class="button" id="applyFiltersBtn" type="button">Apply filters</button><button class="button" id="searchBtn" type="button">Search jobs</button></div>
+      </div>
+    </section>
+
+    <div class="status" id="status" role="status" aria-live="polite"><span>Loading the live job feed…</span><span id="registerStatus"></span></div>
+    <div class="notice" id="importNotice" role="status"></div>
+    <section class="job-list" id="jobs" aria-live="polite"></section>
+    <nav class="pagination" id="pagination" aria-label="Job pages" hidden>
+      <button class="button" id="prevBtn" type="button">Previous</button><span class="page-label" id="pageLabel"></span><button class="button" id="nextBtn" type="button">Next</button>
+    </nav>
+  </main>
+
+  <footer class="shell">
+    <strong>Important:</strong> A sponsor-register match alone does not mean an employer offers sponsorship for a specific vacancy. The first sponsorship filter requires both an exact register match and an explicit offer in the advert. Job listings remain the responsibility of their original publishers.
+  </footer>
+
+  <script src="frontend-config.js"></script>
+  <script>
+    "use strict";
+
+    const BACKEND_API_URL = String(window.JOBAPI_BACKEND_URL || "").replace(/\/$/, "");
+    const apiUrl = path => `${BACKEND_API_URL}${path}`;
+    const PAGE_SIZE = 18;
+    const MAX_AGE_DAYS = 28;
+    const CATEGORY_RULES = [
+      ["Care and support", /care assistant|care worker|support worker|home care|residential support|senior care/i],
+      ["Healthcare", /healthcare assistant|health care assistant|healthcare worker/i],
+      ["Nursing", /\bnurse\b|nursing/i],
+      ["Warehouse and operations", /warehouse|production operative|operative/i],
+      ["Cleaning", /cleaner|cleaning/i],
+      ["Customer service", /customer service|call centre|contact centre/i],
+      ["Technology", /software|developer|programmer|engineer/i],
+      ["Data", /data analyst|data scientist|business intelligence/i],
+      ["Administration", /administrator|administrative|office assistant/i],
+      ["Engineering", /engineer|engineering|technician/i],
+      ["Finance and accounting", /accountant|accounting|finance/i],
+      ["Education", /teacher|teaching assistant|tutor|lecturer/i],
+      ["Hospitality", /kitchen assistant|hospitality|hotel|catering/i],
+      ["Visa sponsorship", /visa sponsorship|sponsorship/i]
+    ];
+    const $ = id => document.getElementById(id);
+    let sheetJobs = [];
+    let collectedJobs = [];
+    let visibleJobs = [];
+    let page = 1;
+    let searchOrigin = null;
+    let applyingFilters = false;
+    let liveSearchActive = false;
+    let nearMeCoordinates = null;
+    const postcodeCache = new Map();
+
+    function text(value) { return String(value == null ? "" : value).trim(); }
+    function key(value) { return String(value || "").toLowerCase().replace(/[^a-z0-9]/g, ""); }
+    function field(job, names) {
+      if (!job || typeof job !== "object") return "";
+      const keys = Object.keys(job);
+      for (const name of names) {
+        if (job[name] !== undefined && job[name] !== null && job[name] !== "") return job[name];
+        const match = keys.find(candidate => key(candidate) === key(name));
+        if (match && job[match] !== undefined && job[match] !== null && job[match] !== "") return job[match];
+      }
+      return "";
+    }
+    function validUrl(value) {
+      try {
+        const url = new URL(value);
+        return ["https:", "http:"].includes(url.protocol) && url.hostname.includes(".") ? url.href : "";
+      } catch (_) { return ""; }
+    }
+    function normaliseJob(raw) {
+      const applicationUrl = validUrl(field(raw, ["applicationUrl", "Application URL", "directApplyUrl", "applyUrl", "url", "job_url", "jobUrl", "link"]));
+      let description = text(field(raw, ["description", "Description", "snippet", "summary"]));
+      const embeddedSource = description.match(/^Source listing URL:\s*(https?:\/\/\S+)\s*/i);
+      const sourceUrl = validUrl(field(raw, ["sourceUrl", "Source URL", "originalUrl", "listingUrl"])) || (embeddedSource ? validUrl(embeddedSource[1]) : "") || applicationUrl;
+      if (embeddedSource) description = description.slice(embeddedSource[0].length).trim();
+      const date = field(raw, ["date", "Source Date", "sourceDate", "date_posted", "postedAt"]);
+      return {
+        id: text(field(raw, ["id", "ID"])) || applicationUrl || sourceUrl,
+        title: text(field(raw, ["title", "Job Title", "jobTitle"])),
+        employer: text(field(raw, ["employer", "Employer", "company", "companyName"])),
+        location: text(field(raw, ["location", "Location", "jobLocation"])),
+        description,
+        date,
+        dateType: text(field(raw, ["dateType", "Date Type"])),
+        sponsorshipStatus: text(field(raw, ["sponsorshipStatus", "Sponsorship Status", "status"])) || "Not specified",
+        sponsorshipEvidence: text(field(raw, ["sponsorshipEvidence", "Sponsorship Evidence", "evidence"])) || "No explicit sponsorship statement found in the collected advert.",
+        sponsorRegisterMatch: text(field(raw, ["sponsorRegisterMatch", "Sponsor Register Match"])),
+        source: text(field(raw, ["source", "Source"])) || "Other",
+        workplaceType: text(field(raw, ["workplaceType", "Workplace Type"])) || "Not specified",
+        postcode: text(field(raw, ["postcode", "Postcode"])),
+        salary: text(field(raw, ["salary", "Salary"])),
+        jobType: text(field(raw, ["jobType", "Job Type", "job_type"])),
+        relevanceScore: Number(field(raw, ["relevanceScore"])) || 0,
+        applicationUrl,
+        sourceUrl,
+        url: applicationUrl || sourceUrl,
+        importNotConfirmed: raw && raw.importNotConfirmed === true
+      };
+    }
+    function parsedDate(value) {
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
+    function isRecent(value, days) {
+      const date = parsedDate(value);
+      if (!date) return false;
+      const age = Date.now() - date.getTime();
+      return age >= 0 && age <= days * 86400000;
+    }
+    function sponsorVerified(job) {
+      const match = job.sponsorRegisterMatch.toLowerCase();
+      const status = job.sponsorshipStatus.toLowerCase();
+      const evidence = job.sponsorshipEvidence.toLowerCase();
+      return status === "sponsorship confirmed" && match.startsWith("matched:") && !advertSaysUnavailable(job);
+    }
+    function advertSaysUnavailable(job) {
+      return /(?:does not|do not|cannot|can't|unable to|not able to|will not|won't|no)\s+(?:currently\s+)?(?:offer|provide|support|give|sponsor)?\s*(?:a\s+)?(?:visa\s+|work\s+|skilled worker\s+)?sponsorship|sponsorship\s+(?:is\s+)?(?:not available|unavailable|not offered|not provided)/i.test(`${job.description} ${job.sponsorshipEvidence}`);
+    }
+    function sponsorGroup(job) {
+      const status = job.sponsorshipStatus.toLowerCase();
+      const evidence = job.sponsorshipEvidence.toLowerCase();
+      if (status === "sponsorship unavailable" || advertSaysUnavailable(job)) return "none";
+      if (sponsorVerified(job)) return "verified";
+      return "unverified";
+    }
+    function category(job) {
+      const value = `${job.title} ${job.description}`;
+      const found = CATEGORY_RULES.find(([, pattern]) => pattern.test(value));
+      return found ? found[0] : "Other";
+    }
+    function allJobs() {
+      const byUrl = new Map();
+      [...sheetJobs, ...collectedJobs].forEach(job => {
+        const dedupeKey = job.url.toLowerCase();
+        if (!byUrl.has(dedupeKey)) byUrl.set(dedupeKey, job);
+      });
+      return [...byUrl.values()];
+    }
+    function setStatus(message, isError = false) {
+      const area = $("status");
+      area.classList.toggle("error", isError);
+      area.firstElementChild.textContent = message;
+    }
+    function setBusy(button, busy, label) {
+      button.disabled = busy;
+      if (busy) {
+        button.dataset.label = button.textContent;
+        button.textContent = label;
+      } else if (button.dataset.label) {
+        button.textContent = button.dataset.label;
+        delete button.dataset.label;
+      }
+    }
+
+    async function loadJobs() {
+      if (!BACKEND_API_URL) { setStatus("The backend URL is not configured for this deployment.", true); return; }
+      setStatus("Loading the jobs feed…");
+      try {
+        const response = await fetch(apiUrl("/api/jobs"), {headers: {Accept: "application/json"}});
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || `Feed request failed (${response.status}).`);
+        if (!Array.isArray(data.jobs)) throw new Error("The feed response does not contain a jobs array.");
+        sheetJobs = data.jobs.map(normaliseJob).filter(job => job.title && job.employer && job.url && parsedDate(job.date));
+        $("feedStamp").textContent = data.refreshedAt ? `Feed updated ${new Date(data.refreshedAt).toLocaleString()}` : "Live feed connected";
+        const register = data.sponsorRegister || {};
+        $("registerStatus").textContent = register.rowCount ? `Sponsor register rows: ${Number(register.rowCount).toLocaleString()}` : "Sponsor register status not supplied";
+        populateSources();
+        const stats = data.stats || {};
+        $("licensedStat").textContent = Number(stats.licensedSponsorJobs ?? allJobs().filter(job => job.sponsorRegisterMatch.toLowerCase().startsWith("matched:")).length).toLocaleString();
+        $("evidenceStat").textContent = Number(stats.advertEvidenceJobs ?? allJobs().filter(job => job.sponsorshipStatus.toLowerCase().includes("confirmed") || /positive sponsorship/i.test(job.sponsorshipEvidence)).length).toLocaleString();
+        $("verifiedStat").textContent = Number(stats.verifiedJobs ?? allJobs().filter(sponsorVerified).length).toLocaleString();
+        $("sponsorCountStat").textContent = Number(stats.licensedSponsors ?? register.rowCount ?? 0).toLocaleString();
+        if (!liveSearchActive) await applyFilters();
+        setStatus(`Loaded ${sheetJobs.length.toLocaleString()} records from the jobs feed.`);
+      } catch (error) {
+        sheetJobs = [];
+        visibleJobs = [];
+        renderJobs();
+        setStatus(`Could not load the jobs feed: ${error.message || "Try again shortly."}`, true);
+        $("feedStamp").textContent = "Feed unavailable";
+      }
+    }
+
+    function populateSources() {
+      const select = $("source");
+      // The source filter is optional in the compact layout. Keep feed loading
+      // working when the control is not present in a custom/deployed template.
+      if (select) {
+        const current = select.value;
+        const sources = [...new Set(allJobs().map(job => job.source).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+        select.replaceChildren(new Option("All sources", "all"));
+        sources.forEach(source => select.add(new Option(source, source)));
+        if (sources.includes(current)) select.value = current;
+      }
+      const categorySelect = $("category");
+      if (categorySelect && categorySelect.options.length === 1) {
+        CATEGORY_RULES.map(([name]) => name).concat("Other").forEach(name => categorySelect.add(new Option(name, name)));
+      }
+    }
+
+    async function postcodeToCoords(postcode) {
+      const clean = String(postcode || "").trim().toUpperCase();
+      if (!clean) throw new Error("Enter a UK postcode first.");
+      if (!postcodeCache.has(clean)) {
+        postcodeCache.set(clean, fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(clean)}`).then(async response => {
+          const data = await response.json();
+          if (!response.ok || data.status !== 200 || !data.result) throw new Error("Postcode not found.");
+          return { lat: Number(data.result.latitude), lon: Number(data.result.longitude) };
+        }));
+      }
+      return postcodeCache.get(clean);
+    }
+    function distanceMiles(a, b) {
+      const rad = value => value * Math.PI / 180;
+      const lat = rad(b.lat - a.lat), lon = rad(b.lon - a.lon);
+      const part = Math.sin(lat / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(lon / 2) ** 2;
+      return 3958.7613 * 2 * Math.atan2(Math.sqrt(part), Math.sqrt(1 - part));
+    }
+    async function jobCoords(job) {
+      const match = `${job.postcode} ${job.location}`.match(/\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b/i);
+      if (!match) return null;
+      try { return await postcodeToCoords(match[0]); } catch (_) { return null; }
+    }
+
+    async function applyFilters() {
+      if (applyingFilters) return;
+      applyingFilters = true;
+      const query = $("query").value.trim().toLowerCase();
+      const location = $("location").value.trim().toLowerCase();
+      const selectedCategory = $("category").value;
+      const sponsorship = $("sponsorship").value;
+      const source = $("source")?.value || "all";
+      const jobType = $("jobType")?.value || "all";
+      const days = Number($("age")?.value) || MAX_AGE_DAYS;
+      const shouldHideOld = $("hideOld")?.checked ?? true;
+      const postcodeText = $("postcode")?.value.trim() || "";
+      let origin = searchOrigin;
+      try {
+        if (postcodeText) {
+          origin = await postcodeToCoords(postcodeText);
+          searchOrigin = origin;
+        }
+      } catch (error) {
+        applyingFilters = false;
+        setStatus(error.message, true);
+        return;
+      }
+
+      // Live search results and the Google Sheets feed are separate result
+      // sets. Do not mix the unfiltered sheet feed into a live query.
+      const candidates = (liveSearchActive ? collectedJobs : allJobs()).filter(job => {
+        const searchText = `${job.title} ${job.employer} ${job.description}`.toLowerCase();
+        if (query && !liveSearchActive && !searchText.includes(query)) return false;
+        if (location && !job.location.toLowerCase().includes(location)) return false;
+        if (selectedCategory !== "all" && category(job) !== selectedCategory) return false;
+        if (sponsorship === "verified" && !sponsorVerified(job)) return false;
+        if (sponsorship === "none" && sponsorGroup(job) !== "none") return false;
+        if (source !== "all" && job.source.toLowerCase() !== source.toLowerCase()) return false;
+        if (jobType !== "all" && !job.jobType.toLowerCase().includes(jobType.replace("fulltime", "full time").replace("parttime", "part time"))) return false;
+        if (shouldHideOld && !isRecent(job.date, days)) return false;
+        return true;
+      });
+
+      if (origin && !liveSearchActive) {
+        setStatus("Checking distances for listings with a postcode…");
+        const distanceResults = await Promise.all(candidates.map(async job => {
+          const coords = await jobCoords(job);
+            return coords ? { job, distance: distanceMiles(origin, coords) } : { job, distance: null };
+        }));
+        const radius = Number($("radius")?.value) || 10;
+          visibleJobs = distanceResults
+            .filter(item => item.distance === null ? liveSearchActive : item.distance <= radius)
+            .sort((a, b) => (a.distance ?? Number.POSITIVE_INFINITY) - (b.distance ?? Number.POSITIVE_INFINITY))
+            .map(item => item.job);
+      } else {
+        visibleJobs = candidates;
+      }
+      const queryTerms = searchTermsForUi(query);
+      visibleJobs.sort((a, b) => {
+        const score = job => Math.max(job.relevanceScore, queryTerms.reduce((sum, term) => sum + (job.title.toLowerCase().includes(term) ? 10 : 0), 0));
+        return score(b) - score(a) || (parsedDate(b.date)?.getTime() || 0) - (parsedDate(a.date)?.getTime() || 0);
+      });
+      applyingFilters = false;
+      page = 1;
+      renderJobs();
+    }
+
+    function badge(job) {
+      if (sponsorVerified(job)) return { label: "Register match + advert evidence", className: "verified" };
+      if (job.sponsorshipStatus.toLowerCase() === "sponsorship unavailable") return { label: "Advert says unavailable", className: "negative" };
+      return { label: "Not stated / unconfirmed", className: "pending" };
+    }
+    function node(tag, className, value) {
+      const element = document.createElement(tag);
+      if (className) element.className = className;
+      if (value !== undefined) element.textContent = value;
+      return element;
+    }
+    function createCard(job) {
+      const card = node("article", "job-card");
+      const head = node("div", "job-head");
+      const textBlock = node("div");
+      textBlock.append(node("div", "company", job.employer), node("h2", "job-title", job.title));
+      const jobBadge = badge(job);
+      const badgeNode = node("span", `badge ${jobBadge.className}`, jobBadge.label);
+      head.append(textBlock, badgeNode);
+      const tags = node("div", "tags");
+      [job.location, job.salary, job.jobType, job.workplaceType].filter(Boolean).forEach(value => tags.append(node("span", "tag", value)));
+      const evidence = node("p", "evidence", job.sponsorshipEvidence);
+      if (job.sponsorRegisterMatch) {
+        const match = node("p", `evidence${sponsorVerified(job) ? " match" : ""}`, job.sponsorRegisterMatch);
+        card.append(head, tags, evidence, match);
+      } else {
+        card.append(head, tags, evidence);
+      }
+      card.append(node("p", "description", job.description || "No description supplied by the job board."));
+      const foot = node("div", "job-foot");
+      const date = parsedDate(job.date);
+      const dateText = date ? `Posted ${date.toLocaleDateString()}${job.dateType ? `\n${job.dateType}` : ""}` : "Posting date unavailable";
+      foot.append(node("div", "date", dateText));
+      const apply = node("a", "apply", "Apply on original listing ↗");
+      apply.textContent = "Apply Directly ↗";
+      if (job.applicationUrl) {
+        apply.href = job.applicationUrl;
+        apply.target = "_blank";
+        apply.rel = "noopener noreferrer";
+        apply.referrerPolicy = "no-referrer";
+        apply.setAttribute("aria-label", `Apply for ${job.title}`);
+      } else {
+        apply.classList.add("disabled");
+        apply.removeAttribute("href");
+      }
+      foot.append(apply);
+      if (job.sourceUrl) {
+        const listing = node("a", "apply", "View Original Listing ↗");
+        listing.href = job.sourceUrl;
+        listing.target = "_blank";
+        listing.rel = "noopener noreferrer";
+        listing.referrerPolicy = "no-referrer";
+        foot.append(listing);
+      }
+      card.append(foot);
+      return card;
+    }
+    function renderJobs() {
+      $("totalStat").textContent = visibleJobs.length.toLocaleString();
+      $("sourceStat").textContent = new Set(visibleJobs.map(job => job.source).filter(Boolean)).size.toLocaleString();
+      const root = $("jobs");
+      root.replaceChildren();
+      if (!visibleJobs.length) {
+        const empty = node("div", "empty");
+        empty.append(node("strong", "", sheetJobs.length || collectedJobs.length ? "No vacancies match these filters" : "No jobs are available"));
+        empty.append(document.createTextNode(sheetJobs.length || collectedJobs.length ? "Change the sponsorship, location or posting-age filters and try again." : "Enter a job title or location, then search the live sources."));
+        root.append(empty);
+        $("pagination").hidden = true;
+        return;
+      }
+      const pageCount = Math.ceil(visibleJobs.length / PAGE_SIZE);
+      page = Math.min(page, pageCount);
+      visibleJobs.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).forEach(job => root.append(createCard(job)));
+      $("pagination").hidden = pageCount <= 1;
+      $("pageLabel").textContent = `Page ${page} of ${pageCount}`;
+      $("prevBtn").disabled = page <= 1;
+      $("nextBtn").disabled = page >= pageCount;
+    }
+
+    function searchTermsForUi(query) {
+      const value = query.toLowerCase().trim();
+      if (value === "care") return ["care assistant", "care worker", "support worker"];
+      return value ? [value] : [];
+    }
+
+    async function searchLiveJobs() {
+      const queryText = $("query").value.trim();
+      const locationText = $("postcode").value.trim() || $("location").value.trim();
+      if (!queryText && !locationText) {
+        setStatus("Enter a job title or UK location to search.", true);
+        return;
+      }
+      const params = new URLSearchParams();
+      params.set("query", queryText);
+      params.set("location", locationText);
+      params.set("radius", $("radius").value);
+      params.set("days", $("age").value);
+      params.set("jobType", $("jobType").value);
+      if ($("salaryMin").value) params.set("salaryMin", $("salaryMin").value);
+      if ($("salaryMax").value) params.set("salaryMax", $("salaryMax").value);
+      if (nearMeCoordinates) {
+        params.set("latitude", nearMeCoordinates.lat);
+        params.set("longitude", nearMeCoordinates.lon);
+      }
+      setBusy($("searchBtn"), true, "Searching…");
+      $("importNotice").classList.remove("visible");
+      setStatus("Searching JobSpy and the official UK Jobs service…");
+      try {
+        const response = await fetch(apiUrl(`/api/search?${params}`), { headers: { Accept: "application/json" } });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || `Search failed (${response.status}).`);
+        collectedJobs = (data.jobs || []).map(normaliseJob).filter(job => job.title && job.employer && job.url);
+        liveSearchActive = true;
+        populateSources();
+        const notice = $("importNotice");
+        const register = data.sponsorRegister || {};
+        $("registerStatus").textContent = register.available ? `Official register checked (${Number(register.rowCount).toLocaleString()} organisations)` : "Official sponsor register unavailable; employers are unverified";
+        if (data.errors?.length) {
+          notice.textContent = data.errors.map(item => `${item.source}: ${item.error}`).join(" · ");
+          notice.classList.add("visible");
+        }
+        await applyFilters();
+        setStatus(`Found ${collectedJobs.length.toLocaleString()} current listings. Results are ranked by title relevance.`);
+      } catch (error) {
+        setStatus(`Could not search live jobs: ${error.message || "Try again shortly."}`, true);
+      } finally {
+        setBusy($("searchBtn"), false);
+      }
+    }
+
+    $("searchBtn").addEventListener("click", searchLiveJobs);
+    $("applyFiltersBtn").addEventListener("click", () => {
+      liveSearchActive = false;
+      collectedJobs = [];
+      applyFilters();
+    });
+    $("resetBtn").addEventListener("click", () => {
+      ["query", "location", "postcode", "salaryMin", "salaryMax"].forEach(id => { $(id).value = ""; });
+      $("category").value = "all";
+      $("sponsorship").value = "verified";
+      if ($("source")) $("source").value = "all";
+      $("jobType").value = "all";
+      $("age").value = "28";
+      $("radius").value = "10";
+      if ($("hideOld")) $("hideOld").checked = true;
+      searchOrigin = null;
+      nearMeCoordinates = null;
+      liveSearchActive = false;
+      collectedJobs = [];
+      applyFilters();
+    });
+    ["query", "location"].forEach(id => $(id).addEventListener("keydown", event => { if (event.key === "Enter") searchLiveJobs(); }));
+    ["category", "sponsorship", "source", "hideOld"].forEach(id => $(id)?.addEventListener("change", applyFilters));
+    ["jobType", "age", "radius"].forEach(id => $(id).addEventListener("change", () => liveSearchActive ? searchLiveJobs() : applyFilters()));
+    $("postcode").addEventListener("change", () => {
+      nearMeCoordinates = null;
+      searchLiveJobs();
+    });
+    ["salaryMin", "salaryMax"].forEach(id => $(id).addEventListener("keydown", event => { if (event.key === "Enter") searchLiveJobs(); }));
+    ["salaryMin", "salaryMax"].forEach(id => $(id).addEventListener("change", () => liveSearchActive && searchLiveJobs()));
+    $("nearMeBtn").addEventListener("click", () => {
+      if (!navigator.geolocation) { setStatus("Location services are unavailable. Enter a UK postcode instead.", true); return; }
+      setStatus("Requesting your location…");
+      navigator.geolocation.getCurrentPosition(position => {
+        nearMeCoordinates = { lat: position.coords.latitude, lon: position.coords.longitude };
+          searchOrigin = nearMeCoordinates;
+        $("postcode").value = "";
+        searchLiveJobs();
+      }, () => setStatus("Location permission was not granted. Enter a postcode instead.", true), { enableHighAccuracy: true, timeout: 12000, maximumAge: 300000 });
+    });
+    $("prevBtn").addEventListener("click", () => { if (page > 1) { page--; renderJobs(); } });
+    $("nextBtn").addEventListener("click", () => { if (page < Math.ceil(visibleJobs.length / PAGE_SIZE)) { page++; renderJobs(); } });
+
+    loadJobs();
+  </script>
+</body>
+</html>

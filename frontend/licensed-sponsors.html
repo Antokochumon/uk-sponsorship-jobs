@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Licensed Sponsor Companies</title>
+  <style>
+    :root{font-family:system-ui,sans-serif;color:#172421;background:#f4f7f3}body{max-width:1100px;margin:0 auto;padding:24px 16px}a{color:#1d4940}header{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:24px}h1{margin:0}input{width:100%;padding:12px;border:1px solid #ccd9cf;border-radius:6px;box-sizing:border-box;font:inherit;margin:12px 0 8px}.meta{color:#61736a;font-size:14px}.notice{padding:18px;border:1px solid #d8e2da;border-radius:8px;background:#fff;margin-top:16px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-top:16px}.card{background:#fff;border:1px solid #d8e2da;border-radius:8px;padding:16px}.card h2{font-size:17px;margin:0 0 10px}.card p{margin:5px 0;color:#61736a;font-size:14px}@media(max-width:600px){header{display:block}}
+  </style>
+</head>
+<body>
+  <header><div><h1>Licensed Sponsor Companies</h1><p class="meta">Companies loaded from the existing Sponsors sheet.</p></div><a href="index.html">Back to jobs</a></header>
+  <p>Being on the licensed sponsor register does not guarantee that every vacancy offers sponsorship. Always check the individual advert and current immigration rules.</p>
+  <p><a href="https://www.gov.uk/government/publications/register-of-licensed-sponsors-workers" target="_blank" rel="noopener noreferrer">View the official government register ↗</a></p>
+  <label for="search">Search companies</label><input id="search" type="search" placeholder="Start typing a company name" autocomplete="off">
+  <div id="state" class="notice" role="status">Loading sponsor companies…</div>
+  <div id="grid" class="grid"></div>
+  <script src="frontend-config.js"></script>
+  <script>
+    "use strict";
+    const endpoint = String(window.JOBAPI_BACKEND_URL || "").replace(/\/$/,"");
+    const state = document.getElementById("state"), grid = document.getElementById("grid"), search = document.getElementById("search");
+    let companies = [];
+    const clean = value => String(value == null ? "" : value).trim();
+    function render() {
+      const query = clean(search.value).toLowerCase();
+      const rows = companies.filter(company => clean(company.employerName).toLowerCase().includes(query));
+      grid.replaceChildren();
+      state.textContent = rows.length.toLocaleString() + " of " + companies.length.toLocaleString() + " licensed sponsor companies shown.";
+      if (!rows.length) { state.textContent = companies.length ? "No licensed sponsor companies match that search." : "No sponsor companies were returned."; return; }
+      rows.forEach(company => {
+        const card = document.createElement("article"); card.className = "card";
+        const title = document.createElement("h2"); title.textContent = company.employerName; card.append(title);
+        [["Licence rating",company.licenceRating],["Route",company.route],["Town/City",company.townCity],["County",company.county]].forEach(([label,value]) => { if (value) { const p=document.createElement("p"); p.textContent=label + ": " + value; card.append(p); }});
+        grid.append(card);
+      });
+    }
+    search.addEventListener("input", render);
+    async function loadSponsors() {
+      if (!endpoint) { state.textContent = "The backend URL is not configured for this deployment."; return; }
+      try {
+        const response = await fetch(endpoint + "/api/sponsors", {headers: {Accept: "application/json"}});
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || `Request failed (${response.status}).`);
+        if (!Array.isArray(data.companies)) throw new Error("The sponsor feed returned no company list.");
+        companies = data.companies; render();
+      } catch (error) {
+        state.textContent = error.message || "Could not load the sponsor directory. Try again shortly.";
+      }
+    }
+    loadSponsors();
+  </script>
+</body>
+</html>
