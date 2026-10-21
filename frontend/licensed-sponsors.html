@@ -4,50 +4,114 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Licensed Sponsor Companies</title>
   <style>
-    :root{font-family:system-ui,sans-serif;color:#172421;background:#f4f7f3}body{max-width:1100px;margin:0 auto;padding:24px 16px}a{color:#1d4940}header{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:24px}h1{margin:0}input{width:100%;padding:12px;border:1px solid #ccd9cf;border-radius:6px;box-sizing:border-box;font:inherit;margin:12px 0 8px}.meta{color:#61736a;font-size:14px}.notice{padding:18px;border:1px solid #d8e2da;border-radius:8px;background:#fff;margin-top:16px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-top:16px}.card{background:#fff;border:1px solid #d8e2da;border-radius:8px;padding:16px}.card h2{font-size:17px;margin:0 0 10px}.card p{margin:5px 0;color:#61736a;font-size:14px}@media(max-width:600px){header{display:block}}
+    :root{font-family:system-ui,sans-serif;color:#172421;background:#f4f7f3}body{max-width:1100px;margin:0 auto;padding:24px 16px}a{color:#1d4940}header{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:24px}h1{margin:0}input{width:100%;padding:12px;border:1px solid #ccd9cf;border-radius:6px;box-sizing:border-box;font:inherit;margin:12px 0 8px}.meta{color:#61736a;font-size:14px}.notice{padding:18px;border:1px solid #d8e2da;border-radius:8px;background:#fff;margin-top:16px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-top:16px}.card{background:#fff;border:1px solid #d8e2da;border-radius:8px;padding:16px}.card h2{font-size:17px;margin:0 0 10px}.card p{margin:5px 0;color:#61736a;font-size:14px}.search-row{display:flex;gap:12px;align-items:flex-end;margin:12px 0 8px}.search-row label{flex:1;margin:0}.search-row input{margin:0}.search-row button{padding:12px 24px;border:1px solid #1d4940;border-radius:6px;background:#1d4940;color:#fff;font:inherit;cursor:pointer;white-space:nowrap}.search-row button:hover{background:#163a33}.search-row button:disabled{opacity:.6;cursor:wait}@media(max-width:600px){header{display:block}.search-row{flex-direction:column;align-items:stretch}}
   </style>
 </head>
 <body>
-  <header><div><h1>Licensed Sponsor Companies</h1><p class="meta">Companies loaded from the existing Sponsors sheet.</p></div><a href="index.html">Back to jobs</a></header>
+  <header><div><h1>Licensed Sponsor Companies</h1><p class="meta">Search the existing Sponsors sheet for a specific company.</p></div><a href="index.html">Back to jobs</a></header>
   <p>Being on the licensed sponsor register does not guarantee that every vacancy offers sponsorship. Always check the individual advert and current immigration rules.</p>
   <p><a href="https://www.gov.uk/government/publications/register-of-licensed-sponsors-workers" target="_blank" rel="noopener noreferrer">View the official government register ↗</a></p>
-  <label for="search">Search companies</label><input id="search" type="search" placeholder="Start typing a company name" autocomplete="off">
-  <div id="state" class="notice" role="status">Loading sponsor companies…</div>
+
+  <div class="search-row">
+    <label for="search">Search companies</label>
+    <input id="search" type="search" placeholder="Enter a company name" autocomplete="off">
+    <button id="searchBtn" type="button">Search</button>
+  </div>
+
+  <div id="state" class="notice" role="status">Enter a company name and click Search.</div>
   <div id="grid" class="grid"></div>
+
   <script src="frontend-config.js"></script>
   <script>
     "use strict";
     const endpoint = String(window.JOBAPI_BACKEND_URL || "").replace(/\/$/,"");
-    const state = document.getElementById("state"), grid = document.getElementById("grid"), search = document.getElementById("search");
-    let companies = [];
+    const state = document.getElementById("state");
+    const grid = document.getElementById("grid");
+    const search = document.getElementById("search");
+    const searchBtn = document.getElementById("searchBtn");
+
     const clean = value => String(value == null ? "" : value).trim();
-    function render() {
-      const query = clean(search.value).toLowerCase();
-      const rows = companies.filter(company => clean(company.employerName).toLowerCase().includes(query));
-      grid.replaceChildren();
-      state.textContent = rows.length.toLocaleString() + " of " + companies.length.toLocaleString() + " licensed sponsor companies shown.";
-      if (!rows.length) { state.textContent = companies.length ? "No licensed sponsor companies match that search." : "No sponsor companies were returned."; return; }
+
+    function clearGrid() { grid.replaceChildren(); }
+
+    function renderCompanies(rows, totalNote) {
+      clearGrid();
+      if (!rows.length) {
+        state.textContent = totalNote || "No licensed sponsor companies match that search.";
+        return;
+      }
+      state.textContent = rows.length.toLocaleString() + " licensed sponsor company" + (rows.length === 1 ? "" : " companies") + " found.";
       rows.forEach(company => {
-        const card = document.createElement("article"); card.className = "card";
-        const title = document.createElement("h2"); title.textContent = company.employerName; card.append(title);
-        [["Licence rating",company.licenceRating],["Route",company.route],["Town/City",company.townCity],["County",company.county]].forEach(([label,value]) => { if (value) { const p=document.createElement("p"); p.textContent=label + ": " + value; card.append(p); }});
+        const card = document.createElement("article");
+        card.className = "card";
+        const title = document.createElement("h2");
+        title.textContent = clean(company.employerName) || "Unknown company";
+        card.append(title);
+        [["Licence rating", company.licenceRating], ["Route", company.route], ["Town/City", company.townCity], ["County", company.county]].forEach(([label, value]) => {
+          if (value) {
+            const p = document.createElement("p");
+            p.textContent = label + ": " + value;
+            card.append(p);
+          }
+        });
         grid.append(card);
       });
     }
-    search.addEventListener("input", render);
-    async function loadSponsors() {
-      if (!endpoint) { state.textContent = "The backend URL is not configured for this deployment."; return; }
+
+    async function searchSponsors() {
+      const query = clean(search.value);
+      if (!query) {
+        state.textContent = "Please enter a company name to search.";
+        clearGrid();
+        return;
+      }
+      if (!endpoint) {
+        state.textContent = "The backend URL is not configured for this deployment.";
+        return;
+      }
+
+      searchBtn.disabled = true;
+      state.textContent = "Searching for “" + query + "”…";
+      clearGrid();
+
       try {
-        const response = await fetch(endpoint + "/api/sponsors", {headers: {Accept: "application/json"}});
+        // Only ask the backend for the specific company — no full list is loaded.
+        const url = endpoint + "/api/sponsors?search=" + encodeURIComponent(query);
+        const response = await fetch(url, { headers: { Accept: "application/json" } });
         const data = await response.json().catch(() => ({}));
         if (!response.ok) throw new Error(data.error || `Request failed (${response.status}).`);
-        if (!Array.isArray(data.companies)) throw new Error("The sponsor feed returned no company list.");
-        companies = data.companies; render();
+
+        // Support common response shapes: {companies: [...]} or a single company object.
+        let rows = [];
+        if (Array.isArray(data.companies)) {
+          rows = data.companies;
+        } else if (data.company) {
+          rows = [data.company];
+        } else if (Array.isArray(data)) {
+          rows = data;
+        } else if (data.employerName) {
+          rows = [data];
+        }
+
+        // Defensive client-side filter in case the backend ignores the search param.
+        const lower = query.toLowerCase();
+        rows = rows.filter(c => clean(c.employerName).toLowerCase().includes(lower));
+
+        renderCompanies(rows, "No licensed sponsor company matches “" + query + "”.");
       } catch (error) {
-        state.textContent = error.message || "Could not load the sponsor directory. Try again shortly.";
+        state.textContent = error.message || "Could not search the sponsor directory. Try again shortly.";
+      } finally {
+        searchBtn.disabled = false;
       }
     }
-    loadSponsors();
+
+    searchBtn.addEventListener("click", searchSponsors);
+    search.addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        searchSponsors();
+      }
+    });
   </script>
 </body>
 </html>
