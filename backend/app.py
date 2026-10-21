@@ -14,6 +14,7 @@ from urllib.parse import urlsplit
 import requests
 from dotenv import load_dotenv
 from flask import Flask, jsonify, request, send_from_directory, session
+from flask_cors import CORS
 from werkzeug.security import check_password_hash
 
 from apps_script_import import AppsScriptClient, AppsScriptImportError
@@ -48,17 +49,15 @@ collection_state: dict[str, Any] = {"running": False, "phase": "idle", "logs": [
 schedule_state: dict[str, Any] = {"hours": None, "nextRun": None}
 
 app = Flask(__name__, static_folder=None)
+
 CORS(
     app,
-    resources={
-        r"/api/*": {
-            "origins": list(ALLOWED_ORIGINS)
-        }
-    },
+    resources={r"/api/*": {"origins": list(ALLOWED_ORIGINS)}},
     supports_credentials=True,
     allow_headers=["Content-Type", "Accept", "X-CSRF-Token"],
     methods=["GET", "POST", "OPTIONS"],
 )
+
 app.json.sort_keys = False
 app.config["MAX_CONTENT_LENGTH"] = 1 * 1024 * 1024
 app.config.update(
