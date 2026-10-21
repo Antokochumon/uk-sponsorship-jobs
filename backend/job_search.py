@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import csv
 import difflib
-import io
 import os
 import re
 import threading
@@ -22,7 +20,6 @@ from collect_jobs import canonical_url, normalize_job
 
 JOBS_SEARCH_URL = "https://www.jobs.service.gov.uk/jobs/search"
 JOBS_BASE_URL = "https://www.jobs.service.gov.uk"
-SPONSOR_REGISTER_PAGE = "https://www.gov.uk/government/publications/register-of-licensed-sponsors-workers"
 REQUEST_HEADERS = {"User-Agent": "UKJobFinder/1.0", "Accept": "text/html,application/xhtml+xml,application/json"}
 RESULT_LIMIT = 15
 SEARCH_TERMS = (
@@ -209,37 +206,38 @@ def _employer_key(value: str) -> str:
     return re.sub(r"\b(limited|ltd|plc|llp|incorporated|inc)\b$", "", normalized).strip()
 
 
-def _load_sponsor_register() -> tuple[set[str], str, int]:
+def _sponsor_feed_url() -> str:
+    return (os.getenv("APPS_SCRIPT_URL", "").strip()
+            or os.getenv("APP_SCRIPT_READ_URL", "").strip())
+
+
+def _load_sponsor_register() -> tuple[set[str], str, int, str]:
     global _sponsor_cache
     now = time.monotonic()
     with _sponsor_lock:
         if _sponsor_cache and now - _sponsor_cache[0] < SPONSOR_CACHE_SECONDS:
-            return _sponsor_cache[1], _sponsor_cache[2], _sponsor_cache[3]
+            return _sponsor_cache[1], _sponsor_cache[2], _sponsor_cache[3], ""
+        feed_url = _sponsor_feed_url()
+        if not feed_url:
+            return set(), "", 0, "Google Sheets sponsor feed is not configured"
         try:
-            page = requests.get(SPONSOR_REGISTER_PAGE, headers=REQUEST_HEADERS, timeout=(5, 15))
-            page.raise_for_status()
-            soup = BeautifulSoup(page.text, "html.parser")
-            csv_url = next(
-                (_safe_url(anchor.get("href", ""), SPONSOR_REGISTER_PAGE)
-                 for anchor in soup.select("a[href]")
-                 if anchor.get("href", "").lower().endswith(".csv") and "worker" in anchor.get_text(" ", strip=True).lower()),
-                "",
-            )
-            if not csv_url:
-                raise ValueError("Official register CSV link was not found")
-            response = requests.get(csv_url, headers={**REQUEST_HEADERS, "Accept": "text/csv"}, timeout=(5, 30))
+            response = requests.get(feed_url, params={"action": "sponsors", "_": int(time.time() * 1000)},
+                                    headers={"Accept": "application/json"}, timeout=(5, 30))
             response.raise_for_status()
-            text = response.content.decode("utf-8-sig", errors="replace")
-            reader = csv.DictReader(io.StringIO(text))
-            columns = reader.fieldnames or []
-            name_column = next((column for column in columns if "organisation name" in column.lower() or "organization name" in column.lower()), None)
-            if not name_column:
-                raise ValueError("Official register has no recognizable organisation-name column")
-            names = {_employer_key(row.get(name_column, "")) for row in reader if _employer_key(row.get(name_column, ""))}
-            _sponsor_cache = (time.monotonic(), names, csv_url, len(names))
-            return names, csv_url, len(names)
-        except (requests.RequestException, ValueError, csv.Error):
-            return set(), "", 0
+            payload = response.json()
+            companies = payload.get("companies") if isinstance(payload, dict) else None
+            if not isinstance(companies, list):
+                raise ValueError("Google Sheets sponsor feed did not contain a companies array")
+            names = {
+                _employer_key(str(row.get("employerName")))
+                for row in companies
+                if isinstance(row, dict) and row.get("employerName")
+            }
+            names.discard("")
+            _sponsor_cache = (time.monotonic(), names, "Google Sheets Sponsors tab", len(names))
+            return names, "Google Sheets Sponsors tab", len(names), ""
+        except (requests.RequestException, ValueError) as exc:
+            return set(), "", 0, f"Google Sheets sponsor feed unavailable ({type(exc).__name__})"
 
 
 def annotate_sponsorship(job: dict[str, Any], sponsor_names: set[str]) -> dict[str, Any]:
@@ -415,7 +413,7 @@ def search_live_jobs(query: str, location: str, radius: int, days: int, salary_m
         job["_fingerprint"] = fingerprint
         if key not in combined or len(str(job.get("description", ""))) > len(str(combined[key].get("description", ""))):
             combined[key] = job
-    register_names, register_url, register_count = _load_sponsor_register()
+    register_names, register_url, register_count, register_error = _load_sponsor_register()
     results = [annotate_sponsorship(job, register_names) for job in combined.values()]
     for job in results:
         job["relevanceScore"] = relevance_score(job, query)
@@ -434,6 +432,7 @@ def search_live_jobs(query: str, location: str, radius: int, days: int, salary_m
         errors.append({"source": "JobSpy", "error": "All JobSpy searches failed"})
     return {
         "jobs": results, "sources": ["UK Government Jobs", "JobSpy"],
-        "sponsorRegister": {"available": bool(register_names), "url": register_url, "rowCount": register_count},
+        "sponsorRegister": {"available": bool(register_names), "url": register_url, "rowCount": register_count,
+                            **({"error": register_error} if register_error else {})},
         "errors": errors,
     }
