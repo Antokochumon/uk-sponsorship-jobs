@@ -5,7 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
   <meta name="theme-color" content="#0e1f1a">
   <meta name="description" content="Search the UK licensed sponsor register for a specific company. Verify if an employer holds a sponsor licence.">
-  <title>Licensed Sponsor Companies — UKSponsorJobsfinder</title>
+  <meta name="keywords" content="licensed sponsors, UK sponsor register, visa sponsorship, sponsor licence, UK jobs">
+  <meta name="author" content="Anto Kochumon">
+  <meta property="og:title" content="Licensed Sponsor Companies — SponsorshipJobsUK">
+  <meta property="og:description" content="Search the official UK licensed sponsor register to verify employer sponsorship licences.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>Licensed Sponsor Companies — SponsorshipJobsUK</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
@@ -116,6 +122,7 @@
       background: linear-gradient(135deg, var(--forest-deep) 0%, #1c3f32 100%);
       border-bottom: 4px solid var(--lime);
       box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+      z-index: 100;
     }
     .masthead-inner {
       display: flex; justify-content: space-between; align-items: center;
@@ -127,6 +134,11 @@
       color: var(--forest-deep); background: var(--lime); border-radius: 12px;
       font-size: 20px; font-weight: 700;
       box-shadow: 0 4px 12px rgba(200, 236, 110, 0.35); flex-shrink: 0;
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
     }
     .brand-text { display: flex; flex-direction: column; }
     .brand-name {
@@ -142,6 +154,179 @@
       background: rgba(255,255,255,0.07); backdrop-filter: blur(4px);
     }
     .button-outline:hover { color: var(--ink); background: var(--lime); border-color: var(--lime); }
+
+    /* ===== MENU BUTTON & NAV ===== */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 30px;
+      height: 22px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      z-index: 110;
+    }
+    .menu-toggle span {
+      display: block;
+      height: 3px;
+      width: 100%;
+      background: var(--lime);
+      border-radius: 3px;
+      transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.25s ease;
+      transform-origin: center;
+    }
+    .menu-toggle.active span:nth-child(1) {
+      transform: translateY(9.5px) rotate(45deg);
+    }
+    .menu-toggle.active span:nth-child(2) {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+    .menu-toggle.active span:nth-child(3) {
+      transform: translateY(-9.5px) rotate(-45deg);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .nav-links a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 42px;
+      padding: 10px 16px;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: var(--radius-sm);
+      color: #f5faf5;
+      background: rgba(255,255,255,0.07);
+      backdrop-filter: blur(4px);
+      font-size: 12.5px;
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background var(--transition), color var(--transition), border-color var(--transition), transform var(--transition);
+    }
+    .nav-links a:hover {
+      color: var(--ink);
+      background: var(--lime);
+      border-color: var(--lime);
+    }
+    .nav-links a:active { transform: translateY(1px); }
+
+    /* Mobile nav — slide down panel */
+    .mobile-nav-panel {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 105;
+      background: linear-gradient(160deg, var(--forest-deep) 0%, #173d2f 100%);
+      backdrop-filter: blur(16px);
+      padding: 0 24px;
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      visibility: hidden;
+      transition:
+        max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.35s ease,
+        visibility 0.35s ease,
+        padding 0.4s ease;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border-bottom: 3px solid var(--lime);
+    }
+    .mobile-nav-panel.open {
+      max-height: 100vh;
+      opacity: 1;
+      visibility: visible;
+      padding: 88px 24px 34px;
+    }
+    .mobile-nav-panel a {
+      display: block;
+      font-size: 17px;
+      font-weight: 700;
+      color: #f5faf5;
+      text-decoration: none;
+      padding: 15px 22px;
+      border-radius: 12px;
+      letter-spacing: -0.01em;
+      transform: translateY(-12px);
+      opacity: 0;
+      transition:
+        background 0.25s ease,
+        color 0.25s ease,
+        transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+        opacity 0.35s ease;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .mobile-nav-panel.open a {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .mobile-nav-panel.open a:nth-child(1) { transition-delay: 0.08s; }
+    .mobile-nav-panel.open a:nth-child(2) { transition-delay: 0.15s; }
+    .mobile-nav-panel.open a:nth-child(3) { transition-delay: 0.22s; }
+    .mobile-nav-panel a:hover,
+    .mobile-nav-panel a:focus-visible {
+      background: var(--lime);
+      color: var(--forest-deep);
+      transform: translateY(0) scale(1.02);
+    }
+    .mobile-nav-panel .mobile-nav-close {
+      position: absolute;
+      top: 22px;
+      right: 24px;
+      font-size: 34px;
+      color: var(--lime);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      cursor: pointer;
+      line-height: 1;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+    .mobile-nav-panel .mobile-nav-close:hover {
+      background: var(--lime);
+      color: var(--forest-deep);
+      transform: rotate(90deg);
+    }
+    .mobile-nav-panel .mobile-nav-brand {
+      position: absolute;
+      top: 26px;
+      left: 24px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #f5faf5;
+      letter-spacing: -0.01em;
+      opacity: 0;
+      transition: opacity 0.4s ease 0.1s;
+    }
+    .mobile-nav-panel.open .mobile-nav-brand { opacity: 1; }
+    .mobile-nav-panel .mobile-nav-brand span { color: var(--lime); }
+
+    .mobile-nav-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+      z-index: 104;
+    }
+    .mobile-nav-overlay.open { opacity: 1; visibility: visible; }
 
     /* ===== PAGE HEADER ===== */
     .page-header {
@@ -226,6 +411,68 @@
       box-shadow: 0 0 0 3px rgba(26, 77, 62, 0.1); outline: none;
     }
     .search-row .button { height: 46px; padding: 0 24px; flex-shrink: 0; }
+
+    /* ===== STYLISH SEARCH BUTTON ===== */
+    .search-btn-stylish {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 46px;
+      padding: 0 26px;
+      border: 1.5px solid var(--forest);
+      border-radius: 12px;
+      background: linear-gradient(180deg, #246b56 0%, #1a4d3e 100%);
+      color: #ffffff;
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      transition:
+        background 0.22s ease,
+        border-color 0.22s ease,
+        box-shadow 0.22s ease,
+        transform 0.18s ease;
+      box-shadow: 0 4px 14px rgba(26, 77, 62, 0.28);
+      flex-shrink: 0;
+    }
+    .search-btn-stylish::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent 0%, rgba(200, 236, 110, 0.55) 50%, transparent 100%);
+      transform: translateX(-100%);
+      transition: transform 0.55s ease;
+    }
+    .search-btn-stylish:hover::before { transform: translateX(100%); }
+    .search-btn-stylish:hover {
+      border-color: #2e7d5e;
+      background: linear-gradient(180deg, #2e7d5e 0%, #1f5c49 100%);
+      box-shadow: 0 8px 24px rgba(26, 77, 62, 0.4);
+      transform: translateY(-2px);
+    }
+    .search-btn-stylish:active { transform: translateY(0) scale(0.98); }
+    .search-btn-stylish:disabled {
+      background: linear-gradient(180deg, #3c7a66 0%, #2c5a4a 100%);
+      opacity: 0.7;
+      cursor: wait;
+      transform: none;
+      box-shadow: none;
+    }
+    .search-btn-stylish .btn-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      transition: transform 0.22s ease;
+    }
+    .search-btn-stylish:hover .btn-icon { transform: scale(1.12); }
+    .search-btn-stylish .btn-icon svg { width: 100%; height: 100%; display: block; }
 
     /* ===== STATE ===== */
     .state-message {
@@ -314,26 +561,140 @@
       font-size: 16px; font-weight: 700; letter-spacing: -0.01em;
     }
 
-    /* ===== FOOTER ===== */
-    footer {
-      padding: 26px 0 34px; color: #67756d; font-size: 11px; line-height: 1.75;
+    /* ===== FOOTER (MODERN, RESPONSIVE, STYLISH) ===== */
+    .site-footer {
+      position: relative;
+      background: linear-gradient(160deg, var(--forest-deep) 0%, #143a2c 100%);
+      color: #c6d6cd;
+      padding: 0;
+      margin-top: 20px;
+      border-top: 4px solid var(--lime);
+      overflow: hidden;
+    }
+    .site-footer::before {
+      content: "";
+      position: absolute;
+      top: -120px;
+      right: -120px;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(200, 236, 110, 0.12), transparent 70%);
+      pointer-events: none;
     }
     .footer-inner {
-      display: flex; justify-content: space-between; align-items: flex-start;
-      gap: 24px; flex-wrap: wrap;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 44px 0 36px;
+      gap: 20px;
+      position: relative;
+      z-index: 1;
     }
-    .footer-note { max-width: 660px; }
-    .footer-note strong { color: var(--ink); }
-    .footer-credit { text-align: right; font-size: 11px; color: #7a8a81; }
+    .footer-brand-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .footer-brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      color: var(--forest-deep);
+      background: var(--lime);
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(200, 236, 110, 0.3);
+    }
+    .footer-brand-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: #f5faf5;
+      letter-spacing: -0.01em;
+    }
+    .footer-brand-name span { color: var(--lime); }
+    .footer-credit {
+      font-size: 13px;
+      color: #c6d6cd;
+      line-height: 1.9;
+    }
     .footer-credit a {
-      color: var(--forest); font-weight: 700; text-decoration: none;
-      border-bottom: 1.5px solid rgba(26, 77, 62, 0.3);
+      color: var(--lime);
+      font-weight: 700;
+      text-decoration: none;
+      border-bottom: 1.5px solid rgba(200, 236, 110, 0.4);
       transition: border-color var(--transition), color var(--transition);
     }
-    .footer-credit a:hover { color: var(--forest-deep); border-color: var(--forest-deep); }
+    .footer-credit a:hover {
+      color: #e6f8c4;
+      border-color: #e6f8c4;
+    }
+    .footer-copyright {
+      display: block;
+      margin-top: 8px;
+      font-size: 11px;
+      color: #9fb5a9;
+      letter-spacing: 0.01em;
+    }
+    .footer-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 4px;
+    }
+    .footer-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 18px;
+      border-radius: 999px;
+      color: #d6e4dc;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(200, 236, 110, 0.18);
+      transition: background 0.22s ease, color 0.22s ease, border-color 0.22s ease, transform 0.18s ease;
+    }
+    .footer-links a:hover {
+      background: var(--lime);
+      color: var(--forest-deep);
+      border-color: var(--lime);
+      transform: translateY(-2px);
+    }
     .footer-divider {
-      height: 1px; background: linear-gradient(90deg, transparent, #d9e5dc, transparent);
-      margin: 18px 0 14px;
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(200, 236, 110, 0.3), transparent);
+      margin: 22px 0 0;
+    }
+    .footer-bottom {
+      width: 100%;
+      font-size: 10.5px;
+      color: #8fa79a;
+      text-align: center;
+      line-height: 1.8;
+      letter-spacing: 0.01em;
+      padding: 18px 0 26px;
+      position: relative;
+      z-index: 1;
+    }
+    .footer-bottom .footer-dot {
+      display: inline-block;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--lime);
+      margin: 0 8px;
+      vertical-align: middle;
+      opacity: 0.6;
     }
 
     /* ===== RESPONSIVE ===== */
@@ -341,22 +702,37 @@
       .page-header { align-items: flex-start; flex-direction: column; gap: 16px; }
       .back-link { align-self: flex-start; }
     }
+
+    /* Mobile menu behaviour */
+    @media (max-width: 780px) {
+      .mast-actions { display: none; }
+      .menu-toggle { display: flex; }
+      .nav-links { display: none; }
+    }
+
     @media (max-width: 680px) {
       .shell { width: calc(100% - 20px); }
       .masthead { padding: 14px 0; }
-      .masthead-inner { flex-direction: column; align-items: stretch; gap: 12px; }
-      .mast-actions { width: 100%; }
-      .mast-actions .button { flex: 1; }
+      .masthead-inner { flex-direction: row; align-items: center; gap: 12px; }
+      .brand-note { font-size: 9.5px; }
       .page-header { padding: 26px 0 6px; }
       h1 { font-size: clamp(26px, 7vw, 32px); }
       .search-card { padding: 16px; }
       .search-row { flex-direction: column; align-items: stretch; }
       .search-row .field { min-width: 0; }
-      .search-row .button { width: 100%; }
+      .search-row .search-btn-stylish { width: 100%; }
       .grid { grid-template-columns: 1fr; gap: 10px; }
-      .footer-inner { flex-direction: column; gap: 14px; }
-      .footer-credit { text-align: left; }
       .loader-card { padding: 30px 34px; }
+      .footer-inner { padding: 34px 0 28px; }
+      .mobile-nav-panel.open { padding: 84px 18px 28px; }
+      .mobile-nav-panel a { font-size: 16px; padding: 14px 18px; }
+      .mobile-nav-panel .mobile-nav-brand { font-size: 14px; left: 18px; top: 26px; }
+      .mobile-nav-panel .mobile-nav-close { right: 18px; }
+    }
+    @media (max-width: 400px) {
+      .footer-links { flex-direction: column; width: 100%; gap: 9px; }
+      .footer-links a { width: 100%; justify-content: center; }
+      .footer-brand-row { flex-direction: column; gap: 8px; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
@@ -366,6 +742,7 @@
         transition-duration: 0.01ms !important;
       }
       .card:hover { transform: none; }
+      .brand-mark { animation: none; }
     }
   </style>
 </head>
@@ -390,17 +767,40 @@
   <header class="masthead">
     <div class="shell masthead-inner">
       <div class="brand">
-        <div class="brand-mark" aria-hidden="true">UK</div>
+        <div class="brand-mark" aria-hidden="true">SJ</div>
         <div class="brand-text">
-          <div class="brand-name">UK<span>Sponsor</span>Jobsfinder</div>
+          <div class="brand-name">Sponsorship<span>Jobs</span>UK</div>
           <div class="brand-note">Recent vacancies · sponsorship evidence · direct links</div>
         </div>
       </div>
-      <div class="mast-actions">
-        <a class="button button-outline" href="index.html">← Back to jobs</a>
+
+      <!-- Desktop nav links -->
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="About.html">About</a>
+        <a href="contact.html">Contact</a>
       </div>
+
+      <!-- Mobile menu button -->
+      <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNavPanel">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
     </div>
   </header>
+
+  <!-- Overlay for mobile nav -->
+  <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+
+  <!-- Mobile slide-down nav panel -->
+  <div class="mobile-nav-panel" id="mobileNavPanel" role="dialog" aria-modal="true" aria-label="Mobile navigation">
+    <div class="mobile-nav-brand">Sponsorship<span>Jobs</span>UK</div>
+    <button class="mobile-nav-close" id="mobileNavClose" aria-label="Close menu">&times;</button>
+    <a href="index.html">Home</a>
+    <a href="About.html">About</a>
+    <a href="contact.html">Contact</a>
+  </div>
 
   <main class="shell">
     <!-- ===== PAGE HEADER ===== -->
@@ -409,6 +809,7 @@
         <h1>Licensed <em>Sponsor</em> Companies</h1>
         <p>Search the existing Sponsors sheet for a specific company. Verify if an employer holds a sponsor licence before applying.</p>
       </div>
+      <a class="back-link" href="index.html">Back to jobs</a>
     </section>
 
     <!-- ===== NOTICE BAR ===== -->
@@ -428,7 +829,12 @@
           <label for="search">Company name</label>
           <input id="search" type="search" placeholder="Enter a company name" autocomplete="off" spellcheck="false">
         </div>
-        <button class="button primary" id="searchBtn" type="button">Search</button>
+        <button class="search-btn-stylish" id="searchBtn" type="button">
+          <span class="btn-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </span>
+          Search
+        </button>
       </div>
     </section>
 
@@ -441,20 +847,27 @@
     <div id="grid" class="grid" aria-live="polite"></div>
   </main>
 
-  <!-- ===== FOOTER ===== -->
-  <footer class="shell">
-    <div class="footer-inner">
-      <div class="footer-note">
-        <strong>Important:</strong> A sponsor-register match alone does not mean an employer offers sponsorship for a specific vacancy. The first sponsorship filter requires both an exact register match and an explicit offer in the advert. Job listings remain the responsibility of their original publishers.
+  <!-- ===== FOOTER (MODERN, RESPONSIVE, STYLISH) ===== -->
+  <footer class="site-footer">
+    <div class="shell">
+      <div class="footer-inner">
+        <div class="footer-brand-row">
+          <div class="footer-brand-mark" aria-hidden="true">SJ</div>
+          <div class="footer-brand-name">Sponsorship<span>Jobs</span>UK</div>
+        </div>
+        <div class="footer-credit">
+          Designed &amp; developed by <a href="https://antokochumon.github.io/Portfolio/" target="_blank" rel="noopener noreferrer">Anto Kochumon</a>
+          <span class="footer-copyright">© 2026 SponsorshipJobsUK. All rights reserved.</span>
+        </div>
+        <div class="footer-links">
+          <a href="index.html">Home</a>
+          <a href="About.html">About</a>
+          <a href="contact.html">Contact</a>
+        </div>
       </div>
-      <div class="footer-credit">
-        Designed &amp; developed by <a href="https://antokochumon.github.io/Portfolio/" target="_blank" rel="noopener noreferrer">Anto Kochumon</a>
-      </div>
-    </div>
-    <div class="footer-divider"></div>
-    <div class="footer-inner">
-      <div class="footer-note" style="font-size:10px;color:#8a9a91;">
-        UKSponsorJobsfinder · Search current UK vacancies with sponsorship evidence and original application links.
+      <div class="footer-divider"></div>
+      <div class="footer-bottom">
+        SponsorshipJobsUK <span class="footer-dot"></span> Search current UK vacancies with sponsorship evidence and original application links.
       </div>
     </div>
   </footer>
@@ -469,6 +882,48 @@
     const grid = document.getElementById("grid");
     const search = document.getElementById("search");
     const searchBtn = document.getElementById("searchBtn");
+
+    /* ===== MOBILE SLIDE-DOWN MENU ===== */
+    const menuToggle = document.getElementById("menuToggle");
+    const mobileNavPanel = document.getElementById("mobileNavPanel");
+    const mobileNavClose = document.getElementById("mobileNavClose");
+    const mobileNavOverlay = document.getElementById("mobileNavOverlay");
+
+    function openMobileMenu() {
+      mobileNavPanel.classList.add("open");
+      mobileNavOverlay.classList.add("open");
+      menuToggle.classList.add("active");
+      menuToggle.setAttribute("aria-expanded", "true");
+      document.body.style.overflow = "hidden";
+    }
+    function closeMobileMenu() {
+      mobileNavPanel.classList.remove("open");
+      mobileNavOverlay.classList.remove("open");
+      menuToggle.classList.remove("active");
+      menuToggle.setAttribute("aria-expanded", "false");
+      document.body.style.overflow = "";
+    }
+    if (menuToggle) {
+      menuToggle.addEventListener("click", () => {
+        if (mobileNavPanel.classList.contains("open")) {
+          closeMobileMenu();
+        } else {
+          openMobileMenu();
+        }
+      });
+    }
+    if (mobileNavClose) mobileNavClose.addEventListener("click", closeMobileMenu);
+    if (mobileNavOverlay) mobileNavOverlay.addEventListener("click", closeMobileMenu);
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && mobileNavPanel.classList.contains("open")) {
+        closeMobileMenu();
+      }
+    });
+    mobileNavPanel.querySelectorAll("a").forEach(link => {
+      link.addEventListener("click", () => {
+        closeMobileMenu();
+      });
+    });
 
     /* ===== PERCENTAGE LOADER ===== */
     const loaderOverlay = document.getElementById("loaderOverlay");
