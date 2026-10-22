@@ -1,46 +1,563 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Licensed Sponsor Companies</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
+  <meta name="theme-color" content="#0e1f1a">
+  <meta name="description" content="Search the UK licensed sponsor register for a specific company. Verify if an employer holds a sponsor licence.">
+  <title>Licensed Sponsor Companies — UKSponsorJobsfinder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
   <style>
-    :root{font-family:system-ui,sans-serif;color:#172421;background:#f4f7f3}body{max-width:1100px;margin:0 auto;padding:24px 16px}a{color:#1d4940}header{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:24px}h1{margin:0}input{width:100%;padding:12px;border:1px solid #ccd9cf;border-radius:6px;box-sizing:border-box;font:inherit;margin:12px 0 8px}.meta{color:#61736a;font-size:14px}.notice{padding:18px;border:1px solid #d8e2da;border-radius:8px;background:#fff;margin-top:16px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin-top:16px}.card{background:#fff;border:1px solid #d8e2da;border-radius:8px;padding:16px}.card h2{font-size:17px;margin:0 0 10px}.card p{margin:5px 0;color:#61736a;font-size:14px}.search-row{display:flex;gap:12px;align-items:flex-end;margin:12px 0 8px}.search-row label{flex:1;margin:0}.search-row input{margin:0}.search-row button{padding:12px 24px;border:1px solid #1d4940;border-radius:6px;background:#1d4940;color:#fff;font:inherit;cursor:pointer;white-space:nowrap}.search-row button:hover{background:#163a33}.search-row button:disabled{opacity:.6;cursor:wait}@media(max-width:600px){header{display:block}.search-row{flex-direction:column;align-items:stretch}}
+    /* ===== DESIGN SYSTEM (SAME AS MAIN PAGE) ===== */
+    :root {
+      color-scheme: light;
+      --ink: #0f1f1a;
+      --ink-soft: #1e332c;
+      --muted: #5a6f66;
+      --line: #dfe8e2;
+      --paper: #f5f9f5;
+      --white: #ffffff;
+      --forest: #1a4d3e;
+      --forest-deep: #0e2e24;
+      --mint: #d4ede0;
+      --lime: #c8ec6e;
+      --lime-soft: #e6f8c4;
+      --amber: #f0b950;
+      --red: #b84a3e;
+      --shadow: 0 8px 28px rgba(18, 40, 28, 0.07);
+      --shadow-lg: 0 18px 48px rgba(18, 40, 28, 0.10);
+      --radius: 14px;
+      --radius-sm: 8px;
+      --font-sans: "DM Sans", "Segoe UI", system-ui, sans-serif;
+      --font-serif: "Newsreader", Georgia, serif;
+      --transition: 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+      font-family: var(--font-sans);
+      color: var(--ink);
+      background: var(--paper);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      min-width: 320px;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(200, 236, 110, 0.18), transparent),
+        linear-gradient(90deg, #e9f0e9 1px, transparent 1px) 0 0 / 48px 48px,
+        linear-gradient(#e9f0e9 1px, transparent 1px) 0 0 / 48px 48px,
+        var(--paper);
+      line-height: 1.5;
+    }
+    button, input { font: inherit; }
+    button, a, input { -webkit-tap-highlight-color: transparent; }
+    button:focus-visible, a:focus-visible, input:focus-visible {
+      outline: 3px solid #4c8f72;
+      outline-offset: 2px;
+    }
+    .shell { width: min(1280px, calc(100% - 32px)); margin: 0 auto; }
+    .button {
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      min-height: 42px; padding: 10px 16px;
+      border: 1px solid transparent; border-radius: var(--radius-sm);
+      color: var(--ink); background: var(--white);
+      font-size: 12.5px; font-weight: 600; cursor: pointer;
+      transition: background var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+      white-space: nowrap; text-decoration: none;
+    }
+    .button:hover { background: #eef6ee; }
+    .button:active { transform: translateY(1px); }
+    .button:disabled { opacity: 0.5; cursor: wait; transform: none; }
+    .button.primary { background: var(--forest); color: #fff; border-color: var(--forest); }
+    .button.primary:hover { background: #246b56; border-color: #246b56; }
+
+    /* ===== LOADER ===== */
+    .loader-overlay {
+      position: fixed; inset: 0; z-index: 9999;
+      display: grid; place-items: center;
+      background: rgba(14, 31, 26, 0.55);
+      backdrop-filter: blur(6px);
+      opacity: 0; visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+    .loader-overlay.active { opacity: 1; visibility: visible; }
+    .loader-card {
+      display: flex; flex-direction: column; align-items: center; gap: 18px;
+      padding: 38px 48px; border-radius: 22px;
+      background: rgba(255,255,255,0.97);
+      box-shadow: 0 24px 70px rgba(0,0,0,0.25);
+      min-width: 240px;
+    }
+    .loader-ring { position: relative; width: 86px; height: 86px; }
+    .loader-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .loader-ring circle { fill: none; stroke-width: 7; stroke-linecap: round; }
+    .loader-ring .track { stroke: #e3eee6; }
+    .loader-ring .progress {
+      stroke: var(--forest);
+      stroke-dasharray: 226;
+      stroke-dashoffset: 226;
+      transition: stroke-dashoffset 0.2s linear;
+    }
+    .loader-percent {
+      position: absolute; inset: 0; display: grid; place-items: center;
+      font-size: 19px; font-weight: 700; color: var(--forest-deep);
+      letter-spacing: -0.02em;
+    }
+    .loader-label {
+      font-size: 12.5px; font-weight: 600; color: var(--ink-soft);
+      letter-spacing: 0.02em; text-align: center;
+    }
+    .loader-sub { font-size: 10.5px; color: var(--muted); margin-top: -10px; }
+
+    /* ===== MASTHEAD ===== */
+    .masthead {
+      position: relative; padding: 18px 0; color: #fff;
+      background: linear-gradient(135deg, var(--forest-deep) 0%, #1c3f32 100%);
+      border-bottom: 4px solid var(--lime);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    }
+    .masthead-inner {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 18px; flex-wrap: wrap;
+    }
+    .brand { display: flex; align-items: center; gap: 13px; }
+    .brand-mark {
+      display: grid; place-items: center; width: 42px; height: 42px;
+      color: var(--forest-deep); background: var(--lime); border-radius: 12px;
+      font-size: 20px; font-weight: 700;
+      box-shadow: 0 4px 12px rgba(200, 236, 110, 0.35); flex-shrink: 0;
+    }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-name {
+      font-size: 17px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2;
+    }
+    .brand-name span { color: var(--lime); }
+    .brand-note {
+      margin-top: 2px; color: #b9c8bf; font-size: 11px; font-weight: 500;
+    }
+    .mast-actions { display: flex; align-items: center; gap: 10px; }
+    .button-outline {
+      border-color: rgba(255,255,255,0.25); color: #f5faf5;
+      background: rgba(255,255,255,0.07); backdrop-filter: blur(4px);
+    }
+    .button-outline:hover { color: var(--ink); background: var(--lime); border-color: var(--lime); }
+
+    /* ===== PAGE HEADER ===== */
+    .page-header {
+      display: flex; justify-content: space-between; align-items: flex-end;
+      gap: 24px; padding: 36px 0 8px;
+    }
+    h1 {
+      font-family: var(--font-serif); font-size: clamp(28px, 4vw, 40px);
+      line-height: 1.08; font-weight: 500; letter-spacing: -0.025em;
+      color: var(--ink); margin: 0;
+    }
+    h1 em {
+      font-style: normal;
+      background: linear-gradient(120deg, var(--forest) 0%, #2e7d5e 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .page-header p {
+      max-width: 560px; margin: 10px 0 0; color: #4e6258;
+      font-size: 13.5px; line-height: 1.65;
+    }
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 10px 16px; border-radius: var(--radius-sm);
+      border: 1.5px solid #d5e0d8; color: var(--forest);
+      background: #f6faf5; font-size: 12.5px; font-weight: 600;
+      text-decoration: none; transition: all var(--transition);
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .back-link:hover { background: var(--mint); border-color: #b8d4c3; }
+    .back-link::before { content: "←"; font-weight: 700; }
+
+    /* ===== NOTICE ===== */
+    .notice-bar {
+      display: flex; align-items: flex-start; gap: 12px;
+      margin: 20px 0 0; padding: 14px 16px;
+      border: 1px solid #e9d19a; border-left: 4px solid var(--amber);
+      border-radius: var(--radius-sm); color: #674d1c;
+      background: #fff8e8; font-size: 12px; line-height: 1.6;
+    }
+    .notice-bar a {
+      color: #674d1c; font-weight: 700;
+      text-decoration: underline; text-underline-offset: 2px;
+    }
+    .notice-bar a:hover { color: #4a3610; }
+    .notice-icon { flex-shrink: 0; font-size: 16px; line-height: 1.4; }
+
+    /* ===== SEARCH ===== */
+    .search-card {
+      margin: 22px 0 0; padding: 22px;
+      border: 1px solid var(--line); border-radius: var(--radius);
+      background: var(--white); box-shadow: var(--shadow);
+    }
+    .search-card h2 {
+      font-size: 15px; font-weight: 700; letter-spacing: -0.01em;
+      display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
+    }
+    .search-card h2::before {
+      content: ""; width: 4px; height: 16px; border-radius: 2px;
+      background: var(--lime);
+    }
+    .search-row {
+      display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;
+    }
+    .search-row .field { flex: 1; min-width: 200px; }
+    .search-row label {
+      display: block; margin-bottom: 6px; color: #4f6258;
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .search-row input {
+      width: 100%; height: 46px; padding: 0 14px;
+      border: 1.5px solid #d5e0d8; border-radius: var(--radius-sm);
+      color: var(--ink); background: #fdfefd;
+      font-size: 13.5px; font-weight: 500;
+      transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+    }
+    .search-row input::placeholder { color: #9aaba1; font-weight: 400; }
+    .search-row input:hover { border-color: #b8ccbd; background: #fff; }
+    .search-row input:focus {
+      border-color: var(--forest); background: #fff;
+      box-shadow: 0 0 0 3px rgba(26, 77, 62, 0.1); outline: none;
+    }
+    .search-row .button { height: 46px; padding: 0 24px; flex-shrink: 0; }
+
+    /* ===== STATE ===== */
+    .state-message {
+      min-height: 38px; display: flex; align-items: center; gap: 10px;
+      margin: 18px 2px 4px; color: #4e6258;
+      font-size: 12px; font-weight: 500; line-height: 1.5;
+    }
+    .state-message.error { color: var(--red); }
+    .state-message::before {
+      content: ""; width: 7px; height: 7px; border-radius: 50%;
+      background: var(--forest); flex-shrink: 0;
+      box-shadow: 0 0 0 3px rgba(26, 77, 62, 0.12);
+    }
+    .state-message.error::before { background: var(--red); box-shadow: 0 0 0 3px rgba(184, 74, 62, 0.12); }
+    .state-message:empty::before { display: none; }
+
+    /* ===== COMPANY GRID ===== */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 14px; margin-top: 14px; padding-bottom: 20px;
+    }
+    .card {
+      background: var(--white); border: 1px solid var(--line);
+      border-radius: var(--radius); padding: 18px;
+      box-shadow: var(--shadow);
+      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+      animation: appear 0.32s ease both;
+      position: relative; overflow: hidden;
+    }
+    .card::after {
+      content: ""; position: absolute; inset: auto 0 0 0; height: 3px;
+      background: linear-gradient(90deg, var(--lime), var(--forest));
+      opacity: 0; transition: opacity var(--transition);
+    }
+    .card:hover {
+      transform: translateY(-3px); box-shadow: var(--shadow-lg);
+      border-color: #c3d9c9;
+    }
+    .card:hover::after { opacity: 1; }
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .card h2 {
+      font-size: 16.5px; font-weight: 700; letter-spacing: -0.015em;
+      line-height: 1.3; margin: 0 0 12px; color: var(--ink);
+      overflow-wrap: anywhere;
+    }
+    .card p {
+      margin: 6px 0; color: #5a6f66; font-size: 12.5px;
+      line-height: 1.55; overflow-wrap: anywhere;
+      display: flex; gap: 4px;
+    }
+    .card p strong {
+      color: #3f5449; font-weight: 600; flex-shrink: 0;
+    }
+
+    /* ===== SKELETON ===== */
+    .skeleton {
+      background: linear-gradient(90deg, #eef3ef 25%, #e2eae4 50%, #eef3ef 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 6px;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .skeleton-line { height: 12px; margin-bottom: 10px; }
+    .skeleton-line.w-60 { width: 60%; }
+    .skeleton-line.w-40 { width: 40%; }
+    .skeleton-line.w-80 { width: 80%; }
+    .skeleton-line.h-20 { height: 20px; }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+      grid-column: 1 / -1; padding: 40px 24px;
+      border: 1.5px dashed #c2d0c5; border-radius: var(--radius);
+      color: #5f7268; background: linear-gradient(180deg, #fbfdfb, #f6faf6);
+      text-align: center; font-size: 12.5px; line-height: 1.65;
+    }
+    .empty-state .empty-icon { font-size: 34px; margin-bottom: 10px; opacity: 0.7; }
+    .empty-state strong {
+      display: block; margin-bottom: 6px; color: var(--ink);
+      font-size: 16px; font-weight: 700; letter-spacing: -0.01em;
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      padding: 26px 0 34px; color: #67756d; font-size: 11px; line-height: 1.75;
+    }
+    .footer-inner {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: 24px; flex-wrap: wrap;
+    }
+    .footer-note { max-width: 660px; }
+    .footer-note strong { color: var(--ink); }
+    .footer-credit { text-align: right; font-size: 11px; color: #7a8a81; }
+    .footer-credit a {
+      color: var(--forest); font-weight: 700; text-decoration: none;
+      border-bottom: 1.5px solid rgba(26, 77, 62, 0.3);
+      transition: border-color var(--transition), color var(--transition);
+    }
+    .footer-credit a:hover { color: var(--forest-deep); border-color: var(--forest-deep); }
+    .footer-divider {
+      height: 1px; background: linear-gradient(90deg, transparent, #d9e5dc, transparent);
+      margin: 18px 0 14px;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .page-header { align-items: flex-start; flex-direction: column; gap: 16px; }
+      .back-link { align-self: flex-start; }
+    }
+    @media (max-width: 680px) {
+      .shell { width: calc(100% - 20px); }
+      .masthead { padding: 14px 0; }
+      .masthead-inner { flex-direction: column; align-items: stretch; gap: 12px; }
+      .mast-actions { width: 100%; }
+      .mast-actions .button { flex: 1; }
+      .page-header { padding: 26px 0 6px; }
+      h1 { font-size: clamp(26px, 7vw, 32px); }
+      .search-card { padding: 16px; }
+      .search-row { flex-direction: column; align-items: stretch; }
+      .search-row .field { min-width: 0; }
+      .search-row .button { width: 100%; }
+      .grid { grid-template-columns: 1fr; gap: 10px; }
+      .footer-inner { flex-direction: column; gap: 14px; }
+      .footer-credit { text-align: left; }
+      .loader-card { padding: 30px 34px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .card:hover { transform: none; }
+    }
   </style>
 </head>
 <body>
-  <header><div><h1>Licensed Sponsor Companies</h1><p class="meta">Search the existing Sponsors sheet for a specific company.</p></div><a href="index.html">Back to jobs</a></header>
-  <p>Being on the licensed sponsor register does not guarantee that every vacancy offers sponsorship. Always check the individual advert and current immigration rules.</p>
-  <p><a href="https://www.gov.uk/government/publications/register-of-licensed-sponsors-workers" target="_blank" rel="noopener noreferrer">View the official government register ↗</a></p>
 
-  <div class="search-row">
-    <label for="search">Search companies</label>
-    <input id="search" type="search" placeholder="Enter a company name" autocomplete="off">
-    <button id="searchBtn" type="button">Search</button>
+  <!-- ===== PERCENTAGE LOADER ===== -->
+  <div class="loader-overlay" id="loaderOverlay" role="alert" aria-live="assertive">
+    <div class="loader-card">
+      <div class="loader-ring">
+        <svg viewBox="0 0 86 86" aria-hidden="true">
+          <circle class="track" cx="43" cy="43" r="36"></circle>
+          <circle class="progress" id="loaderProgress" cx="43" cy="43" r="36"></circle>
+        </svg>
+        <div class="loader-percent" id="loaderPercent">0%</div>
+      </div>
+      <div class="loader-label" id="loaderLabel">Searching sponsors…</div>
+      <div class="loader-sub" id="loaderSub">Checking the licensed register</div>
+    </div>
   </div>
 
-  <div id="state" class="notice" role="status">Enter a company name and click Search.</div>
-  <div id="grid" class="grid"></div>
+  <!-- ===== MASTHEAD ===== -->
+  <header class="masthead">
+    <div class="shell masthead-inner">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">UK</div>
+        <div class="brand-text">
+          <div class="brand-name">UK<span>Sponsor</span>Jobsfinder</div>
+          <div class="brand-note">Recent vacancies · sponsorship evidence · direct links</div>
+        </div>
+      </div>
+      <div class="mast-actions">
+        <a class="button button-outline" href="index.html">← Back to jobs</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <!-- ===== PAGE HEADER ===== -->
+    <section class="page-header">
+      <div>
+        <h1>Licensed <em>Sponsor</em> Companies</h1>
+        <p>Search the existing Sponsors sheet for a specific company. Verify if an employer holds a sponsor licence before applying.</p>
+      </div>
+    </section>
+
+    <!-- ===== NOTICE BAR ===== -->
+    <div class="notice-bar">
+      <span class="notice-icon" aria-hidden="true">⚠️</span>
+      <div>
+        Being on the licensed sponsor register does not guarantee that every vacancy offers sponsorship. Always check the individual advert and current immigration rules.
+        <a href="https://www.gov.uk/government/publications/register-of-licensed-sponsors-workers" target="_blank" rel="noopener noreferrer">View the official government register ↗</a>
+      </div>
+    </div>
+
+    <!-- ===== SEARCH CARD ===== -->
+    <section class="search-card">
+      <h2>Search companies</h2>
+      <div class="search-row">
+        <div class="field">
+          <label for="search">Company name</label>
+          <input id="search" type="search" placeholder="Enter a company name" autocomplete="off" spellcheck="false">
+        </div>
+        <button class="button primary" id="searchBtn" type="button">Search</button>
+      </div>
+    </section>
+
+    <!-- ===== STATE MESSAGE ===== -->
+    <div id="state" class="state-message" role="status" aria-live="polite">
+      Enter a company name and click Search.
+    </div>
+
+    <!-- ===== RESULTS GRID ===== -->
+    <div id="grid" class="grid" aria-live="polite"></div>
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="shell">
+    <div class="footer-inner">
+      <div class="footer-note">
+        <strong>Important:</strong> A sponsor-register match alone does not mean an employer offers sponsorship for a specific vacancy. The first sponsorship filter requires both an exact register match and an explicit offer in the advert. Job listings remain the responsibility of their original publishers.
+      </div>
+      <div class="footer-credit">
+        Designed &amp; developed by <a href="https://antokochumon.github.io/Portfolio/" target="_blank" rel="noopener noreferrer">Anto Kochumon</a>
+      </div>
+    </div>
+    <div class="footer-divider"></div>
+    <div class="footer-inner">
+      <div class="footer-note" style="font-size:10px;color:#8a9a91;">
+        UKSponsorJobsfinder · Search current UK vacancies with sponsorship evidence and original application links.
+      </div>
+    </div>
+  </footer>
 
   <script src="frontend-config.js"></script>
   <script>
     "use strict";
-    const endpoint = String(window.JOBAPI_BACKEND_URL || "").replace(/\/$/,"");
+
+    /* ===== CONFIG ===== */
+    const endpoint = String(window.JOBAPI_BACKEND_URL || "").replace(/\/$/, "");
     const state = document.getElementById("state");
     const grid = document.getElementById("grid");
     const search = document.getElementById("search");
     const searchBtn = document.getElementById("searchBtn");
 
+    /* ===== PERCENTAGE LOADER ===== */
+    const loaderOverlay = document.getElementById("loaderOverlay");
+    const loaderPercent = document.getElementById("loaderPercent");
+    const loaderProgress = document.getElementById("loaderProgress");
+    const loaderLabel = document.getElementById("loaderLabel");
+    const loaderSub = document.getElementById("loaderSub");
+    const CIRCUMFERENCE = 2 * Math.PI * 36;
+
+    function setLoaderPercent(percent) {
+      const clamped = Math.max(0, Math.min(100, Math.round(percent)));
+      loaderPercent.textContent = `${clamped}%`;
+      loaderProgress.style.strokeDashoffset = CIRCUMFERENCE - (CIRCUMFERENCE * clamped) / 100;
+    }
+    function showLoader(label, sub) {
+      loaderLabel.textContent = label || "Searching sponsors…";
+      loaderSub.textContent = sub || "Checking the licensed register";
+      setLoaderPercent(0);
+      loaderOverlay.classList.add("active");
+    }
+    function hideLoader() {
+      loaderOverlay.classList.remove("active");
+    }
+    let loaderInterval = null;
+    function startLoaderAnimation(target, duration) {
+      const start = performance.now();
+      const from = parseInt(loaderPercent.textContent) || 0;
+      if (loaderInterval) clearInterval(loaderInterval);
+      loaderInterval = setInterval(() => {
+        const elapsed = performance.now() - start;
+        const t = Math.min(elapsed / duration, 1);
+        const eased = 1 - Math.pow(1 - t, 3);
+        setLoaderPercent(from + (target - from) * eased);
+        if (t >= 1) { clearInterval(loaderInterval); loaderInterval = null; }
+      }, 30);
+    }
+    function finishLoader() {
+      setLoaderPercent(100);
+      setTimeout(() => hideLoader(), 350);
+    }
+
+    /* ===== UTILS ===== */
     const clean = value => String(value == null ? "" : value).trim();
 
-    function clearGrid() { grid.replaceChildren(); }
+    function clearGrid() {
+      grid.replaceChildren();
+    }
 
+    /* ===== SKELETON ===== */
+    function showSkeleton() {
+      clearGrid();
+      for (let i = 0; i < 3; i++) {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.setAttribute("aria-hidden", "true");
+        card.innerHTML = `
+          <div class="skeleton skeleton-line h-20 w-60"></div>
+          <div class="skeleton skeleton-line w-40"></div>
+          <div class="skeleton skeleton-line w-80"></div>
+          <div class="skeleton skeleton-line w-60"></div>
+        `;
+        grid.append(card);
+      }
+    }
+
+    /* ===== EMPTY STATE ===== */
+    function showEmptyState(title, message) {
+      clearGrid();
+      const empty = document.createElement("div");
+      empty.className = "empty-state";
+      empty.innerHTML = `
+        <div class="empty-icon" aria-hidden="true">🏢</div>
+        <strong>${title}</strong>
+        ${message ? `<span>${message}</span>` : ""}
+      `;
+      grid.append(empty);
+    }
+
+    /* ===== RENDER COMPANIES ===== */
     function renderCompanies(rows, totalNote) {
       clearGrid();
       if (!rows.length) {
         state.textContent = totalNote || "No licensed sponsor companies match that search.";
+        state.classList.remove("error");
+        showEmptyState("No companies found", totalNote || "Try a different company name.");
         return;
       }
-      state.textContent = rows.length.toLocaleString() + " licensed sponsor company" + (rows.length === 1 ? "" : " companies") + " found.";
+      state.textContent = rows.length.toLocaleString() + " licensed sponsor compan" + (rows.length === 1 ? "y" : "ies") + " found.";
+      state.classList.remove("error");
       rows.forEach(company => {
         const card = document.createElement("article");
         card.className = "card";
@@ -50,7 +567,7 @@
         [["Licence rating", company.licenceRating], ["Route", company.route], ["Town/City", company.townCity], ["County", company.county]].forEach(([label, value]) => {
           if (value) {
             const p = document.createElement("p");
-            p.textContent = label + ": " + value;
+            p.innerHTML = `<strong>${label}:</strong> ${clean(value)}`;
             card.append(p);
           }
         });
@@ -58,21 +575,28 @@
       });
     }
 
+    /* ===== SEARCH SPONSORS ===== */
     async function searchSponsors() {
       const query = clean(search.value);
       if (!query) {
         state.textContent = "Please enter a company name to search.";
+        state.classList.add("error");
         clearGrid();
+        showEmptyState("Enter a company name", "Type a name above and click Search.");
         return;
       }
       if (!endpoint) {
         state.textContent = "The backend URL is not configured for this deployment.";
+        state.classList.add("error");
         return;
       }
 
       searchBtn.disabled = true;
       state.textContent = "Searching for “" + query + "”…";
-      clearGrid();
+      state.classList.remove("error");
+      showSkeleton();
+      showLoader("Searching sponsors…", `Looking for “${query}” in the licensed register`);
+      startLoaderAnimation(80, 2200);
 
       try {
         // Only ask the backend for the specific company — no full list is loaded.
@@ -98,13 +622,20 @@
         rows = rows.filter(c => clean(c.employerName).toLowerCase().includes(lower));
 
         renderCompanies(rows, "No licensed sponsor company matches “" + query + "”.");
+        finishLoader();
       } catch (error) {
         state.textContent = error.message || "Could not search the sponsor directory. Try again shortly.";
+        state.classList.add("error");
+        clearGrid();
+        showEmptyState("Search failed", error.message || "Could not search the sponsor directory. Try again shortly.");
+        setLoaderPercent(100);
+        setTimeout(() => hideLoader(), 250);
       } finally {
         searchBtn.disabled = false;
       }
     }
 
+    /* ===== EVENT LISTENERS ===== */
     searchBtn.addEventListener("click", searchSponsors);
     search.addEventListener("keydown", e => {
       if (e.key === "Enter") {
@@ -112,6 +643,10 @@
         searchSponsors();
       }
     });
+
+    /* ===== INIT ===== */
+    // Show initial empty state
+    showEmptyState("Start your search", "Enter a company name above to check if they are a licensed sponsor.");
   </script>
 </body>
 </html>
