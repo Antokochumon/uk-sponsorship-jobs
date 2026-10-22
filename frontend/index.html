@@ -7,11 +7,11 @@
   <meta name="description" content="Find UK jobs with visa sponsorship evidence. Search current vacancies from public sources, check sponsor register matches and apply directly. Fast, modern and mobile-friendly.">
   <meta name="keywords" content="UK jobs, sponsorship jobs, visa sponsorship, UK work visa, sponsored jobs, job search UK">
   <meta name="author" content="Anto Kochumon">
-  <meta property="og:title" content="UKSponsorJobsfinder – Find UK jobs with sponsorship evidence">
+  <meta property="og:title" content="SponsorshipJobsUK – Find UK jobs with sponsorship evidence">
   <meta property="og:description" content="Search current UK vacancies with sponsorship evidence and original application links. Modern, fast and mobile-friendly.">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
-  <title>UKSponsorJobsfinder — Find UK jobs with sponsorship evidence</title>
+  <title>SponsorshipJobsUK — Find UK jobs with sponsorship evidence</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
@@ -74,6 +74,7 @@
       background: linear-gradient(135deg, var(--forest-deep) 0%, #1c3f32 100%);
       border-bottom: 4px solid var(--lime);
       box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+      z-index: 100;
     }
     .masthead-inner {
       display: flex;
@@ -117,38 +118,180 @@
       letter-spacing: 0.01em;
     }
     .mast-actions { display: flex; align-items: center; gap: 10px; }
-    .button {
+
+    /* ===== MENU BUTTON & NAV ===== */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 30px;
+      height: 22px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      z-index: 110;
+    }
+    .menu-toggle span {
+      display: block;
+      height: 3px;
+      width: 100%;
+      background: var(--lime);
+      border-radius: 3px;
+      transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.25s ease;
+      transform-origin: center;
+    }
+    .menu-toggle.active span:nth-child(1) {
+      transform: translateY(9.5px) rotate(45deg);
+    }
+    .menu-toggle.active span:nth-child(2) {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+    .menu-toggle.active span:nth-child(3) {
+      transform: translateY(-9.5px) rotate(-45deg);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .nav-links a {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
       min-height: 42px;
       padding: 10px 16px;
-      border: 1px solid transparent;
+      border: 1px solid rgba(255,255,255,0.25);
       border-radius: var(--radius-sm);
-      color: var(--ink);
-      background: var(--white);
-      font-size: 12.5px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition);
-      white-space: nowrap;
-      text-decoration: none;
-    }
-    .button:hover { background: #eef6ee; }
-    .button:active { transform: translateY(1px); }
-    .button:disabled { opacity: 0.5; cursor: wait; transform: none; }
-    .button-outline {
-      border-color: rgba(255,255,255,0.25);
       color: #f5faf5;
       background: rgba(255,255,255,0.07);
       backdrop-filter: blur(4px);
+      font-size: 12.5px;
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background var(--transition), color var(--transition), border-color var(--transition), transform var(--transition);
     }
-    .button-outline:hover {
+    .nav-links a:hover {
       color: var(--ink);
       background: var(--lime);
       border-color: var(--lime);
     }
+    .nav-links a:active { transform: translateY(1px); }
+
+    /* Mobile nav — slide down panel */
+    .mobile-nav-panel {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 105;
+      background: linear-gradient(160deg, var(--forest-deep) 0%, #173d2f 100%);
+      backdrop-filter: blur(16px);
+      padding: 0 24px;
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      visibility: hidden;
+      transition:
+        max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.35s ease,
+        visibility 0.35s ease,
+        padding 0.4s ease;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border-bottom: 3px solid var(--lime);
+    }
+    .mobile-nav-panel.open {
+      max-height: 100vh;
+      opacity: 1;
+      visibility: visible;
+      padding: 88px 24px 34px;
+    }
+    .mobile-nav-panel a {
+      display: block;
+      font-size: 17px;
+      font-weight: 700;
+      color: #f5faf5;
+      text-decoration: none;
+      padding: 15px 22px;
+      border-radius: 12px;
+      letter-spacing: -0.01em;
+      transform: translateY(-12px);
+      opacity: 0;
+      transition:
+        background 0.25s ease,
+        color 0.25s ease,
+        transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+        opacity 0.35s ease;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .mobile-nav-panel.open a {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .mobile-nav-panel.open a:nth-child(1) { transition-delay: 0.08s; }
+    .mobile-nav-panel.open a:nth-child(2) { transition-delay: 0.15s; }
+    .mobile-nav-panel.open a:nth-child(3) { transition-delay: 0.22s; }
+    .mobile-nav-panel a:hover,
+    .mobile-nav-panel a:focus-visible {
+      background: var(--lime);
+      color: var(--forest-deep);
+      transform: translateY(0) scale(1.02);
+    }
+    .mobile-nav-panel .mobile-nav-close {
+      position: absolute;
+      top: 22px;
+      right: 24px;
+      font-size: 34px;
+      color: var(--lime);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      cursor: pointer;
+      line-height: 1;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+    .mobile-nav-panel .mobile-nav-close:hover {
+      background: var(--lime);
+      color: var(--forest-deep);
+      transform: rotate(90deg);
+    }
+    .mobile-nav-panel .mobile-nav-brand {
+      position: absolute;
+      top: 26px;
+      left: 24px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #f5faf5;
+      letter-spacing: -0.01em;
+      opacity: 0;
+      transition: opacity 0.4s ease 0.1s;
+    }
+    .mobile-nav-panel.open .mobile-nav-brand { opacity: 1; }
+    .mobile-nav-panel .mobile-nav-brand span { color: var(--lime); }
+
+    /* overlay behind mobile panel */
+    .mobile-nav-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+      z-index: 104;
+    }
+    .mobile-nav-overlay.open { opacity: 1; visibility: visible; }
 
     /* ===== INTRO ===== */
     .intro {
@@ -378,24 +521,138 @@
       accent-color: var(--forest);
       border-radius: 4px;
     }
-    .action-group { display: flex; flex-wrap: wrap; gap: 8px; }
-    .action-group .button {
-      border-color: #d6e0d8;
-      background: #f6faf5;
-      font-weight: 600;
+
+    /* ===== STYLISH ACTION BUTTONS ===== */
+    .action-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
     }
-    .action-group .button:hover {
-      background: var(--mint);
-      border-color: #b8d4c3;
+    .action-btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 46px;
+      padding: 12px 22px;
+      border: 1.5px solid #cfe0d4;
+      border-radius: 12px;
+      background: linear-gradient(180deg, #ffffff 0%, #f3f9f4 100%);
+      color: var(--forest);
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      transition:
+        background 0.22s ease,
+        border-color 0.22s ease,
+        color 0.22s ease,
+        box-shadow 0.22s ease,
+        transform 0.18s ease;
+      box-shadow: 0 2px 6px rgba(18, 40, 28, 0.06);
     }
-    .action-group .button.primary {
-      background: var(--forest);
-      color: #fff;
+    .action-btn::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent 0%, rgba(200, 236, 110, 0.35) 50%, transparent 100%);
+      transform: translateX(-100%);
+      transition: transform 0.55s ease;
+    }
+    .action-btn:hover::before { transform: translateX(100%); }
+    .action-btn:hover {
+      border-color: #a9c9b4;
+      background: linear-gradient(180deg, #ffffff 0%, #e8f3ea 100%);
+      box-shadow: 0 6px 18px rgba(26, 77, 62, 0.14);
+      transform: translateY(-2px);
+    }
+    .action-btn:active { transform: translateY(0) scale(0.98); }
+    .action-btn:disabled {
+      opacity: 0.55;
+      cursor: wait;
+      transform: none;
+      box-shadow: none;
+    }
+    .action-btn .btn-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      transition: transform 0.22s ease;
+    }
+    .action-btn:hover .btn-icon { transform: scale(1.12); }
+    .action-btn .btn-icon svg { width: 100%; height: 100%; display: block; }
+
+    /* Near me – accent mint */
+    .action-btn.near-me {
+      border-color: #bfe0cd;
+      color: #14503a;
+      background: linear-gradient(180deg, #f2fbf5 0%, #e2f4e8 100%);
+    }
+    .action-btn.near-me:hover {
+      background: linear-gradient(180deg, #e6f8ec 0%, #d2eeda 100%);
+      border-color: #93cba9;
+    }
+
+    /* Apply filters – amber accent */
+    .action-btn.apply-filters {
+      border-color: #edd7a3;
+      color: #7a5a17;
+      background: linear-gradient(180deg, #fffbf0 0%, #fdf4dd 100%);
+    }
+    .action-btn.apply-filters:hover {
+      background: linear-gradient(180deg, #fff5df 0%, #faebc4 100%);
+      border-color: #dbbf79;
+    }
+
+    /* Search – primary forest with lime sheen */
+    .action-btn.search-primary {
       border-color: var(--forest);
+      color: #ffffff;
+      background: linear-gradient(180deg, #246b56 0%, #1a4d3e 100%);
+      box-shadow: 0 4px 14px rgba(26, 77, 62, 0.28);
     }
-    .action-group .button.primary:hover {
-      background: #246b56;
-      border-color: #246b56;
+    .action-btn.search-primary::before {
+      background: linear-gradient(120deg, transparent 0%, rgba(200, 236, 110, 0.55) 50%, transparent 100%);
+    }
+    .action-btn.search-primary:hover {
+      border-color: #2e7d5e;
+      background: linear-gradient(180deg, #2e7d5e 0%, #1f5c49 100%);
+      box-shadow: 0 8px 24px rgba(26, 77, 62, 0.4);
+    }
+    .action-btn.search-primary:disabled {
+      background: linear-gradient(180deg, #3c7a66 0%, #2c5a4a 100%);
+    }
+
+    /* Reset button in filters top */
+    .filters-top .button,
+    #resetBtn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 9px 18px;
+      border: 1.5px solid #d5e2d9;
+      border-radius: 10px;
+      background: #f7faf7;
+      color: #3d5a4b;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+      white-space: nowrap;
+    }
+    #resetBtn:hover {
+      background: var(--mint);
+      border-color: #a9c9b4;
+      color: var(--forest);
+      transform: translateY(-1px);
     }
 
     /* ===== STATUS & NOTICE ===== */
@@ -701,14 +958,49 @@
       font-weight: 600;
       padding: 0 6px;
     }
+    .pagination .button {
+      min-height: 42px;
+      padding: 10px 18px;
+      border: 1.5px solid #d5e2d9;
+      border-radius: 10px;
+      background: #ffffff;
+      color: var(--forest);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+      box-shadow: 0 2px 6px rgba(18, 40, 28, 0.06);
+    }
+    .pagination .button:hover:not(:disabled) {
+      background: var(--mint);
+      border-color: #a9c9b4;
+      transform: translateY(-1px);
+    }
+    .pagination .button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
 
     /* ===== FOOTER (REDESIGNED) ===== */
     .site-footer {
-      background: var(--forest-deep);
+      position: relative;
+      background: linear-gradient(160deg, var(--forest-deep) 0%, #143a2c 100%);
       color: #c6d6cd;
       padding: 0;
       margin-top: 20px;
       border-top: 4px solid var(--lime);
+      overflow: hidden;
+    }
+    .site-footer::before {
+      content: "";
+      position: absolute;
+      top: -120px;
+      right: -120px;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(200, 236, 110, 0.12), transparent 70%);
+      pointer-events: none;
     }
     .footer-inner {
       display: flex;
@@ -716,16 +1008,37 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 34px 0 30px;
-      gap: 18px;
+      padding: 44px 0 36px;
+      gap: 20px;
+      position: relative;
+      z-index: 1;
     }
-    .footer-note {
-      max-width: 680px;
-      font-size: 11.5px;
-      line-height: 1.8;
-      color: #b3c6bb;
+    .footer-brand-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
     }
-    .footer-note strong { color: #eaf5ec; }
+    .footer-brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      color: var(--forest-deep);
+      background: var(--lime);
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(200, 236, 110, 0.3);
+    }
+    .footer-brand-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: #f5faf5;
+      letter-spacing: -0.01em;
+    }
+    .footer-brand-name span { color: var(--lime); }
     .footer-credit {
       font-size: 13px;
       color: #c6d6cd;
@@ -744,16 +1057,43 @@
     }
     .footer-copyright {
       display: block;
-      margin-top: 6px;
+      margin-top: 8px;
       font-size: 11px;
       color: #9fb5a9;
       letter-spacing: 0.01em;
     }
+    .footer-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 4px;
+    }
+    .footer-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 18px;
+      border-radius: 999px;
+      color: #d6e4dc;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(200, 236, 110, 0.18);
+      transition: background 0.22s ease, color 0.22s ease, border-color 0.22s ease, transform 0.18s ease;
+    }
+    .footer-links a:hover {
+      background: var(--lime);
+      color: var(--forest-deep);
+      border-color: var(--lime);
+      transform: translateY(-2px);
+    }
     .footer-divider {
       width: 100%;
       height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(200, 236, 110, 0.25), transparent);
-      margin: 18px 0 0;
+      background: linear-gradient(90deg, transparent, rgba(200, 236, 110, 0.3), transparent);
+      margin: 22px 0 0;
     }
     .footer-bottom {
       width: 100%;
@@ -762,7 +1102,19 @@
       text-align: center;
       line-height: 1.8;
       letter-spacing: 0.01em;
-      padding: 16px 0 22px;
+      padding: 18px 0 26px;
+      position: relative;
+      z-index: 1;
+    }
+    .footer-bottom .footer-dot {
+      display: inline-block;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--lime);
+      margin: 0 8px;
+      vertical-align: middle;
+      opacity: 0.6;
     }
 
     /* ===== RESPONSIVE ===== */
@@ -776,12 +1128,19 @@
       .intro { align-items: flex-start; }
       .summary { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
+
+    /* Mobile menu behaviour */
+    @media (max-width: 780px) {
+      .mast-actions { display: none; }
+      .menu-toggle { display: flex; }
+      .nav-links { display: none; }
+    }
+
     @media (max-width: 680px) {
       .shell { width: calc(100% - 20px); }
       .masthead { padding: 14px 0; }
-      .masthead-inner { flex-direction: column; align-items: stretch; gap: 12px; }
-      .mast-actions { width: 100%; }
-      .mast-actions .button { flex: 1; }
+      .masthead-inner { flex-direction: row; align-items: center; gap: 12px; }
+      .brand-note { font-size: 9.5px; }
       .intro { display: block; padding: 26px 0 18px; }
       h1 { font-size: clamp(28px, 7vw, 34px); }
       .freshness { display: inline-flex; margin-top: 14px; }
@@ -793,8 +1152,20 @@
       .filter-grid, .filter-grid.secondary { grid-template-columns: 1fr 1fr; gap: 10px; }
       .filter-grid .field:first-child { grid-column: 1 / -1; }
       .filter-actions { flex-direction: column; align-items: stretch; }
-      .action-group { display: grid; grid-template-columns: 1fr 1fr; }
-      .action-group .button { width: 100%; }
+      .action-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+      .action-group .action-btn {
+        width: 100%;
+        min-height: 44px;
+        padding: 10px 14px;
+        font-size: 11.5px;
+      }
+      .action-group .action-btn.search-primary {
+        grid-column: 1 / -1;
+      }
       .status { flex-direction: column; align-items: flex-start; justify-content: center; padding: 4px 0; }
       .job-card { padding: 15px; }
       .job-head { flex-direction: column-reverse; align-items: flex-start; }
@@ -802,14 +1173,22 @@
       .job-foot { flex-direction: column; align-items: stretch; }
       .job-foot .actions { width: 100%; }
       .job-foot .apply { flex: 1; text-align: center; justify-content: center; }
-      .footer-inner { padding: 28px 0 24px; }
+      .footer-inner { padding: 34px 0 28px; }
       .inline-loader { padding: 32px 16px; }
+      .mobile-nav-panel.open { padding: 84px 18px 28px; }
+      .mobile-nav-panel a { font-size: 16px; padding: 14px 18px; }
+      .mobile-nav-panel .mobile-nav-brand { font-size: 14px; left: 18px; top: 26px; }
+      .mobile-nav-panel .mobile-nav-close { right: 18px; }
     }
     @media (max-width: 400px) {
       .summary { grid-template-columns: 1fr 1fr; }
       .filter-grid, .filter-grid.secondary { grid-template-columns: 1fr; }
       .filter-grid .field:first-child { grid-column: auto; }
       .action-group { grid-template-columns: 1fr; }
+      .action-group .action-btn.search-primary { grid-column: auto; }
+      .footer-links { flex-direction: column; width: 100%; gap: 9px; }
+      .footer-links a { width: 100%; justify-content: center; }
+      .footer-brand-row { flex-direction: column; gap: 8px; }
     }
 
     /* ===== REDUCED MOTION ===== */
@@ -820,7 +1199,8 @@
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
       }
-      .metric:hover, .job-card:hover, .apply:hover { transform: none; }
+      .metric:hover, .job-card:hover, .apply:hover,
+      .action-btn:hover, .footer-links a:hover { transform: none; }
       .brand-mark { animation: none; }
     }
 
@@ -855,17 +1235,40 @@
   <header class="masthead">
     <div class="shell masthead-inner">
       <div class="brand">
-        <div class="brand-mark" aria-hidden="true">UK</div>
+        <div class="brand-mark" aria-hidden="true">SJ</div>
         <div class="brand-text">
-          <div class="brand-name">UK<span>Sponsor</span>Jobsfinder</div>
+          <div class="brand-name">Sponsorship<span>Jobs</span>UK</div>
           <div class="brand-note">Recent vacancies · sponsorship evidence · direct links</div>
         </div>
       </div>
-      <div class="mast-actions">
-        <a class="button button-outline" href="licensed-sponsors.html">Licensed Sponsor Companies</a>
+
+      <!-- Desktop nav links -->
+      <div class="nav-links">
+        <a href="licensed-sponsors.html">Licensed Sponsors</a>
+        <a href="About.html">About</a>
+        <a href="contact.html">Contact</a>
       </div>
+
+      <!-- Mobile menu button -->
+      <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNavPanel">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
     </div>
   </header>
+
+  <!-- Overlay for mobile nav -->
+  <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+
+  <!-- Mobile slide-down nav panel -->
+  <div class="mobile-nav-panel" id="mobileNavPanel" role="dialog" aria-modal="true" aria-label="Mobile navigation">
+    <div class="mobile-nav-brand">Sponsorship<span>Jobs</span>UK</div>
+    <button class="mobile-nav-close" id="mobileNavClose" aria-label="Close menu">&times;</button>
+    <a href="licensed-sponsors.html">Licensed Sponsors</a>
+    <a href="About.html">About</a>
+    <a href="contact.html">Contact</a>
+  </div>
 
   <main class="shell">
     <section class="intro">
@@ -907,9 +1310,24 @@
       <div class="filter-actions">
         <span class="check">Results are ranked by title relevance and posting date.</span>
         <div class="action-group">
-          <button class="button" id="nearMeBtn" type="button">Near me</button>
-          <button class="button" id="applyFiltersBtn" type="button">Apply filters</button>
-          <button class="button primary" id="searchBtn" type="button">Search jobs</button>
+          <button class="action-btn near-me" id="nearMeBtn" type="button">
+            <span class="btn-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </span>
+            Near me
+          </button>
+          <button class="action-btn apply-filters" id="applyFiltersBtn" type="button">
+            <span class="btn-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            </span>
+            Apply filters
+          </button>
+          <button class="action-btn search-primary" id="searchBtn" type="button">
+            <span class="btn-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </span>
+            Search jobs
+          </button>
         </div>
       </div>
     </section>
@@ -952,17 +1370,23 @@
   <footer class="site-footer">
     <div class="shell">
       <div class="footer-inner">
-        <div class="footer-note">
-          <strong>Important:</strong> A sponsor-register match alone does not mean an employer offers sponsorship for a specific vacancy. The first sponsorship filter requires both an exact register match and an explicit offer in the advert. Job listings remain the responsibility of their original publishers.
+        <div class="footer-brand-row">
+          <div class="footer-brand-mark" aria-hidden="true">SJ</div>
+          <div class="footer-brand-name">Sponsorship<span>Jobs</span>UK</div>
         </div>
         <div class="footer-credit">
           Designed &amp; developed by <a href="https://antokochumon.github.io/Portfolio/" target="_blank" rel="noopener noreferrer">Anto Kochumon</a>
-          <span class="footer-copyright">© 2025 UKSponsorJobsfinder. All rights reserved.</span>
+          <span class="footer-copyright">© 2026 SponsorshipJobsUK. All rights reserved.</span>
+        </div>
+        <div class="footer-links">
+          <a href="licensed-sponsors.html">Licensed Sponsors</a>
+          <a href="About.html">About</a>
+          <a href="contact.html">Contact</a>
         </div>
       </div>
       <div class="footer-divider"></div>
       <div class="footer-bottom">
-        UKSponsorJobsfinder · Search current UK vacancies with sponsorship evidence and original application links.
+        SponsorshipJobsUK <span class="footer-dot"></span> Search current UK vacancies with sponsorship evidence and original application links.
       </div>
     </div>
   </footer>
@@ -1004,6 +1428,52 @@
     let nearMeCoordinates = null;
     const postcodeCache = new Map();
 
+    /* ===== MOBILE SLIDE-DOWN MENU ===== */
+    const menuToggle = $("menuToggle");
+    const mobileNavPanel = $("mobileNavPanel");
+    const mobileNavClose = $("mobileNavClose");
+    const mobileNavOverlay = $("mobileNavOverlay");
+
+    function openMobileMenu() {
+      mobileNavPanel.classList.add("open");
+      mobileNavOverlay.classList.add("open");
+      menuToggle.classList.add("active");
+      menuToggle.setAttribute("aria-expanded", "true");
+      document.body.style.overflow = "hidden";
+    }
+    function closeMobileMenu() {
+      mobileNavPanel.classList.remove("open");
+      mobileNavOverlay.classList.remove("open");
+      menuToggle.classList.remove("active");
+      menuToggle.setAttribute("aria-expanded", "false");
+      document.body.style.overflow = "";
+    }
+    if (menuToggle) {
+      menuToggle.addEventListener("click", () => {
+        if (mobileNavPanel.classList.contains("open")) {
+          closeMobileMenu();
+        } else {
+          openMobileMenu();
+        }
+      });
+    }
+    if (mobileNavClose) mobileNavClose.addEventListener("click", closeMobileMenu);
+    if (mobileNavOverlay) mobileNavOverlay.addEventListener("click", closeMobileMenu);
+
+    // Close on Escape key
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && mobileNavPanel.classList.contains("open")) {
+        closeMobileMenu();
+      }
+    });
+    // Close menu when a mobile nav link is clicked
+    mobileNavPanel.querySelectorAll("a").forEach(link => {
+      link.addEventListener("click", () => {
+        // allow navigation; just close the panel
+        closeMobileMenu();
+      });
+    });
+
     /* ===== INLINE LOADER ===== */
     const inlineLoader = $("inlineLoader");
     const inlinePercent = $("inlinePercent");
@@ -1034,13 +1504,15 @@
       const start = performance.now();
       const from = parseInt(inlinePercent.textContent) || 0;
       if (loaderInterval) clearInterval(loaderInterval);
+      // Smooth, slow-start easing: cubic ease-out
       loaderInterval = setInterval(() => {
         const elapsed = performance.now() - start;
         const t = Math.min(elapsed / duration, 1);
+        // Strong ease-out for a gentle rise that never gets stuck at 85
         const eased = 1 - Math.pow(1 - t, 3);
         setInlinePercent(from + (target - from) * eased);
         if (t >= 1) { clearInterval(loaderInterval); loaderInterval = null; }
-      }, 30);
+      }, 40);
     }
 
     /* ===== UTILS ===== */
@@ -1255,8 +1727,6 @@
         saveCache();
       } catch (error) {
         clearTimeout(timeout);
-        // Silent fail on background refresh — user still sees cached data.
-        // Only surface a gentle message; never show "signal is aborted".
         console.warn("Background refresh failed:", error && error.message);
         if (error && error.name === "TimeoutError") {
           setStatus("Showing cached results. Live feed is taking longer than usual — will retry on next search.");
@@ -1317,7 +1787,6 @@
         sheetJobs = [];
         visibleJobs = [];
         renderJobs();
-        // Friendly, human-readable message — never expose "signal is aborted without reason".
         const friendly = error && error.name === "TimeoutError"
           ? "The jobs feed took too long to respond. Please check your connection and try again."
           : "Could not load the jobs feed right now. Please try again in a moment.";
