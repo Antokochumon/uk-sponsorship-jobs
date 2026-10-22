@@ -95,6 +95,11 @@
       font-weight: 700;
       box-shadow: 0 4px 12px rgba(200, 236, 110, 0.35);
       flex-shrink: 0;
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
     }
     .brand-text { display: flex; flex-direction: column; }
     .brand-name {
@@ -153,6 +158,22 @@
       gap: 24px;
       padding: 36px 0 26px;
     }
+    .intro-left { flex: 1 1 0; min-width: 0; }
+    .free-tag {
+      display: inline-block;
+      margin-bottom: 10px;
+      padding: 5px 14px;
+      border-radius: 999px;
+      background: linear-gradient(120deg, var(--lime-soft), var(--mint));
+      border: 1px solid #c3dfc9;
+      color: var(--forest-deep);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      animation: fadeUp 0.5s ease both;
+    }
     h1 {
       max-width: 680px;
       font-family: var(--font-serif);
@@ -161,6 +182,7 @@
       font-weight: 500;
       letter-spacing: -0.025em;
       color: var(--ink);
+      animation: fadeUp 0.55s ease both;
     }
     h1 em {
       font-style: normal;
@@ -175,6 +197,11 @@
       color: #4e6258;
       font-size: 13.5px;
       line-height: 1.65;
+      animation: fadeUp 0.6s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .freshness {
       flex: 0 0 auto;
@@ -190,6 +217,7 @@
       font-weight: 600;
       white-space: nowrap;
       box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      animation: fadeUp 0.6s ease both;
     }
     .freshness::before {
       content: "";
@@ -223,7 +251,12 @@
       transition: transform var(--transition), box-shadow var(--transition);
       position: relative;
       overflow: hidden;
+      animation: fadeUp 0.5s ease both;
     }
+    .metric:nth-child(2) { animation-delay: 0.05s; }
+    .metric:nth-child(3) { animation-delay: 0.1s; }
+    .metric:nth-child(4) { animation-delay: 0.15s; }
+    .metric:nth-child(5) { animation-delay: 0.2s; }
     .metric::after {
       content: "";
       position: absolute;
@@ -260,6 +293,7 @@
       background: var(--white);
       box-shadow: var(--shadow);
       margin-bottom: 14px;
+      animation: fadeUp 0.55s ease both;
     }
     .filters-top {
       display: flex;
@@ -668,26 +702,32 @@
       padding: 0 6px;
     }
 
-    /* ===== FOOTER ===== */
+    /* ===== FOOTER (REDESIGNED) ===== */
     .site-footer {
       background: var(--forest-deep);
       color: #c6d6cd;
-      padding: 34px 0 30px;
+      padding: 0;
       margin-top: 20px;
       border-top: 4px solid var(--lime);
     }
     .footer-inner {
       display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 24px;
-      flex-wrap: wrap;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 34px 0 30px;
+      gap: 18px;
     }
-    .footer-note { max-width: 640px; font-size: 11.5px; line-height: 1.8; color: #b3c6bb; }
+    .footer-note {
+      max-width: 680px;
+      font-size: 11.5px;
+      line-height: 1.8;
+      color: #b3c6bb;
+    }
     .footer-note strong { color: #eaf5ec; }
     .footer-credit {
-      text-align: right;
-      font-size: 12px;
+      font-size: 13px;
       color: #c6d6cd;
       line-height: 1.9;
     }
@@ -710,16 +750,19 @@
       letter-spacing: 0.01em;
     }
     .footer-divider {
+      width: 100%;
       height: 1px;
       background: linear-gradient(90deg, transparent, rgba(200, 236, 110, 0.25), transparent);
-      margin: 20px 0 16px;
+      margin: 18px 0 0;
     }
     .footer-bottom {
+      width: 100%;
       font-size: 10.5px;
       color: #8fa79a;
       text-align: center;
       line-height: 1.8;
       letter-spacing: 0.01em;
+      padding: 16px 0 22px;
     }
 
     /* ===== RESPONSIVE ===== */
@@ -759,8 +802,7 @@
       .job-foot { flex-direction: column; align-items: stretch; }
       .job-foot .actions { width: 100%; }
       .job-foot .apply { flex: 1; text-align: center; justify-content: center; }
-      .footer-inner { flex-direction: column; gap: 16px; }
-      .footer-credit { text-align: left; }
+      .footer-inner { padding: 28px 0 24px; }
       .inline-loader { padding: 32px 16px; }
     }
     @media (max-width: 400px) {
@@ -779,6 +821,7 @@
         transition-duration: 0.01ms !important;
       }
       .metric:hover, .job-card:hover, .apply:hover { transform: none; }
+      .brand-mark { animation: none; }
     }
 
     /* ===== SKELETON LOADING ===== */
@@ -826,7 +869,8 @@
 
   <main class="shell">
     <section class="intro">
-      <div>
+      <div class="intro-left">
+        <span class="free-tag">Free UK sponsorship job finder — no signup needed</span>
         <h1>Find the next role.<br><em>Check the evidence.</em></h1>
         <p>Search current UK vacancies from public job sources. Sponsorship claims are checked against advert wording and the official sponsor register.</p>
       </div>
@@ -904,7 +948,7 @@
     </nav>
   </main>
 
-  <!-- ===== FOOTER ===== -->
+  <!-- ===== FOOTER (REDESIGNED) ===== -->
   <footer class="site-footer">
     <div class="shell">
       <div class="footer-inner">
@@ -913,7 +957,7 @@
         </div>
         <div class="footer-credit">
           Designed &amp; developed by <a href="https://antokochumon.github.io/Portfolio/" target="_blank" rel="noopener noreferrer">Anto Kochumon</a>
-          <span class="footer-copyright">© 2025 UKSponsorJobsfinder. All rights reserved.</span>
+          <span class="footer-copyright">© 2026 UKSponsorJobsfinder. All rights reserved.</span>
         </div>
       </div>
       <div class="footer-divider"></div>
@@ -1155,11 +1199,6 @@
 
     /* ===== SAFE JOBS EXTRACTION ===== */
     function extractJobsFromResponse(data) {
-      // Handle multiple possible response shapes:
-      // 1. { jobs: [...] }
-      // 2. { data: { jobs: [...] } }
-      // 3. { results: [...] }
-      // 4. direct array response
       if (Array.isArray(data)) return data;
       if (data && Array.isArray(data.jobs)) return data.jobs;
       if (data && data.data && Array.isArray(data.data.jobs)) return data.data.jobs;
@@ -1192,7 +1231,6 @@
 
         const rawJobs = extractJobsFromResponse(data);
         if (!rawJobs) {
-          // Not an array — but maybe empty feed. Don't crash; just keep cache.
           console.warn("Feed response missing jobs array. Response keys:", Object.keys(data || {}));
           setStatus("Cached results shown. Live feed returned an unexpected format — will retry on next search.");
           return;
@@ -1216,7 +1254,6 @@
         setStatus(`Loaded ${sheetJobs.length.toLocaleString()} records from the jobs feed.`);
         saveCache();
       } catch (error) {
-        // silent fail on background refresh — user still sees cached data
         console.warn("Background refresh failed:", error.message);
         setStatus("Showing cached results. Live feed will retry on next search.");
       }
@@ -1236,7 +1273,6 @@
 
         const rawJobs = extractJobsFromResponse(data);
         if (!rawJobs) {
-          // Empty/unexpected but not an error — treat as no jobs
           sheetJobs = [];
           visibleJobs = [];
           renderJobs();
