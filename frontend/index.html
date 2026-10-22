@@ -74,11 +74,6 @@
       background: linear-gradient(135deg, var(--forest-deep) 0%, #1c3f32 100%);
       border-bottom: 4px solid var(--lime);
       box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-      animation: slide-down 0.5s ease both;
-    }
-    @keyframes slide-down {
-      from { transform: translateY(-100%); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
     }
     .masthead-inner {
       display: flex;
@@ -100,11 +95,6 @@
       font-weight: 700;
       box-shadow: 0 4px 12px rgba(200, 236, 110, 0.35);
       flex-shrink: 0;
-      animation: pulse-glow 3s ease-in-out infinite;
-    }
-    @keyframes pulse-glow {
-      0%, 100% { box-shadow: 0 4px 12px rgba(200, 236, 110, 0.35); }
-      50% { box-shadow: 0 4px 22px rgba(200, 236, 110, 0.6); }
     }
     .brand-text { display: flex; flex-direction: column; }
     .brand-name {
@@ -141,7 +131,7 @@
       text-decoration: none;
     }
     .button:hover { background: #eef6ee; }
-    .button:active { transform: translateY(1px) scale(0.99); }
+    .button:active { transform: translateY(1px); }
     .button:disabled { opacity: 0.5; cursor: wait; transform: none; }
     .button-outline {
       border-color: rgba(255,255,255,0.25);
@@ -153,7 +143,6 @@
       color: var(--ink);
       background: var(--lime);
       border-color: var(--lime);
-      transform: translateY(-1px);
     }
 
     /* ===== INTRO ===== */
@@ -162,39 +151,7 @@
       justify-content: space-between;
       align-items: flex-end;
       gap: 24px;
-      padding: 34px 0 24px;
-      animation: fade-up 0.5s ease 0.1s both;
-    }
-    @keyframes fade-up {
-      from { opacity: 0; transform: translateY(14px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .intro-left { min-width: 0; }
-    .free-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 14px;
-      margin-bottom: 16px;
-      border-radius: 30px;
-      background: linear-gradient(135deg, #eaf7d8, #f6fce9);
-      border: 1px solid #c8e6a4;
-      color: var(--forest);
-      font-size: 11.5px;
-      font-weight: 700;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-      box-shadow: 0 2px 10px rgba(200, 236, 110, 0.25);
-      animation: gentle-float 4s ease-in-out infinite;
-    }
-    @keyframes gentle-float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-3px); }
-    }
-    .free-tag::before {
-      content: "★";
-      color: var(--forest);
-      font-size: 13px;
+      padding: 36px 0 26px;
     }
     h1 {
       max-width: 680px;
@@ -213,13 +170,12 @@
       background-clip: text;
     }
     .intro p {
-      max-width: 560px;
-      margin: 14px 0 0;
+      max-width: 540px;
+      margin: 12px 0 0;
       color: #4e6258;
       font-size: 13.5px;
       line-height: 1.65;
     }
-    .intro p strong { color: var(--forest); font-weight: 700; }
     .freshness {
       flex: 0 0 auto;
       display: inline-flex;
@@ -250,13 +206,12 @@
     }
 
     /* ===== SUMMARY METRICS ===== */
-    main { padding-bottom: 30px; }
+    main { padding-bottom: 40px; }
     .summary {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 10px;
       margin-bottom: 16px;
-      animation: fade-up 0.5s ease 0.15s both;
     }
     .metric {
       min-height: 86px;
@@ -278,7 +233,7 @@
       opacity: 0;
       transition: opacity var(--transition);
     }
-    .metric:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+    .metric:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
     .metric:hover::after { opacity: 1; }
     .metric strong {
       display: block;
@@ -305,7 +260,6 @@
       background: var(--white);
       box-shadow: var(--shadow);
       margin-bottom: 14px;
-      animation: fade-up 0.5s ease 0.2s both;
     }
     .filters-top {
       display: flex;
@@ -358,7 +312,7 @@
       background: #fdfefd;
       font-size: 12.5px;
       font-weight: 500;
-      transition: border-color var(--transition), box-shadow var(--transition), background var(--transition), transform var(--transition);
+      transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
     }
     .field input::placeholder { color: #9aaba1; font-weight: 400; }
     .field input:hover, .field select:hover { border-color: #b8ccbd; background: #fff; }
@@ -399,7 +353,6 @@
     .action-group .button:hover {
       background: var(--mint);
       border-color: #b8d4c3;
-      transform: translateY(-1px);
     }
     .action-group .button.primary {
       background: var(--forest);
@@ -409,8 +362,6 @@
     .action-group .button.primary:hover {
       background: #246b56;
       border-color: #246b56;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 14px rgba(26, 77, 62, 0.3);
     }
 
     /* ===== STATUS & NOTICE ===== */
@@ -518,17 +469,17 @@
       display: flex;
       flex-direction: column;
       transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
-      animation: appear 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      animation: appear 0.32s ease both;
       position: relative;
     }
     .job-card:hover {
-      transform: translateY(-4px) scale(1.005);
+      transform: translateY(-3px);
       box-shadow: var(--shadow-lg);
       border-color: #c3d9c9;
     }
     @keyframes appear {
-      from { opacity: 0; transform: translateY(14px) scale(0.98); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .job-head {
       display: flex;
@@ -587,9 +538,7 @@
       overflow-wrap: anywhere;
       border: 1px solid #e4eee6;
       letter-spacing: 0.01em;
-      transition: background var(--transition), border-color var(--transition);
     }
-    .tag:hover { background: var(--mint); border-color: #b8d4c3; }
     .evidence, .description {
       margin: 0 0 10px;
       color: #4f6359;
@@ -688,7 +637,6 @@
       text-align: center;
       font-size: 13px;
       line-height: 1.7;
-      animation: fade-up 0.5s ease both;
     }
     .empty strong {
       display: block;
@@ -720,30 +668,28 @@
       padding: 0 6px;
     }
 
-    /* ===== FOOTER (compact, centered, animated) ===== */
+    /* ===== FOOTER ===== */
     .site-footer {
       background: var(--forest-deep);
       color: #c6d6cd;
-      padding: 30px 0 26px;
-      margin-top: 16px;
+      padding: 34px 0 30px;
+      margin-top: 20px;
       border-top: 4px solid var(--lime);
-      animation: fade-up 0.6s ease 0.3s both;
     }
     .footer-inner {
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 14px;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
+      flex-wrap: wrap;
     }
+    .footer-note { max-width: 640px; font-size: 11.5px; line-height: 1.8; color: #b3c6bb; }
+    .footer-note strong { color: #eaf5ec; }
     .footer-credit {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      font-size: 13px;
-      color: #d7e6dd;
-      line-height: 1.7;
+      text-align: right;
+      font-size: 12px;
+      color: #c6d6cd;
+      line-height: 1.9;
     }
     .footer-credit a {
       color: var(--lime);
@@ -757,31 +703,23 @@
       border-color: #e6f8c4;
     }
     .footer-copyright {
-      font-size: 12px;
+      display: block;
+      margin-top: 6px;
+      font-size: 11px;
       color: #9fb5a9;
-      letter-spacing: 0.02em;
-      margin-top: 2px;
+      letter-spacing: 0.01em;
     }
     .footer-divider {
-      width: min(420px, 80%);
       height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(200, 236, 110, 0.3), transparent);
-      margin: 4px auto 0;
+      background: linear-gradient(90deg, transparent, rgba(200, 236, 110, 0.25), transparent);
+      margin: 20px 0 16px;
     }
     .footer-bottom {
       font-size: 10.5px;
       color: #8fa79a;
       text-align: center;
       line-height: 1.8;
-      letter-spacing: 0.02em;
-      max-width: 640px;
-    }
-    .footer-bottom .dev-note {
-      display: block;
-      margin-top: 4px;
-      font-size: 10px;
-      color: #7f968a;
-      font-style: italic;
+      letter-spacing: 0.01em;
     }
 
     /* ===== RESPONSIVE ===== */
@@ -821,9 +759,9 @@
       .job-foot { flex-direction: column; align-items: stretch; }
       .job-foot .actions { width: 100%; }
       .job-foot .apply { flex: 1; text-align: center; justify-content: center; }
+      .footer-inner { flex-direction: column; gap: 16px; }
+      .footer-credit { text-align: left; }
       .inline-loader { padding: 32px 16px; }
-      .site-footer { padding: 26px 0 22px; }
-      .footer-credit { font-size: 12px; }
     }
     @media (max-width: 400px) {
       .summary { grid-template-columns: 1fr 1fr; }
@@ -840,7 +778,7 @@
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
       }
-      .metric:hover, .job-card:hover, .apply:hover, .button:hover { transform: none; }
+      .metric:hover, .job-card:hover, .apply:hover { transform: none; }
     }
 
     /* ===== SKELETON LOADING ===== */
@@ -888,14 +826,9 @@
 
   <main class="shell">
     <section class="intro">
-      <div class="intro-left">
-        <div class="free-tag">Free Sponsorship Job Finder · No sign-up needed</div>
+      <div>
         <h1>Find the next role.<br><em>Check the evidence.</em></h1>
-        <p>
-          This job match checks the <strong>official UK licensed sponsor register</strong> against the advert listing.
-          When sponsorship is mentioned in the advert, we display that evidence directly on the job card so you can
-          decide with confidence. Search current UK vacancies from public job sources.
-        </p>
+        <p>Search current UK vacancies from public job sources. Sponsorship claims are checked against advert wording and the official sponsor register.</p>
       </div>
       <div class="freshness" id="feedStamp">Connecting to the live feed</div>
     </section>
@@ -943,7 +876,7 @@
     </div>
     <div class="notice" id="importNotice" role="status"></div>
 
-    <!-- INLINE LOADER -->
+    <!-- INLINE LOADER (shown only when loading jobs) -->
     <div class="inline-loader" id="inlineLoader">
       <div class="inline-loader-inner">
         <div class="inline-ring">
@@ -959,6 +892,7 @@
     </div>
 
     <section class="job-list" id="jobs" aria-live="polite" aria-busy="true">
+      <!-- skeleton shown while loading -->
       <div class="skeleton-card" aria-hidden="true"><div class="skeleton skeleton-line h-20 w-60"></div><div class="skeleton skeleton-line w-40"></div><div class="skeleton skeleton-line w-80"></div><div class="skeleton skeleton-line w-60" style="margin-bottom:14px;"></div><div class="skeleton skeleton-line w-80"></div><div class="skeleton skeleton-line w-40"></div></div>
       <div class="skeleton-card" aria-hidden="true"><div class="skeleton skeleton-line h-20 w-60"></div><div class="skeleton skeleton-line w-40"></div><div class="skeleton skeleton-line w-80"></div><div class="skeleton skeleton-line w-60" style="margin-bottom:14px;"></div><div class="skeleton skeleton-line w-80"></div><div class="skeleton skeleton-line w-40"></div></div>
     </section>
@@ -970,22 +904,21 @@
     </nav>
   </main>
 
-  <!-- ===== FOOTER (compact) ===== -->
+  <!-- ===== FOOTER ===== -->
   <footer class="site-footer">
     <div class="shell">
       <div class="footer-inner">
+        <div class="footer-note">
+          <strong>Important:</strong> A sponsor-register match alone does not mean an employer offers sponsorship for a specific vacancy. The first sponsorship filter requires both an exact register match and an explicit offer in the advert. Job listings remain the responsibility of their original publishers.
+        </div>
         <div class="footer-credit">
-          Designed &amp; developed by
-          <a href="https://antokochumon.github.io/Portfolio/" target="_blank" rel="noopener noreferrer">Anto Kochumon</a>
-          <span class="footer-copyright">© 2026 UKSponsorJobsfinder. All rights reserved.</span>
+          Designed &amp; developed by <a href="https://antokochumon.github.io/Portfolio/" target="_blank" rel="noopener noreferrer">Anto Kochumon</a>
+          <span class="footer-copyright">© 2025 UKSponsorJobsfinder. All rights reserved.</span>
         </div>
-
-        <div class="footer-divider"></div>
-
-        <div class="footer-bottom">
-          UKSponsorJobsfinder · Search current UK vacancies with sponsorship evidence and original application links.
-          <span class="dev-note">First-stage development · More features coming soon.</span>
-        </div>
+      </div>
+      <div class="footer-divider"></div>
+      <div class="footer-bottom">
+        UKSponsorJobsfinder · Search current UK vacancies with sponsorship evidence and original application links.
       </div>
     </div>
   </footer>
@@ -1168,7 +1101,7 @@
       }
     }
 
-    /* ===== LOCAL STORAGE CACHE ===== */
+    /* ===== LOCAL STORAGE CACHE (fast restore) ===== */
     function saveCache() {
       try {
         const payload = {
@@ -1193,7 +1126,7 @@
       } catch (_) { return false; }
     }
 
-    /* ===== FAST LOAD ===== */
+    /* ===== FAST LOAD: CACHE FIRST, REFRESH IN BACKGROUND ===== */
     async function loadJobs() {
       if (!BACKEND_API_URL) {
         setStatus("The backend URL is not configured for this deployment.", true);
@@ -1204,12 +1137,15 @@
 
       const hasCache = loadCache();
       if (hasCache) {
+        // Instant render from cache — zero waiting
         populateSources();
         await applyFilters();
         setStatus(`Loaded ${sheetJobs.length.toLocaleString()} records from local cache. Updating in background…`);
         $("feedStamp").textContent = "Cached feed · refreshing…";
+        // Background refresh; no loader shown
         refreshFeedInBackground();
       } else {
+        // No cache — show inline loader and fetch
         showInlineLoader("Loading UK jobs…", "Fetching live feed and sponsor register");
         startLoaderAnimation(85, 1800);
         setStatus("Loading the jobs feed…");
@@ -1217,27 +1153,62 @@
       }
     }
 
+    /* ===== SAFE JOBS EXTRACTION ===== */
+    function extractJobsFromResponse(data) {
+      // Handle multiple possible response shapes:
+      // 1. { jobs: [...] }
+      // 2. { data: { jobs: [...] } }
+      // 3. { results: [...] }
+      // 4. direct array response
+      if (Array.isArray(data)) return data;
+      if (data && Array.isArray(data.jobs)) return data.jobs;
+      if (data && data.data && Array.isArray(data.data.jobs)) return data.data.jobs;
+      if (data && Array.isArray(data.results)) return data.results;
+      if (data && Array.isArray(data.items)) return data.items;
+      return null;
+    }
+
+    function extractMeta(data) {
+      if (!data || typeof data !== "object") return {};
+      return {
+        refreshedAt: data.refreshedAt,
+        sponsorRegister: data.sponsorRegister || (data.data && data.data.sponsorRegister) || {},
+        stats: data.stats || (data.data && data.data.stats) || {},
+        errors: data.errors || (data.data && data.data.errors)
+      };
+    }
+
     async function refreshFeedInBackground() {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 20000); // increased timeout
       try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 20000);
         const response = await fetch(apiUrl("/api/jobs"), {
           headers: { Accept: "application/json" },
           signal: controller.signal
         });
+        clearTimeout(timeout);
         const data = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(data.error || `Feed request failed (${response.status}).`);
-        if (!Array.isArray(data.jobs)) throw new Error("The feed response does not contain a jobs array.");
-        sheetJobs = data.jobs.map(normaliseJob).filter(job => job.title && job.employer && job.url && parsedDate(job.date));
-        $("feedStamp").textContent = data.refreshedAt
-          ? `Feed updated ${new Date(data.refreshedAt).toLocaleString()}`
+        if (!response.ok) throw new Error(data.error || data.message || `Feed request failed (${response.status}).`);
+
+        const rawJobs = extractJobsFromResponse(data);
+        if (!rawJobs) {
+          // Not an array — but maybe empty feed. Don't crash; just keep cache.
+          console.warn("Feed response missing jobs array. Response keys:", Object.keys(data || {}));
+          setStatus("Cached results shown. Live feed returned an unexpected format — will retry on next search.");
+          return;
+        }
+
+        sheetJobs = rawJobs.map(normaliseJob).filter(job => job.title && job.employer && job.url && parsedDate(job.date));
+        const meta = extractMeta(data);
+        $("feedStamp").textContent = meta.refreshedAt
+          ? `Feed updated ${new Date(meta.refreshedAt).toLocaleString()}`
           : "Live feed connected";
-        const register = data.sponsorRegister || {};
+        const register = meta.sponsorRegister;
         $("registerStatus").textContent = register.rowCount
           ? `Sponsor register rows: ${Number(register.rowCount).toLocaleString()}`
           : "Sponsor register status not supplied";
         populateSources();
-        const stats = data.stats || {};
+        const stats = meta.stats;
         $("licensedStat").textContent = Number(stats.licensedSponsorJobs ?? allJobs().filter(job => job.sponsorRegisterMatch.toLowerCase().startsWith("matched:")).length).toLocaleString();
         $("verifiedStat").textContent = Number(stats.verifiedJobs ?? allJobs().filter(sponsorVerified).length).toLocaleString();
         $("sponsorCountStat").textContent = Number(stats.licensedSponsors ?? register.rowCount ?? 0).toLocaleString();
@@ -1245,34 +1216,51 @@
         setStatus(`Loaded ${sheetJobs.length.toLocaleString()} records from the jobs feed.`);
         saveCache();
       } catch (error) {
+        // silent fail on background refresh — user still sees cached data
         console.warn("Background refresh failed:", error.message);
         setStatus("Showing cached results. Live feed will retry on next search.");
-      } finally {
-        clearTimeout(timeout);
       }
     }
 
     async function fetchAndRender() {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 20000); // increased timeout
       try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 20000);
         const response = await fetch(apiUrl("/api/jobs"), {
           headers: { Accept: "application/json" },
           signal: controller.signal
         });
+        clearTimeout(timeout);
         const data = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(data.error || `Feed request failed (${response.status}).`);
-        if (!Array.isArray(data.jobs)) throw new Error("The feed response does not contain a jobs array.");
-        sheetJobs = data.jobs.map(normaliseJob).filter(job => job.title && job.employer && job.url && parsedDate(job.date));
-        $("feedStamp").textContent = data.refreshedAt
-          ? `Feed updated ${new Date(data.refreshedAt).toLocaleString()}`
+        if (!response.ok) throw new Error(data.error || data.message || `Feed request failed (${response.status}).`);
+
+        const rawJobs = extractJobsFromResponse(data);
+        if (!rawJobs) {
+          // Empty/unexpected but not an error — treat as no jobs
+          sheetJobs = [];
+          visibleJobs = [];
+          renderJobs();
+          const meta = extractMeta(data);
+          $("feedStamp").textContent = meta.refreshedAt
+            ? `Feed updated ${new Date(meta.refreshedAt).toLocaleString()}`
+            : "Live feed connected";
+          setStatus("The jobs feed returned no listings. Try searching for a job title or location.");
+          setInlinePercent(100);
+          setTimeout(() => { hideInlineLoader(); }, 300);
+          return;
+        }
+
+        sheetJobs = rawJobs.map(normaliseJob).filter(job => job.title && job.employer && job.url && parsedDate(job.date));
+        const meta = extractMeta(data);
+        $("feedStamp").textContent = meta.refreshedAt
+          ? `Feed updated ${new Date(meta.refreshedAt).toLocaleString()}`
           : "Live feed connected";
-        const register = data.sponsorRegister || {};
+        const register = meta.sponsorRegister;
         $("registerStatus").textContent = register.rowCount
           ? `Sponsor register rows: ${Number(register.rowCount).toLocaleString()}`
           : "Sponsor register status not supplied";
         populateSources();
-        const stats = data.stats || {};
+        const stats = meta.stats;
         $("licensedStat").textContent = Number(stats.licensedSponsorJobs ?? allJobs().filter(job => job.sponsorRegisterMatch.toLowerCase().startsWith("matched:")).length).toLocaleString();
         $("verifiedStat").textContent = Number(stats.verifiedJobs ?? allJobs().filter(sponsorVerified).length).toLocaleString();
         $("sponsorCountStat").textContent = Number(stats.licensedSponsors ?? register.rowCount ?? 0).toLocaleString();
@@ -1289,8 +1277,6 @@
         $("feedStamp").textContent = "Feed unavailable";
         setInlinePercent(100);
         setTimeout(() => hideInlineLoader(), 250);
-      } finally {
-        clearTimeout(timeout);
       }
     }
 
@@ -1484,18 +1470,14 @@
       }
       const pageCount = Math.ceil(visibleJobs.length / PAGE_SIZE);
       page = Math.min(page, pageCount);
-      visibleJobs.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).forEach((job, index) => {
-        const card = createCard(job);
-        card.style.animationDelay = `${Math.min(index * 0.04, 0.4)}s`;
-        root.append(card);
-      });
+      visibleJobs.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).forEach(job => root.append(createCard(job)));
       $("pagination").hidden = pageCount <= 1;
       $("pageLabel").textContent = `Page ${page} of ${pageCount}`;
       $("prevBtn").disabled = page <= 1;
       $("nextBtn").disabled = page >= pageCount;
     }
 
-    /* ===== LIVE SEARCH ===== */
+    /* ===== LIVE SEARCH (only triggered by button) ===== */
     async function searchLiveJobs() {
       const queryText = $("query").value.trim();
       const locationText = $("postcode").value.trim() || $("location").value.trim();
@@ -1520,25 +1502,29 @@
       startLoaderAnimation(80, 2200);
       $("importNotice").classList.remove("visible");
       setStatus("Searching JobSpy and the official UK Jobs service…");
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 25000); // increased timeout for live search
       try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 25000);
         const response = await fetch(apiUrl(`/api/search?${params}`), {
           headers: { Accept: "application/json" },
           signal: controller.signal
         });
+        clearTimeout(timeout);
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error || `Search failed (${response.status}).`);
-        collectedJobs = (data.jobs || []).map(normaliseJob).filter(job => job.title && job.employer && job.url);
+        if (!response.ok) throw new Error(data.error || data.message || `Search failed (${response.status}).`);
+
+        const rawJobs = extractJobsFromResponse(data) || [];
+        collectedJobs = rawJobs.map(normaliseJob).filter(job => job.title && job.employer && job.url);
         liveSearchActive = true;
         populateSources();
         const notice = $("importNotice");
-        const register = data.sponsorRegister || {};
+        const meta = extractMeta(data);
+        const register = meta.sponsorRegister;
         $("registerStatus").textContent = register.available
           ? `Official register checked (${Number(register.rowCount).toLocaleString()} organisations)`
           : "Official sponsor register unavailable; employers are unverified";
-        if (data.errors?.length) {
-          notice.textContent = data.errors.map(item => `${item.source}: ${item.error}`).join(" · ");
+        if (meta.errors?.length) {
+          notice.textContent = meta.errors.map(item => `${item.source}: ${item.error}`).join(" · ");
           notice.classList.add("visible");
         }
         await applyFilters();
@@ -1551,7 +1537,6 @@
         setInlinePercent(100);
         setTimeout(() => hideInlineLoader(), 250);
       } finally {
-        clearTimeout(timeout);
         setBusy($("searchBtn"), false);
       }
     }
