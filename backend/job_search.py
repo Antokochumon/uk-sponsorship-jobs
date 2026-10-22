@@ -21,7 +21,7 @@ from collect_jobs import canonical_url, normalize_job
 JOBS_SEARCH_URL = "https://www.jobs.service.gov.uk/jobs/search"
 JOBS_BASE_URL = "https://www.jobs.service.gov.uk"
 REQUEST_HEADERS = {"User-Agent": "UKJobFinder/1.0", "Accept": "text/html,application/xhtml+xml,application/json"}
-RESULT_LIMIT = 15
+RESULT_LIMIT = 100
 SEARCH_TERMS = (
     "care assistant", "care worker", "support worker", "healthcare assistant", "nurse",
     "warehouse operative", "cleaner", "customer service", "kitchen assistant", "software developer",
