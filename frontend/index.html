@@ -209,7 +209,7 @@
     main { padding-bottom: 40px; }
     .summary {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr)); /* adjusted from 6 to 5 columns */
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 10px;
       margin-bottom: 16px;
     }
@@ -393,70 +393,64 @@
     }
     .notice.visible { display: block; }
 
-    /* ===== PERCENTAGE LOADER ===== */
-    .loader-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      display: grid;
-      place-items: center;
-      background: rgba(14, 31, 26, 0.55);
-      backdrop-filter: blur(6px);
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.25s ease, visibility 0.25s ease;
+    /* ===== INLINE LOADER (replaces overlay) ===== */
+    .inline-loader {
+      display: none;
+      grid-column: 1 / -1;
+      justify-content: center;
+      align-items: center;
+      padding: 48px 24px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
     }
-    .loader-overlay.active { opacity: 1; visibility: visible; }
-    .loader-card {
+    .inline-loader.active { display: flex; }
+    .inline-loader-inner {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 18px;
-      padding: 38px 48px;
-      border-radius: 22px;
-      background: rgba(255, 255, 255, 0.97);
-      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
-      min-width: 240px;
+      gap: 16px;
     }
-    .loader-ring {
+    .inline-ring {
       position: relative;
-      width: 86px;
-      height: 86px;
+      width: 70px;
+      height: 70px;
     }
-    .loader-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-    .loader-ring circle {
+    .inline-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .inline-ring circle {
       fill: none;
-      stroke-width: 7;
+      stroke-width: 6;
       stroke-linecap: round;
     }
-    .loader-ring .track { stroke: #e3eee6; }
-    .loader-ring .progress {
+    .inline-ring .track { stroke: #e3eee6; }
+    .inline-ring .progress {
       stroke: var(--forest);
-      stroke-dasharray: 226;
-      stroke-dashoffset: 226;
+      stroke-dasharray: 188;
+      stroke-dashoffset: 188;
       transition: stroke-dashoffset 0.2s linear;
     }
-    .loader-percent {
+    .inline-percent {
       position: absolute;
       inset: 0;
       display: grid;
       place-items: center;
-      font-size: 19px;
+      font-size: 16px;
       font-weight: 700;
       color: var(--forest-deep);
       letter-spacing: -0.02em;
     }
-    .loader-label {
+    .inline-label {
       font-size: 12.5px;
       font-weight: 600;
       color: var(--ink-soft);
       letter-spacing: 0.02em;
       text-align: center;
     }
-    .loader-sub {
+    .inline-sub {
       font-size: 10.5px;
       color: var(--muted);
-      margin-top: -10px;
+      margin-top: -8px;
     }
 
     /* ===== JOB CARDS ===== */
@@ -467,7 +461,7 @@
     }
     .job-card {
       min-width: 0;
-      padding: 18px;
+      padding: 20px;
       border: 1px solid var(--line);
       border-radius: var(--radius);
       background: var(--white);
@@ -491,19 +485,20 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 10px;
+      gap: 12px;
     }
     .company {
-      margin-bottom: 5px;
+      margin-bottom: 6px;
       color: #5a6f66;
       font-size: 10px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.08em;
+      line-height: 1.4;
     }
     .job-title {
-      font-size: 16.5px;
-      line-height: 1.3;
+      font-size: 17px;
+      line-height: 1.35;
       font-weight: 700;
       letter-spacing: -0.015em;
       overflow-wrap: anywhere;
@@ -512,15 +507,15 @@
     .badge {
       flex: 0 0 auto;
       max-width: 190px;
-      padding: 6px 9px;
+      padding: 7px 10px;
       border-radius: 6px;
       color: #46564e;
       background: #edf2ee;
       font-size: 9.5px;
       font-weight: 700;
       text-align: center;
-      line-height: 1.3;
-      letter-spacing: 0.01em;
+      line-height: 1.4;
+      letter-spacing: 0.02em;
     }
     .badge.verified { color: #0e4a2e; background: #d7f2e1; box-shadow: inset 0 0 0 1px #b4e6c8; }
     .badge.mentioned { color: #795819; background: #fff0c8; }
@@ -529,26 +524,42 @@
     .tags {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
-      margin: 13px 0;
+      gap: 7px;
+      margin: 14px 0;
     }
     .tag {
       max-width: 100%;
-      padding: 5px 9px;
+      padding: 6px 11px;
       border-radius: 20px;
       color: #466056;
       background: #f0f6f1;
-      font-size: 10.5px;
+      font-size: 11px;
       font-weight: 500;
       overflow-wrap: anywhere;
       border: 1px solid #e4eee6;
+      letter-spacing: 0.01em;
     }
     .evidence, .description {
-      margin: 0 0 9px;
+      margin: 0 0 10px;
       color: #4f6359;
-      font-size: 11.5px;
-      line-height: 1.6;
+      font-size: 12px;
+      line-height: 1.7;
       overflow-wrap: anywhere;
+      letter-spacing: 0.01em;
+    }
+    .evidence {
+      font-style: normal;
+      color: #3f574c;
+      background: #f7faf8;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border-left: 3px solid #c8e6d4;
+    }
+    .evidence.match {
+      color: #1d6b43;
+      font-weight: 600;
+      background: #f0faf4;
+      border-left-color: #3aa76d;
     }
     .description {
       display: -webkit-box;
@@ -556,39 +567,44 @@
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 3;
       color: #63776c;
+      font-size: 12.5px;
+      line-height: 1.7;
+      padding: 2px 0;
+      margin-top: 4px;
     }
-    .match { color: #1d6b43; font-weight: 700; }
     .job-foot {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       margin-top: auto;
-      padding-top: 14px;
+      padding-top: 16px;
       border-top: 1px solid #e9efea;
       flex-wrap: wrap;
     }
     .date {
       color: #728078;
-      font-size: 10.5px;
-      line-height: 1.5;
+      font-size: 11px;
+      line-height: 1.6;
       white-space: pre-line;
       font-weight: 500;
+      letter-spacing: 0.01em;
     }
     .apply {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      padding: 9px 13px;
+      gap: 5px;
+      padding: 10px 15px;
       border-radius: 6px;
       color: #fff;
       background: var(--forest);
-      font-size: 10.5px;
+      font-size: 11px;
       font-weight: 700;
       text-decoration: none;
       transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
       white-space: nowrap;
       box-shadow: 0 2px 8px rgba(26, 77, 62, 0.2);
+      letter-spacing: 0.02em;
     }
     .apply:hover {
       background: #246b56;
@@ -604,33 +620,33 @@
     .apply.disabled { opacity: 0.5; pointer-events: none; }
     .job-foot .actions {
       display: flex;
-      gap: 6px;
+      gap: 7px;
       flex-wrap: wrap;
     }
 
     /* ===== EMPTY STATE ===== */
     .empty {
       grid-column: 1 / -1;
-      padding: 44px 24px;
+      padding: 48px 24px;
       border: 1.5px dashed #c2d0c5;
       border-radius: var(--radius);
       color: #5f7268;
       background: linear-gradient(180deg, #fbfdfb, #f6faf6);
       text-align: center;
-      font-size: 12.5px;
-      line-height: 1.65;
+      font-size: 13px;
+      line-height: 1.7;
     }
     .empty strong {
       display: block;
-      margin-bottom: 7px;
+      margin-bottom: 8px;
       color: var(--ink);
-      font-size: 17px;
+      font-size: 18px;
       font-weight: 700;
       letter-spacing: -0.01em;
     }
     .empty .empty-icon {
-      font-size: 36px;
-      margin-bottom: 10px;
+      font-size: 40px;
+      margin-bottom: 12px;
       opacity: 0.7;
     }
 
@@ -727,7 +743,7 @@
       .job-foot .apply { flex: 1; text-align: center; justify-content: center; }
       .footer-inner { flex-direction: column; gap: 14px; }
       .footer-credit { text-align: left; }
-      .loader-card { padding: 30px 34px; }
+      .inline-loader { padding: 32px 16px; }
     }
     @media (max-width: 400px) {
       .summary { grid-template-columns: 1fr 1fr; }
@@ -759,7 +775,7 @@
       100% { background-position: -200% 0; }
     }
     .skeleton-card {
-      padding: 18px;
+      padding: 20px;
       border: 1px solid var(--line);
       border-radius: var(--radius);
       background: var(--white);
@@ -773,21 +789,6 @@
   </style>
 </head>
 <body>
-
-  <!-- ===== PERCENTAGE LOADER ===== -->
-  <div class="loader-overlay" id="loaderOverlay" role="alert" aria-live="assertive">
-    <div class="loader-card">
-      <div class="loader-ring">
-        <svg viewBox="0 0 86 86" aria-hidden="true">
-          <circle class="track" cx="43" cy="43" r="36"></circle>
-          <circle class="progress" id="loaderProgress" cx="43" cy="43" r="36"></circle>
-        </svg>
-        <div class="loader-percent" id="loaderPercent">0%</div>
-      </div>
-      <div class="loader-label" id="loaderLabel">Loading UK jobs…</div>
-      <div class="loader-sub" id="loaderSub">Connecting to live sources</div>
-    </div>
-  </div>
 
   <!-- ===== MASTHEAD ===== -->
   <header class="masthead">
@@ -819,7 +820,6 @@
       <div class="metric"><strong id="verifiedStat">—</strong><span>Verified register match &amp; advert evidence</span></div>
       <div class="metric"><strong id="sourceStat">2</strong><span>Live job sources</span></div>
       <div class="metric"><strong id="licensedStat">—</strong><span>Licensed sponsor employers</span></div>
-      <!-- Removed "Advert evidence" metric as requested -->
       <div class="metric"><strong id="sponsorCountStat">—</strong><span>Licensed sponsor companies</span></div>
     </section>
 
@@ -857,6 +857,21 @@
       <span id="registerStatus"></span>
     </div>
     <div class="notice" id="importNotice" role="status"></div>
+
+    <!-- INLINE LOADER (shown only when loading jobs) -->
+    <div class="inline-loader" id="inlineLoader">
+      <div class="inline-loader-inner">
+        <div class="inline-ring">
+          <svg viewBox="0 0 70 70" aria-hidden="true">
+            <circle class="track" cx="35" cy="35" r="30"></circle>
+            <circle class="progress" id="inlineProgress" cx="35" cy="35" r="30"></circle>
+          </svg>
+          <div class="inline-percent" id="inlinePercent">0%</div>
+        </div>
+        <div class="inline-label" id="inlineLabel">Loading UK jobs…</div>
+        <div class="inline-sub" id="inlineSub">Connecting to live sources</div>
+      </div>
+    </div>
 
     <section class="job-list" id="jobs" aria-live="polite" aria-busy="true">
       <!-- skeleton shown while loading -->
@@ -897,6 +912,7 @@
     const apiUrl = path => `${BACKEND_API_URL}${path}`;
     const PAGE_SIZE = 18;
     const MAX_AGE_DAYS = 28;
+    const STORAGE_KEY = "uksponsorjobsfinder_cache_v2";
     const CATEGORY_RULES = [
       ["Care and support", /care assistant|care worker|support worker|home care|residential support|senior care/i],
       ["Healthcare", /healthcare assistant|health care assistant|healthcare worker/i],
@@ -924,39 +940,41 @@
     let nearMeCoordinates = null;
     const postcodeCache = new Map();
 
-    /* ===== PERCENTAGE LOADER ===== */
-    const loaderOverlay = $("loaderOverlay");
-    const loaderPercent = $("loaderPercent");
-    const loaderProgress = $("loaderProgress");
-    const loaderLabel = $("loaderLabel");
-    const loaderSub = $("loaderSub");
-    const CIRCUMFERENCE = 2 * Math.PI * 36;
+    /* ===== INLINE LOADER ===== */
+    const inlineLoader = $("inlineLoader");
+    const inlinePercent = $("inlinePercent");
+    const inlineProgress = $("inlineProgress");
+    const inlineLabel = $("inlineLabel");
+    const inlineSub = $("inlineSub");
+    const CIRCUMFERENCE = 2 * Math.PI * 30;
 
-    function showLoader(label, sub) {
-      loaderLabel.textContent = label || "Loading UK jobs…";
-      loaderSub.textContent = sub || "Connecting to live sources";
-      setLoaderPercent(0);
-      loaderOverlay.classList.add("active");
+    function showInlineLoader(label, sub) {
+      inlineLabel.textContent = label || "Loading UK jobs…";
+      inlineSub.textContent = sub || "Connecting to live sources";
+      setInlinePercent(0);
+      inlineLoader.classList.add("active");
+      $("jobs").setAttribute("aria-busy", "true");
     }
-    function hideLoader() {
-      loaderOverlay.classList.remove("active");
+    function hideInlineLoader() {
+      inlineLoader.classList.remove("active");
+      $("jobs").setAttribute("aria-busy", "false");
     }
-    function setLoaderPercent(percent) {
+    function setInlinePercent(percent) {
       const clamped = Math.max(0, Math.min(100, Math.round(percent)));
-      loaderPercent.textContent = `${clamped}%`;
-      loaderProgress.style.strokeDashoffset = CIRCUMFERENCE - (CIRCUMFERENCE * clamped) / 100;
+      inlinePercent.textContent = `${clamped}%`;
+      inlineProgress.style.strokeDashoffset = CIRCUMFERENCE - (CIRCUMFERENCE * clamped) / 100;
     }
-    // Animated load simulation for fetching jobs
+
     let loaderInterval = null;
     function startLoaderAnimation(target, duration) {
       const start = performance.now();
-      const from = parseInt(loaderPercent.textContent) || 0;
+      const from = parseInt(inlinePercent.textContent) || 0;
       if (loaderInterval) clearInterval(loaderInterval);
       loaderInterval = setInterval(() => {
         const elapsed = performance.now() - start;
         const t = Math.min(elapsed / duration, 1);
         const eased = 1 - Math.pow(1 - t, 3);
-        setLoaderPercent(from + (target - from) * eased);
+        setInlinePercent(from + (target - from) * eased);
         if (t >= 1) { clearInterval(loaderInterval); loaderInterval = null; }
       }, 30);
     }
@@ -1063,16 +1081,59 @@
       }
     }
 
-    /* ===== LOAD JOBS ===== */
+    /* ===== LOCAL STORAGE CACHE ===== */
+    function saveCache() {
+      try {
+        const payload = {
+          sheetJobs: sheetJobs.slice(0, 120),
+          collectedJobs: collectedJobs.slice(0, 120),
+          liveSearchActive,
+          cachedAt: Date.now()
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      } catch (_) { /* ignore quota errors */ }
+    }
+    function loadCache() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return false;
+        const payload = JSON.parse(raw);
+        if (!payload || Date.now() - payload.cachedAt > 6 * 60 * 60 * 1000) return false;
+        sheetJobs = (payload.sheetJobs || []).map(normaliseJob).filter(j => j.title && j.employer && j.url);
+        collectedJobs = (payload.collectedJobs || []).map(normaliseJob).filter(j => j.title && j.employer && j.url);
+        liveSearchActive = !!payload.liveSearchActive;
+        return sheetJobs.length > 0 || collectedJobs.length > 0;
+      } catch (_) { return false; }
+    }
+
+    /* ===== LOAD JOBS (background refresh, no initial loader) ===== */
     async function loadJobs() {
       if (!BACKEND_API_URL) {
         setStatus("The backend URL is not configured for this deployment.", true);
         $("jobs").setAttribute("aria-busy", "false");
+        hideInlineLoader();
         return;
       }
-      showLoader("Loading UK jobs…", "Fetching live feed and sponsor register");
-      startLoaderAnimation(85, 2200);
-      setStatus("Loading the jobs feed…");
+      // Do NOT show loader on first open if cache exists or even if not — we show it only when fetching explicitly
+      const hasCache = loadCache();
+      if (hasCache) {
+        // show cached data immediately
+        populateSources();
+        await applyFilters();
+        setStatus(`Loaded ${sheetJobs.length.toLocaleString()} records from local cache. Refreshing in background…`);
+        $("feedStamp").textContent = "Cached feed · updating…";
+        // background refresh without visible loader
+        refreshFeedInBackground();
+      } else {
+        // No cache: show inline loader only for the actual fetch
+        showInlineLoader("Loading UK jobs…", "Fetching live feed and sponsor register");
+        startLoaderAnimation(85, 2000);
+        setStatus("Loading the jobs feed…");
+        await fetchAndRender();
+      }
+    }
+
+    async function refreshFeedInBackground() {
       try {
         const response = await fetch(apiUrl("/api/jobs"), { headers: { Accept: "application/json" } });
         const data = await response.json().catch(() => ({}));
@@ -1089,22 +1150,49 @@
         populateSources();
         const stats = data.stats || {};
         $("licensedStat").textContent = Number(stats.licensedSponsorJobs ?? allJobs().filter(job => job.sponsorRegisterMatch.toLowerCase().startsWith("matched:")).length).toLocaleString();
-        // "Advert evidence" metric removed — no assignment needed
         $("verifiedStat").textContent = Number(stats.verifiedJobs ?? allJobs().filter(sponsorVerified).length).toLocaleString();
         $("sponsorCountStat").textContent = Number(stats.licensedSponsors ?? register.rowCount ?? 0).toLocaleString();
         if (!liveSearchActive) await applyFilters();
         setStatus(`Loaded ${sheetJobs.length.toLocaleString()} records from the jobs feed.`);
-        setLoaderPercent(100);
-        setTimeout(() => { hideLoader(); $("jobs").setAttribute("aria-busy", "false"); }, 350);
+        saveCache();
+      } catch (error) {
+        // silent fail on background refresh
+        console.warn("Background refresh failed:", error.message);
+      }
+    }
+
+    async function fetchAndRender() {
+      try {
+        const response = await fetch(apiUrl("/api/jobs"), { headers: { Accept: "application/json" } });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || `Feed request failed (${response.status}).`);
+        if (!Array.isArray(data.jobs)) throw new Error("The feed response does not contain a jobs array.");
+        sheetJobs = data.jobs.map(normaliseJob).filter(job => job.title && job.employer && job.url && parsedDate(job.date));
+        $("feedStamp").textContent = data.refreshedAt
+          ? `Feed updated ${new Date(data.refreshedAt).toLocaleString()}`
+          : "Live feed connected";
+        const register = data.sponsorRegister || {};
+        $("registerStatus").textContent = register.rowCount
+          ? `Sponsor register rows: ${Number(register.rowCount).toLocaleString()}`
+          : "Sponsor register status not supplied";
+        populateSources();
+        const stats = data.stats || {};
+        $("licensedStat").textContent = Number(stats.licensedSponsorJobs ?? allJobs().filter(job => job.sponsorRegisterMatch.toLowerCase().startsWith("matched:")).length).toLocaleString();
+        $("verifiedStat").textContent = Number(stats.verifiedJobs ?? allJobs().filter(sponsorVerified).length).toLocaleString();
+        $("sponsorCountStat").textContent = Number(stats.licensedSponsors ?? register.rowCount ?? 0).toLocaleString();
+        if (!liveSearchActive) await applyFilters();
+        setStatus(`Loaded ${sheetJobs.length.toLocaleString()} records from the jobs feed.`);
+        setInlinePercent(100);
+        setTimeout(() => { hideInlineLoader(); }, 300);
+        saveCache();
       } catch (error) {
         sheetJobs = [];
         visibleJobs = [];
         renderJobs();
         setStatus(`Could not load the jobs feed: ${error.message || "Try again shortly."}`, true);
         $("feedStamp").textContent = "Feed unavailable";
-        setLoaderPercent(100);
-        setTimeout(() => hideLoader(), 250);
-        $("jobs").setAttribute("aria-busy", "false");
+        setInlinePercent(100);
+        setTimeout(() => hideInlineLoader(), 250);
       }
     }
 
@@ -1305,7 +1393,7 @@
       $("nextBtn").disabled = page >= pageCount;
     }
 
-    /* ===== LIVE SEARCH ===== */
+    /* ===== LIVE SEARCH (only triggered by button) ===== */
     async function searchLiveJobs() {
       const queryText = $("query").value.trim();
       const locationText = $("postcode").value.trim() || $("location").value.trim();
@@ -1326,8 +1414,8 @@
         params.set("longitude", nearMeCoordinates.lon);
       }
       setBusy($("searchBtn"), true, "Searching…");
-      showLoader("Searching live jobs…", "Scanning JobSpy and official UK Jobs service");
-      startLoaderAnimation(80, 3000);
+      showInlineLoader("Searching live jobs…", "Scanning JobSpy and official UK Jobs service");
+      startLoaderAnimation(80, 2500);
       $("importNotice").classList.remove("visible");
       setStatus("Searching JobSpy and the official UK Jobs service…");
       try {
@@ -1348,18 +1436,20 @@
         }
         await applyFilters();
         setStatus(`Found ${collectedJobs.length.toLocaleString()} current listings. Results are ranked by title relevance.`);
-        setLoaderPercent(100);
-        setTimeout(() => { hideLoader(); $("jobs").setAttribute("aria-busy", "false"); }, 350);
+        setInlinePercent(100);
+        setTimeout(() => { hideInlineLoader(); }, 300);
+        saveCache();
       } catch (error) {
         setStatus(`Could not search live jobs: ${error.message || "Try again shortly."}`, true);
-        setLoaderPercent(100);
-        setTimeout(() => hideLoader(), 250);
+        setInlinePercent(100);
+        setTimeout(() => hideInlineLoader(), 250);
       } finally {
         setBusy($("searchBtn"), false);
       }
     }
 
     /* ===== EVENT LISTENERS ===== */
+    // Only the search button triggers live search; all other inputs just apply local filters.
     $("searchBtn").addEventListener("click", searchLiveJobs);
     $("applyFiltersBtn").addEventListener("click", () => {
       liveSearchActive = false;
@@ -1381,22 +1471,27 @@
       collectedJobs = [];
       applyFilters();
     });
-    ["query", "location"].forEach(id => $(id).addEventListener("keydown", event => { if (event.key === "Enter") searchLiveJobs(); }));
+    // No auto-search on typing or enter — only applyFilters on enter for query/location (keeps existing quick filter behavior, but does not hit live API)
+    ["query", "location"].forEach(id => $(id).addEventListener("keydown", event => {
+      if (event.key === "Enter") { event.preventDefault(); applyFilters(); }
+    }));
     ["category", "sponsorship", "source", "hideOld"].forEach(id => $(id)?.addEventListener("change", applyFilters));
-    ["jobType", "age", "radius"].forEach(id => $(id).addEventListener("change", () => liveSearchActive ? searchLiveJobs() : applyFilters()));
+    ["jobType", "age", "radius"].forEach(id => $(id).addEventListener("change", applyFilters));
     $("postcode").addEventListener("change", () => {
       nearMeCoordinates = null;
-      searchLiveJobs();
+      applyFilters();
     });
-    ["salaryMin", "salaryMax"].forEach(id => $(id).addEventListener("keydown", event => { if (event.key === "Enter") searchLiveJobs(); }));
-    ["salaryMin", "salaryMax"].forEach(id => $(id).addEventListener("change", () => liveSearchActive && searchLiveJobs()));
+    ["salaryMin", "salaryMax"].forEach(id => $(id).addEventListener("keydown", event => {
+      if (event.key === "Enter") { event.preventDefault(); applyFilters(); }
+    }));
+    ["salaryMin", "salaryMax"].forEach(id => $(id).addEventListener("change", applyFilters));
     $("nearMeBtn").addEventListener("click", () => {
       if (!navigator.geolocation) {
         setStatus("Location services are unavailable. Enter a UK postcode instead.", true);
         return;
       }
       setStatus("Requesting your location…");
-      showLoader("Getting your location…", "Waiting for permission");
+      showInlineLoader("Getting your location…", "Waiting for permission");
       startLoaderAnimation(50, 2000);
       navigator.geolocation.getCurrentPosition(
         position => {
@@ -1407,7 +1502,7 @@
         },
         () => {
           setStatus("Location permission was not granted. Enter a postcode instead.", true);
-          hideLoader();
+          hideInlineLoader();
         },
         { enableHighAccuracy: true, timeout: 12000, maximumAge: 300000 }
       );
@@ -1416,8 +1511,7 @@
     $("nextBtn").addEventListener("click", () => { if (page < Math.ceil(visibleJobs.length / PAGE_SIZE)) { page++; renderJobs(); } });
 
     /* ===== INIT ===== */
-    // Loader is hidden by default (no "active" class), so the page opens immediately.
-    // loadJobs() will call showLoader() only when fetching data begins.
+    // Load cache immediately, then fetch fresh data in background (no overlay on first open)
     loadJobs();
   </script>
 </body>
