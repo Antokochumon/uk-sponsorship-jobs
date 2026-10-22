@@ -957,7 +957,7 @@
         </div>
         <div class="footer-credit">
           Designed &amp; developed by <a href="https://antokochumon.github.io/Portfolio/" target="_blank" rel="noopener noreferrer">Anto Kochumon</a>
-          <span class="footer-copyright">© 2026 UKSponsorJobsfinder. All rights reserved.</span>
+          <span class="footer-copyright">© 2025 UKSponsorJobsfinder. All rights reserved.</span>
         </div>
       </div>
       <div class="footer-divider"></div>
@@ -1218,9 +1218,9 @@
     }
 
     async function refreshFeedInBackground() {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(new DOMException("Feed refresh timed out", "TimeoutError")), 20000);
       try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 20000);
         const response = await fetch(apiUrl("/api/jobs"), {
           headers: { Accept: "application/json" },
           signal: controller.signal
@@ -1254,15 +1254,22 @@
         setStatus(`Loaded ${sheetJobs.length.toLocaleString()} records from the jobs feed.`);
         saveCache();
       } catch (error) {
-        console.warn("Background refresh failed:", error.message);
-        setStatus("Showing cached results. Live feed will retry on next search.");
+        clearTimeout(timeout);
+        // Silent fail on background refresh — user still sees cached data.
+        // Only surface a gentle message; never show "signal is aborted".
+        console.warn("Background refresh failed:", error && error.message);
+        if (error && error.name === "TimeoutError") {
+          setStatus("Showing cached results. Live feed is taking longer than usual — will retry on next search.");
+        } else if (error && error.name !== "AbortError") {
+          setStatus("Showing cached results. Live feed will retry on next search.");
+        }
       }
     }
 
     async function fetchAndRender() {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(new DOMException("Feed request timed out", "TimeoutError")), 20000);
       try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 20000);
         const response = await fetch(apiUrl("/api/jobs"), {
           headers: { Accept: "application/json" },
           signal: controller.signal
@@ -1306,10 +1313,16 @@
         setTimeout(() => { hideInlineLoader(); }, 300);
         saveCache();
       } catch (error) {
+        clearTimeout(timeout);
         sheetJobs = [];
         visibleJobs = [];
         renderJobs();
-        setStatus(`Could not load the jobs feed: ${error.message || "Try again shortly."}`, true);
+        // Friendly, human-readable message — never expose "signal is aborted without reason".
+        const friendly = error && error.name === "TimeoutError"
+          ? "The jobs feed took too long to respond. Please check your connection and try again."
+          : "Could not load the jobs feed right now. Please try again in a moment.";
+        console.warn("Initial feed load failed:", error && error.message);
+        setStatus(friendly, true);
         $("feedStamp").textContent = "Feed unavailable";
         setInlinePercent(100);
         setTimeout(() => hideInlineLoader(), 250);
@@ -1538,9 +1551,9 @@
       startLoaderAnimation(80, 2200);
       $("importNotice").classList.remove("visible");
       setStatus("Searching JobSpy and the official UK Jobs service…");
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(new DOMException("Search timed out", "TimeoutError")), 25000);
       try {
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 25000);
         const response = await fetch(apiUrl(`/api/search?${params}`), {
           headers: { Accept: "application/json" },
           signal: controller.signal
@@ -1569,7 +1582,12 @@
         setTimeout(() => { hideInlineLoader(); }, 300);
         saveCache();
       } catch (error) {
-        setStatus(`Could not search live jobs: ${error.message || "Try again shortly."}`, true);
+        clearTimeout(timeout);
+        const friendly = error && error.name === "TimeoutError"
+          ? "The live search took too long to respond. Please try again in a moment."
+          : "Could not search live jobs right now. Please try again shortly.";
+        console.warn("Live search failed:", error && error.message);
+        setStatus(friendly, true);
         setInlinePercent(100);
         setTimeout(() => hideInlineLoader(), 250);
       } finally {
