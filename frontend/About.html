@@ -1,0 +1,1120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
+  <meta name="theme-color" content="#0e1f1a">
+  <meta name="description" content="Learn how SponsorshipJobsUK works — how we collect jobs from Indeed UK, Glassdoor UK and the UK Government Sponsor Register, verify sponsor licences and analyse sponsorship wording.">
+  <meta name="keywords" content="about SponsorshipJobsUK, UK sponsorship jobs, sponsor register, Indeed UK, Glassdoor UK, how it works">
+  <meta name="author" content="Anto Kochumon">
+  <meta property="og:title" content="About — SponsorshipJobsUK">
+  <meta property="og:description" content="How SponsorshipJobsUK finds and verifies UK jobs with sponsorship evidence.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>About — SponsorshipJobsUK</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
+  <style>
+    /* ===== DESIGN SYSTEM (SAME AS MAIN PAGE) ===== */
+    :root {
+      color-scheme: light;
+      --ink: #0f1f1a;
+      --ink-soft: #1e332c;
+      --muted: #5a6f66;
+      --line: #dfe8e2;
+      --paper: #f5f9f5;
+      --white: #ffffff;
+      --forest: #1a4d3e;
+      --forest-deep: #0e2e24;
+      --mint: #d4ede0;
+      --lime: #c8ec6e;
+      --lime-soft: #e6f8c4;
+      --amber: #f0b950;
+      --red: #b84a3e;
+      --shadow: 0 8px 28px rgba(18, 40, 28, 0.07);
+      --shadow-lg: 0 18px 48px rgba(18, 40, 28, 0.10);
+      --radius: 14px;
+      --radius-sm: 8px;
+      --font-sans: "DM Sans", "Segoe UI", system-ui, sans-serif;
+      --font-serif: "Newsreader", Georgia, serif;
+      --transition: 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+      font-family: var(--font-sans);
+      color: var(--ink);
+      background: var(--paper);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      min-width: 320px;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(200, 236, 110, 0.18), transparent),
+        linear-gradient(90deg, #e9f0e9 1px, transparent 1px) 0 0 / 48px 48px,
+        linear-gradient(#e9f0e9 1px, transparent 1px) 0 0 / 48px 48px,
+        var(--paper);
+      line-height: 1.5;
+    }
+    button, input { font: inherit; }
+    button, a, input { -webkit-tap-highlight-color: transparent; }
+    button:focus-visible, a:focus-visible, input:focus-visible {
+      outline: 3px solid #4c8f72;
+      outline-offset: 2px;
+    }
+    img, svg { display: block; max-width: 100%; }
+    .shell { width: min(1280px, calc(100% - 32px)); margin: 0 auto; }
+
+    /* ===== MASTHEAD ===== */
+    .masthead {
+      position: relative;
+      padding: 18px 0;
+      color: #fff;
+      background: linear-gradient(135deg, var(--forest-deep) 0%, #1c3f32 100%);
+      border-bottom: 4px solid var(--lime);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+      z-index: 100;
+    }
+    .masthead-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+    .brand { display: flex; align-items: center; gap: 13px; }
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      color: var(--forest-deep);
+      background: var(--lime);
+      border-radius: 12px;
+      font-size: 20px;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(200, 236, 110, 0.35);
+      flex-shrink: 0;
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+    .brand-text { display: flex; flex-direction: column; }
+    .brand-name {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+    .brand-name span { color: var(--lime); }
+    .brand-note {
+      margin-top: 2px;
+      color: #b9c8bf;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+    }
+    .mast-actions { display: flex; align-items: center; gap: 10px; }
+
+    /* ===== MENU BUTTON & NAV ===== */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 30px;
+      height: 22px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      z-index: 110;
+    }
+    .menu-toggle span {
+      display: block;
+      height: 3px;
+      width: 100%;
+      background: var(--lime);
+      border-radius: 3px;
+      transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.25s ease;
+      transform-origin: center;
+    }
+    .menu-toggle.active span:nth-child(1) {
+      transform: translateY(9.5px) rotate(45deg);
+    }
+    .menu-toggle.active span:nth-child(2) {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+    .menu-toggle.active span:nth-child(3) {
+      transform: translateY(-9.5px) rotate(-45deg);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .nav-links a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 42px;
+      padding: 10px 16px;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: var(--radius-sm);
+      color: #f5faf5;
+      background: rgba(255,255,255,0.07);
+      backdrop-filter: blur(4px);
+      font-size: 12.5px;
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background var(--transition), color var(--transition), border-color var(--transition), transform var(--transition);
+    }
+    .nav-links a:hover {
+      color: var(--ink);
+      background: var(--lime);
+      border-color: var(--lime);
+    }
+    .nav-links a:active { transform: translateY(1px); }
+
+    /* Mobile nav — slide down panel */
+    .mobile-nav-panel {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 105;
+      background: linear-gradient(160deg, var(--forest-deep) 0%, #173d2f 100%);
+      backdrop-filter: blur(16px);
+      padding: 0 24px;
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      visibility: hidden;
+      transition:
+        max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.35s ease,
+        visibility 0.35s ease,
+        padding 0.4s ease;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border-bottom: 3px solid var(--lime);
+    }
+    .mobile-nav-panel.open {
+      max-height: 100vh;
+      opacity: 1;
+      visibility: visible;
+      padding: 88px 24px 34px;
+    }
+    .mobile-nav-panel a {
+      display: block;
+      font-size: 17px;
+      font-weight: 700;
+      color: #f5faf5;
+      text-decoration: none;
+      padding: 15px 22px;
+      border-radius: 12px;
+      letter-spacing: -0.01em;
+      transform: translateY(-12px);
+      opacity: 0;
+      transition:
+        background 0.25s ease,
+        color 0.25s ease,
+        transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+        opacity 0.35s ease;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .mobile-nav-panel.open a {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .mobile-nav-panel.open a:nth-child(1) { transition-delay: 0.08s; }
+    .mobile-nav-panel.open a:nth-child(2) { transition-delay: 0.15s; }
+    .mobile-nav-panel.open a:nth-child(3) { transition-delay: 0.22s; }
+    .mobile-nav-panel a:hover,
+    .mobile-nav-panel a:focus-visible {
+      background: var(--lime);
+      color: var(--forest-deep);
+      transform: translateY(0) scale(1.02);
+    }
+    .mobile-nav-panel .mobile-nav-close {
+      position: absolute;
+      top: 22px;
+      right: 24px;
+      font-size: 34px;
+      color: var(--lime);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      cursor: pointer;
+      line-height: 1;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+    .mobile-nav-panel .mobile-nav-close:hover {
+      background: var(--lime);
+      color: var(--forest-deep);
+      transform: rotate(90deg);
+    }
+    .mobile-nav-panel .mobile-nav-brand {
+      position: absolute;
+      top: 26px;
+      left: 24px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #f5faf5;
+      letter-spacing: -0.01em;
+      opacity: 0;
+      transition: opacity 0.4s ease 0.1s;
+    }
+    .mobile-nav-panel.open .mobile-nav-brand { opacity: 1; }
+    .mobile-nav-panel .mobile-nav-brand span { color: var(--lime); }
+
+    .mobile-nav-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+      z-index: 104;
+    }
+    .mobile-nav-overlay.open { opacity: 1; visibility: visible; }
+
+    /* ===== PAGE HEADER ===== */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 24px;
+      padding: 40px 0 8px;
+      animation: fadeUp 0.5s ease both;
+    }
+    .page-header-left { max-width: 720px; }
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 12px;
+      padding: 5px 14px;
+      border-radius: 999px;
+      background: linear-gradient(120deg, var(--lime-soft), var(--mint));
+      border: 1px solid #c3dfc9;
+      color: var(--forest-deep);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(30px, 4.4vw, 46px);
+      line-height: 1.06;
+      font-weight: 500;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      margin: 0;
+    }
+    h1 em {
+      font-style: normal;
+      background: linear-gradient(120deg, var(--forest) 0%, #2e7d5e 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .page-header p {
+      max-width: 640px;
+      margin: 14px 0 0;
+      color: #4e6258;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 11px 18px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid #d5e0d8;
+      color: var(--forest);
+      background: #f6faf5;
+      font-size: 12.5px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all var(--transition);
+      white-space: nowrap;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .back-link:hover { background: var(--mint); border-color: #b8d4c3; transform: translateY(-1px); }
+    .back-link::before { content: "←"; font-weight: 700; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== CONTENT SECTIONS ===== */
+    main { padding-bottom: 40px; }
+
+    .section-card {
+      margin-top: 22px;
+      padding: 26px 26px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--white);
+      box-shadow: var(--shadow);
+      animation: fadeUp 0.55s ease both;
+    }
+    .section-card:nth-of-type(1) { animation-delay: 0.05s; }
+    .section-card:nth-of-type(2) { animation-delay: 0.1s; }
+    .section-card:nth-of-type(3) { animation-delay: 0.15s; }
+    .section-card:nth-of-type(4) { animation-delay: 0.2s; }
+    .section-card:nth-of-type(5) { animation-delay: 0.25s; }
+
+    .section-card h2 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      color: var(--ink);
+      margin-bottom: 14px;
+    }
+    .section-card h2::before {
+      content: "";
+      width: 5px;
+      height: 20px;
+      border-radius: 3px;
+      background: linear-gradient(180deg, var(--lime), var(--forest));
+      flex-shrink: 0;
+    }
+    .section-card p {
+      color: #3f5449;
+      font-size: 14px;
+      line-height: 1.8;
+      margin-bottom: 12px;
+    }
+    .section-card p:last-child { margin-bottom: 0; }
+    .section-card p strong { color: var(--ink); font-weight: 700; }
+
+    /* ===== SOURCE CARDS ===== */
+    .source-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+      margin-top: 6px;
+    }
+    .source-card {
+      position: relative;
+      padding: 20px 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, #fdfefd, #f6faf6);
+      overflow: hidden;
+      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+      animation: fadeUp 0.6s ease both;
+    }
+    .source-card::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--lime), var(--forest));
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+    .source-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+      border-color: #c3d9c9;
+    }
+    .source-card:hover::after { opacity: 1; }
+    .source-card .source-icon {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--lime-soft);
+      color: var(--forest);
+      font-size: 22px;
+      margin-bottom: 12px;
+      box-shadow: inset 0 0 0 1px #d5ecb0;
+    }
+    .source-card h3 {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+    .source-card p {
+      margin: 0;
+      color: #4f6359;
+      font-size: 12.5px;
+      line-height: 1.7;
+    }
+
+    /* ===== HOW IT WORKS — STEPS ===== */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 8px;
+    }
+    .step {
+      display: flex;
+      gap: 16px;
+      padding: 16px 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, #fdfefd, #f6faf6);
+      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+      animation: fadeUp 0.6s ease both;
+    }
+    .step:hover {
+      transform: translateX(4px);
+      box-shadow: var(--shadow);
+      border-color: #c3d9c9;
+    }
+    .step-number {
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--forest);
+      color: var(--lime);
+      font-size: 17px;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(26, 77, 62, 0.25);
+    }
+    .step-body h3 {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 4px;
+      letter-spacing: -0.01em;
+    }
+    .step-body p {
+      margin: 0;
+      color: #4f6359;
+      font-size: 12.5px;
+      line-height: 1.7;
+    }
+
+    /* ===== INFO CALLOUT ===== */
+    .callout {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      padding: 16px 18px;
+      border-radius: var(--radius);
+      border: 1px solid #cfe6d6;
+      border-left: 4px solid var(--forest);
+      background: linear-gradient(180deg, #f3fbf6, #e9f7ee);
+      margin-top: 14px;
+    }
+    .callout.warn {
+      border-color: #edd7a3;
+      border-left-color: var(--amber);
+      background: linear-gradient(180deg, #fffbf0, #fdf4dd);
+    }
+    .callout .callout-icon {
+      flex-shrink: 0;
+      font-size: 20px;
+      line-height: 1.3;
+    }
+    .callout p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.7;
+      color: #2f4439;
+    }
+    .callout.warn p { color: #674d1c; }
+    .callout p strong { color: inherit; }
+
+    /* ===== FEATURE LIST ===== */
+    .feature-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .feature-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: #fbfdfb;
+      font-size: 13px;
+      line-height: 1.65;
+      color: #3f5449;
+    }
+    .feature-item .tick {
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--mint);
+      color: var(--forest-deep);
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 1px;
+    }
+
+    /* ===== FUTURE / DEV STATUS ===== */
+    .dev-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 14px;
+      border-radius: 999px;
+      background: #fff3d6;
+      border: 1px solid #ecd08a;
+      color: #7a5a17;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .dev-status::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--amber);
+      box-shadow: 0 0 0 3px rgba(240, 185, 80, 0.25);
+      animation: pulse-dot 2s infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.45; }
+    }
+
+    /* ===== CTA STRIP ===== */
+    .cta-strip {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+      padding: 24px 26px;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, var(--forest-deep) 0%, #1c3f32 100%);
+      color: #fff;
+      box-shadow: var(--shadow-lg);
+      border-bottom: 4px solid var(--lime);
+    }
+    .cta-strip h2 {
+      font-family: var(--font-serif);
+      font-size: clamp(20px, 2.6vw, 26px);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      margin: 0 0 6px;
+    }
+    .cta-strip p {
+      margin: 0;
+      color: #b9c8bf;
+      font-size: 12.5px;
+      line-height: 1.6;
+    }
+    .cta-strip .cta-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 46px;
+      padding: 12px 22px;
+      border-radius: 12px;
+      font-size: 12.5px;
+      font-weight: 700;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background 0.22s ease, color 0.22s ease, border-color 0.22s ease, transform 0.18s ease, box-shadow 0.22s ease;
+    }
+    .cta-btn.primary {
+      background: var(--lime);
+      color: var(--forest-deep);
+      border: 1.5px solid var(--lime);
+      box-shadow: 0 4px 14px rgba(200, 236, 110, 0.3);
+    }
+    .cta-btn.primary:hover {
+      background: #e0f59a;
+      border-color: #e0f59a;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(200, 236, 110, 0.4);
+    }
+    .cta-btn.outline {
+      background: rgba(255,255,255,0.07);
+      color: #f5faf5;
+      border: 1.5px solid rgba(255,255,255,0.3);
+      backdrop-filter: blur(4px);
+    }
+    .cta-btn.outline:hover {
+      background: rgba(255,255,255,0.16);
+      border-color: var(--lime);
+      color: var(--lime);
+      transform: translateY(-2px);
+    }
+
+    /* ===== FOOTER (MODERN, RESPONSIVE, STYLISH) ===== */
+    .site-footer {
+      position: relative;
+      background: linear-gradient(160deg, var(--forest-deep) 0%, #143a2c 100%);
+      color: #c6d6cd;
+      padding: 0;
+      margin-top: 20px;
+      border-top: 4px solid var(--lime);
+      overflow: hidden;
+    }
+    .site-footer::before {
+      content: "";
+      position: absolute;
+      top: -120px;
+      right: -120px;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(200, 236, 110, 0.12), transparent 70%);
+      pointer-events: none;
+    }
+    .footer-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 44px 0 36px;
+      gap: 20px;
+      position: relative;
+      z-index: 1;
+    }
+    .footer-brand-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .footer-brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      color: var(--forest-deep);
+      background: var(--lime);
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(200, 236, 110, 0.3);
+    }
+    .footer-brand-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: #f5faf5;
+      letter-spacing: -0.01em;
+    }
+    .footer-brand-name span { color: var(--lime); }
+    .footer-credit {
+      font-size: 13px;
+      color: #c6d6cd;
+      line-height: 1.9;
+    }
+    .footer-credit a {
+      color: var(--lime);
+      font-weight: 700;
+      text-decoration: none;
+      border-bottom: 1.5px solid rgba(200, 236, 110, 0.4);
+      transition: border-color var(--transition), color var(--transition);
+    }
+    .footer-credit a:hover {
+      color: #e6f8c4;
+      border-color: #e6f8c4;
+    }
+    .footer-copyright {
+      display: block;
+      margin-top: 8px;
+      font-size: 11px;
+      color: #9fb5a9;
+      letter-spacing: 0.01em;
+    }
+    .footer-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 4px;
+    }
+    .footer-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 18px;
+      border-radius: 999px;
+      color: #d6e4dc;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(200, 236, 110, 0.18);
+      transition: background 0.22s ease, color 0.22s ease, border-color 0.22s ease, transform 0.18s ease;
+    }
+    .footer-links a:hover {
+      background: var(--lime);
+      color: var(--forest-deep);
+      border-color: var(--lime);
+      transform: translateY(-2px);
+    }
+    .footer-divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(200, 236, 110, 0.3), transparent);
+      margin: 22px 0 0;
+    }
+    .footer-bottom {
+      width: 100%;
+      font-size: 10.5px;
+      color: #8fa79a;
+      text-align: center;
+      line-height: 1.8;
+      letter-spacing: 0.01em;
+      padding: 18px 0 26px;
+      position: relative;
+      z-index: 1;
+    }
+    .footer-bottom .footer-dot {
+      display: inline-block;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--lime);
+      margin: 0 8px;
+      vertical-align: middle;
+      opacity: 0.6;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .page-header { align-items: flex-start; flex-direction: column; gap: 16px; }
+      .back-link { align-self: flex-start; }
+    }
+
+    /* Mobile menu behaviour */
+    @media (max-width: 780px) {
+      .mast-actions { display: none; }
+      .menu-toggle { display: flex; }
+      .nav-links { display: none; }
+    }
+
+    @media (max-width: 680px) {
+      .shell { width: calc(100% - 20px); }
+      .masthead { padding: 14px 0; }
+      .masthead-inner { flex-direction: row; align-items: center; gap: 12px; }
+      .brand-note { font-size: 9.5px; }
+      .page-header { padding: 30px 0 6px; }
+      h1 { font-size: clamp(27px, 7.5vw, 34px); }
+      .section-card { padding: 20px 16px; }
+      .section-card h2 { font-size: 17px; }
+      .section-card p { font-size: 13px; }
+      .source-grid { grid-template-columns: 1fr; gap: 10px; }
+      .step { padding: 14px 14px; }
+      .step-body h3 { font-size: 14px; }
+      .feature-list { grid-template-columns: 1fr; }
+      .cta-strip { flex-direction: column; align-items: flex-start; padding: 20px 18px; }
+      .cta-strip .cta-actions { width: 100%; }
+      .cta-btn { flex: 1; text-align: center; justify-content: center; }
+      .footer-inner { padding: 34px 0 28px; }
+      .mobile-nav-panel.open { padding: 84px 18px 28px; }
+      .mobile-nav-panel a { font-size: 16px; padding: 14px 18px; }
+      .mobile-nav-panel .mobile-nav-brand { font-size: 14px; left: 18px; top: 26px; }
+      .mobile-nav-panel .mobile-nav-close { right: 18px; }
+    }
+    @media (max-width: 400px) {
+      .footer-links { flex-direction: column; width: 100%; gap: 9px; }
+      .footer-links a { width: 100%; justify-content: center; }
+      .footer-brand-row { flex-direction: column; gap: 8px; }
+      .cta-strip .cta-actions { flex-direction: column; }
+      .cta-btn { width: 100%; }
+    }
+
+    /* ===== REDUCED MOTION ===== */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .source-card:hover, .step:hover, .back-link:hover,
+      .cta-btn:hover, .footer-links a:hover { transform: none; }
+      .brand-mark { animation: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== MASTHEAD ===== -->
+  <header class="masthead">
+    <div class="shell masthead-inner">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">SJ</div>
+        <div class="brand-text">
+          <div class="brand-name">Sponsorship<span>Jobs</span>UK</div>
+          <div class="brand-note">Recent vacancies · sponsorship evidence · direct links</div>
+        </div>
+      </div>
+
+      <!-- Desktop nav links -->
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="licensed-sponsors.html">Licensed Sponsors</a>
+        <a href="contact.html">Contact</a>
+      </div>
+
+      <!-- Mobile menu button -->
+      <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNavPanel">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Overlay for mobile nav -->
+  <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+
+  <!-- Mobile slide-down nav panel -->
+  <div class="mobile-nav-panel" id="mobileNavPanel" role="dialog" aria-modal="true" aria-label="Mobile navigation">
+    <div class="mobile-nav-brand">Sponsorship<span>Jobs</span>UK</div>
+    <button class="mobile-nav-close" id="mobileNavClose" aria-label="Close menu">&times;</button>
+    <a href="index.html">Home</a>
+    <a href="licensed-sponsors.html">Licensed Sponsors</a>
+    <a href="contact.html">Contact</a>
+  </div>
+
+  <main class="shell">
+    <!-- ===== PAGE HEADER ===== -->
+    <section class="page-header">
+      <div class="page-header-left">
+        <span class="eyebrow">About the project</span>
+        <h1>Find jobs with <em>real sponsorship evidence</em>.</h1>
+        <p>SponsorshipJobsUK collects current UK vacancies from public job sources, checks each employer against the official UK licensed sponsor register, and analyses the advert wording to surface genuine sponsorship opportunities — with direct application links.</p>
+      </div>
+      <a class="back-link" href="index.html">Back to jobs</a>
+    </section>
+
+    <!-- ===== SECTION: WHAT THIS SITE DOES ===== -->
+    <section class="section-card">
+      <h2>What SponsorshipJobsUK does</h2>
+      <p><strong>SponsorshipJobsUK</strong> is a free, modern job search tool designed for people looking for UK roles that may offer visa sponsorship. Instead of browsing endless listings and guessing, you can search, filter and immediately see whether an employer appears on the official licensed sponsor register and whether the advert itself talks about sponsorship.</p>
+      <p>Every listing links back to the original publisher so you can apply directly. We never host applications ourselves and we never ask you to sign up.</p>
+      <div class="feature-list">
+        <div class="feature-item"><span class="tick">✓</span><span>Search current UK vacancies by job title, location and category</span></div>
+        <div class="feature-item"><span class="tick">✓</span><span>Filter to roles where the employer is a licensed sponsor and the advert confirms sponsorship</span></div>
+        <div class="feature-item"><span class="tick">✓</span><span>See the exact register-match status and sponsorship wording for every job</span></div>
+        <div class="feature-item"><span class="tick">✓</span><span>Apply directly through the original job advert</span></div>
+        <div class="feature-item"><span class="tick">✓</span><span>Results limited to the last 28 days by default, so listings stay fresh</span></div>
+        <div class="feature-item"><span class="tick">✓</span><span>Works on mobile, tablet and desktop with no app required</span></div>
+      </div>
+    </section>
+
+    <!-- ===== SECTION: WHERE THE JOBS COME FROM ===== -->
+    <section class="section-card">
+      <h2>Where the jobs come from</h2>
+      <p>We import vacancies from public job sources and combine them with the official UK Government sponsor register. Each source adds a different layer of evidence:</p>
+      <div class="source-grid">
+        <div class="source-card">
+          <div class="source-icon" aria-hidden="true">🔎</div>
+          <h3>Indeed UK</h3>
+          <p>One of the largest public job boards in the UK. We use it to surface current vacancies across many industries and locations.</p>
+        </div>
+        <div class="source-card">
+          <div class="source-icon" aria-hidden="true">🏢</div>
+          <h3>Glassdoor UK</h3>
+          <p>Company listings and job adverts that often include extra context about the employer and the role.</p>
+        </div>
+        <div class="source-card">
+          <div class="source-icon" aria-hidden="true">📋</div>
+          <h3>UK Government Sponsor Register</h3>
+          <p>The official register of licensed sponsors published by the Home Office. We match every employer name against this list.</p>
+        </div>
+        <div class="source-card">
+          <div class="source-icon" aria-hidden="true">🌐</div>
+          <h3>Other public job feeds</h3>
+          <p>Additional public listings that help us cover more roles, sectors and regions across the UK.</p>
+        </div>
+      </div>
+      <div class="callout">
+        <span class="callout-icon" aria-hidden="true">💡</span>
+        <p><strong>We do not copy job adverts permanently.</strong> Listings are pulled from their original publishers, and applications always go back to the original advert or company careers page.</p>
+      </div>
+    </section>
+
+    <!-- ===== SECTION: HOW VERIFICATION WORKS ===== -->
+    <section class="section-card">
+      <h2>How the sponsorship check works</h2>
+      <p>Every job goes through a simple three-step check before it appears in your search results:</p>
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">1</div>
+          <div class="step-body">
+            <h3>Employer name matched against the official register</h3>
+            <p>We compare the employer name on the advert with the UK Government's register of licensed sponsors. Exact matches are flagged so you can see whether the company holds a sponsor licence.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <div class="step-body">
+            <h3>Advert description analysed for sponsorship wording</h3>
+            <p>We read the job description and highlight phrases such as "visa sponsorship available" or "we are a licensed sponsor". We also detect wording that says sponsorship is <em>not</em> offered, so those roles can be filtered out.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <div class="step-body">
+            <h3>Results classified into clear statuses</h3>
+            <p>Each role gets a status: register match + advert evidence (best), not stated or unconfirmed, or advert says unavailable. The default filter shows only the strongest matches first.</p>
+          </div>
+        </div>
+      </div>
+      <div class="callout warn">
+        <span class="callout-icon" aria-hidden="true">⚠️</span>
+        <p><strong>A register match is not a guarantee.</strong> A company may hold a sponsor licence but still choose not to sponsor a particular vacancy. Always confirm sponsorship directly with the employer and check current Home Office rules before applying.</p>
+      </div>
+    </section>
+
+    <!-- ===== SECTION: HOW SEARCH & FILTERS WORK ===== -->
+    <section class="section-card">
+      <h2>How search and filters work</h2>
+      <p>When you use the search page, the site combines your filters with the imported job data and shows the most relevant results:</p>
+      <p><strong>Search jobs</strong> queries the live job sources and pulls in current vacancies for your job title or location. <strong>Apply filters</strong> works on the already-imported listings, so it responds instantly and never leaves the page. <strong>Near me</strong> uses your device location to find roles within your chosen radius.</p>
+      <p>The default sponsorship filter shows only roles where the employer is a licensed sponsor <em>and</em> the advert explicitly mentions sponsorship. You can switch to "All jobs" or "No sponsorship offered" at any time to see a wider set of listings. Results are limited to the last 28 days by default, so you are not looking at stale adverts.</p>
+    </section>
+
+    <!-- ===== SECTION: DEVELOPMENT STATUS ===== -->
+    <section class="section-card">
+      <h2>Development status</h2>
+      <span class="dev-status">Active development</span>
+      <p>SponsorshipJobsUK is a new site and we are actively building it. You may occasionally notice:</p>
+      <div class="feature-list">
+        <div class="feature-item"><span class="tick">!</span><span>Short loading delays while the live feed refreshes</span></div>
+        <div class="feature-item"><span class="tick">!</span><span>Occasional data gaps from a job source</span></div>
+        <div class="feature-item"><span class="tick">!</span><span>Small UI changes as we improve the experience</span></div>
+      </div>
+      <p style="margin-top:14px;">If you run into an issue, <strong>simply refresh the page</strong> — cached results will restore the list quickly while the live feed updates in the background. We will keep adding new features such as richer filters, saved searches and better sponsorship analysis.</p>
+    </section>
+
+    <!-- ===== SECTION: PRIVACY & RESPONSIBILITY ===== -->
+    <section class="section-card">
+      <h2>Privacy and responsibility</h2>
+      <p>We do not require an account and we do not ask for your CV. Your searches stay in your browser, and applications are handled entirely by the original job publisher. SponsorshipJobsUK does not act as a recruiter and does not make immigration decisions.</p>
+      <p>Always verify sponsorship and eligibility against the <a href="https://www.gov.uk/government/publications/register-of-licensed-sponsors-workers" target="_blank" rel="noopener noreferrer" style="color:var(--forest);font-weight:700;">official UK Government sponsor register</a> and the latest Home Office guidance before making an application or accepting a role.</p>
+    </section>
+
+    <!-- ===== CTA STRIP ===== -->
+    <section class="cta-strip">
+      <div>
+        <h2>Ready to find your next role?</h2>
+        <p>Search current UK vacancies with sponsorship evidence and direct application links.</p>
+      </div>
+      <div class="cta-actions">
+        <a class="cta-btn primary" href="index.html">Search jobs</a>
+        <a class="cta-btn outline" href="licensed-sponsors.html">Check a sponsor</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== FOOTER (MODERN, RESPONSIVE, STYLISH) ===== -->
+  <footer class="site-footer">
+    <div class="shell">
+      <div class="footer-inner">
+        <div class="footer-brand-row">
+          <div class="footer-brand-mark" aria-hidden="true">SJ</div>
+          <div class="footer-brand-name">Sponsorship<span>Jobs</span>UK</div>
+        </div>
+        <div class="footer-credit">
+          Designed &amp; developed by <a href="https://antokochumon.github.io/Portfolio/" target="_blank" rel="noopener noreferrer">Anto Kochumon</a>
+          <span class="footer-copyright">© 2026 SponsorshipJobsUK. All rights reserved.</span>
+        </div>
+        <div class="footer-links">
+          <a href="index.html">Home</a>
+          <a href="licensed-sponsors.html">Licensed Sponsors</a>
+          <a href="contact.html">Contact</a>
+        </div>
+      </div>
+      <div class="footer-divider"></div>
+      <div class="footer-bottom">
+        SponsorshipJobsUK <span class="footer-dot"></span> Search current UK vacancies with sponsorship evidence and original application links.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    "use strict";
+
+    /* ===== MOBILE SLIDE-DOWN MENU ===== */
+    const menuToggle = document.getElementById("menuToggle");
+    const mobileNavPanel = document.getElementById("mobileNavPanel");
+    const mobileNavClose = document.getElementById("mobileNavClose");
+    const mobileNavOverlay = document.getElementById("mobileNavOverlay");
+
+    function openMobileMenu() {
+      mobileNavPanel.classList.add("open");
+      mobileNavOverlay.classList.add("open");
+      menuToggle.classList.add("active");
+      menuToggle.setAttribute("aria-expanded", "true");
+      document.body.style.overflow = "hidden";
+    }
+    function closeMobileMenu() {
+      mobileNavPanel.classList.remove("open");
+      mobileNavOverlay.classList.remove("open");
+      menuToggle.classList.remove("active");
+      menuToggle.setAttribute("aria-expanded", "false");
+      document.body.style.overflow = "";
+    }
+    if (menuToggle) {
+      menuToggle.addEventListener("click", () => {
+        if (mobileNavPanel.classList.contains("open")) {
+          closeMobileMenu();
+        } else {
+          openMobileMenu();
+        }
+      });
+    }
+    if (mobileNavClose) mobileNavClose.addEventListener("click", closeMobileMenu);
+    if (mobileNavOverlay) mobileNavOverlay.addEventListener("click", closeMobileMenu);
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && mobileNavPanel.classList.contains("open")) {
+        closeMobileMenu();
+      }
+    });
+    mobileNavPanel.querySelectorAll("a").forEach(link => {
+      link.addEventListener("click", () => {
+        closeMobileMenu();
+      });
+    });
+  </script>
+</body>
+</html>
