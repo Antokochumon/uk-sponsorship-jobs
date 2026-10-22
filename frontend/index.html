@@ -209,7 +209,7 @@
     main { padding-bottom: 40px; }
     .summary {
       display: grid;
-      grid-template-columns: repeat(6, minmax(0, 1fr));
+      grid-template-columns: repeat(5, minmax(0, 1fr)); /* adjusted from 6 to 5 columns */
       gap: 10px;
       margin-bottom: 16px;
     }
@@ -819,7 +819,7 @@
       <div class="metric"><strong id="verifiedStat">—</strong><span>Verified register match &amp; advert evidence</span></div>
       <div class="metric"><strong id="sourceStat">2</strong><span>Live job sources</span></div>
       <div class="metric"><strong id="licensedStat">—</strong><span>Licensed sponsor employers</span></div>
-      <div class="metric"><strong id="evidenceStat">—</strong><span>Advert evidence</span></div>
+      <!-- Removed "Advert evidence" metric as requested -->
       <div class="metric"><strong id="sponsorCountStat">—</strong><span>Licensed sponsor companies</span></div>
     </section>
 
@@ -1089,7 +1089,7 @@
         populateSources();
         const stats = data.stats || {};
         $("licensedStat").textContent = Number(stats.licensedSponsorJobs ?? allJobs().filter(job => job.sponsorRegisterMatch.toLowerCase().startsWith("matched:")).length).toLocaleString();
-        $("evidenceStat").textContent = Number(stats.advertEvidenceJobs ?? allJobs().filter(job => job.sponsorshipStatus.toLowerCase().includes("confirmed") || /positive sponsorship/i.test(job.sponsorshipEvidence)).length).toLocaleString();
+        // "Advert evidence" metric removed — no assignment needed
         $("verifiedStat").textContent = Number(stats.verifiedJobs ?? allJobs().filter(sponsorVerified).length).toLocaleString();
         $("sponsorCountStat").textContent = Number(stats.licensedSponsors ?? register.rowCount ?? 0).toLocaleString();
         if (!liveSearchActive) await applyFilters();
@@ -1416,6 +1416,8 @@
     $("nextBtn").addEventListener("click", () => { if (page < Math.ceil(visibleJobs.length / PAGE_SIZE)) { page++; renderJobs(); } });
 
     /* ===== INIT ===== */
+    // Loader is hidden by default (no "active" class), so the page opens immediately.
+    // loadJobs() will call showLoader() only when fetching data begins.
     loadJobs();
   </script>
 </body>
