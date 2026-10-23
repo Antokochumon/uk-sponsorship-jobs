@@ -4,14 +4,20 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
   <meta name="theme-color" content="#0e1f1a">
-  <meta name="description" content="Learn how SponsorshipJobsUK works — how we collect jobs from Indeed UK, Glassdoor UK and the UK Government Sponsor Register, verify sponsor licences and analyse sponsorship wording.">
-  <meta name="keywords" content="about SponsorshipJobsUK, UK sponsorship jobs, sponsor register, Indeed UK, Glassdoor UK, how it works">
-  <meta name="author" content="Anto Kochumon">
-  <meta property="og:title" content="About — SponsorshipJobsUK">
-  <meta property="og:description" content="How SponsorshipJobsUK finds and verifies UK jobs with sponsorship evidence.">
+  <meta name="description" content="Learn how SponsorshipJobsUK finds UK visa sponsorship jobs, checks employers against the official sponsor register and links to original job adverts.">
+  <meta name="keywords" content="UK visa sponsorship jobs, jobs with visa sponsorship UK, SponsorshipJobsUK, licensed sponsor register, sponsored jobs UK, how sponsorship job search works">
+  <meta name="author" content="SponsorshipJobsUK">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="googlebot" content="index, follow">
+  <meta property="og:site_name" content="SponsorshipJobsUK">
+  <meta property="og:title" content="About SponsorshipJobsUK | UK Visa Sponsorship Jobs">
+  <meta property="og:description" content="Find out how we collect UK job listings, check sponsor-register evidence and link you to original adverts.">
   <meta property="og:type" content="website">
-  <meta name="twitter:card" content="summary_large_image">
-  <title>About — SponsorshipJobsUK</title>
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="About SponsorshipJobsUK | UK Visa Sponsorship Jobs">
+  <meta name="twitter:description" content="How our UK visa sponsorship job search works, including sponsor-register checks and original job links.">
+  <title>About SponsorshipJobsUK | UK Visa Sponsorship Jobs</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
@@ -870,6 +876,134 @@
       .source-card:hover, .step:hover, .back-link:hover,
       .cta-btn:hover, .footer-links a:hover { transform: none; }
       .brand-mark { animation: none; }
+    }
+
+    /* ===== ADDITIONAL POLISH ANIMATIONS ===== */
+    @keyframes gentleBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-2px); }
+    }
+    @keyframes softPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(200, 236, 110, 0.3); }
+      50% { box-shadow: 0 0 0 8px rgba(200, 236, 110, 0); }
+    }
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    @keyframes scaleIn {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    /* Page header entrance */
+    .page-header {
+      animation: fadeUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+    .eyebrow {
+      animation: fadeUp 0.5s 0.1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+    h1 {
+      animation: fadeUp 0.5s 0.18s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+    .page-header p {
+      animation: fadeUp 0.5s 0.26s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+    .back-link {
+      animation: fadeUp 0.5s 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+
+    /* Section cards - slightly enhanced entrance */
+    .section-card {
+      animation: fadeUp 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+    .section-card:nth-of-type(1) { animation-delay: 0.08s; }
+    .section-card:nth-of-type(2) { animation-delay: 0.16s; }
+    .section-card:nth-of-type(3) { animation-delay: 0.24s; }
+    .section-card:nth-of-type(4) { animation-delay: 0.32s; }
+    .section-card:nth-of-type(5) { animation-delay: 0.40s; }
+    .section-card:nth-of-type(6) { animation-delay: 0.48s; }
+
+    /* Source cards stagger */
+    .source-card {
+      animation: fadeUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+    .source-card:nth-child(1) { animation-delay: 0.10s; }
+    .source-card:nth-child(2) { animation-delay: 0.16s; }
+    .source-card:nth-child(3) { animation-delay: 0.22s; }
+    .source-card:nth-child(4) { animation-delay: 0.28s; }
+
+    /* Steps stagger */
+    .step {
+      animation: fadeUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+    .step:nth-child(1) { animation-delay: 0.06s; }
+    .step:nth-child(2) { animation-delay: 0.14s; }
+    .step:nth-child(3) { animation-delay: 0.22s; }
+
+    /* Feature items subtle entrance */
+    .feature-item {
+      animation: fadeUp 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+    .feature-item:nth-child(1) { animation-delay: 0.04s; }
+    .feature-item:nth-child(2) { animation-delay: 0.08s; }
+    .feature-item:nth-child(3) { animation-delay: 0.12s; }
+    .feature-item:nth-child(4) { animation-delay: 0.16s; }
+    .feature-item:nth-child(5) { animation-delay: 0.20s; }
+    .feature-item:nth-child(6) { animation-delay: 0.24s; }
+
+    /* Callout gentle entrance */
+    .callout {
+      animation: scaleIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      animation-delay: 0.15s;
+    }
+
+    /* Dev status pulse */
+    .dev-status {
+      animation: fadeUp 0.4s 0.1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+    .dev-status::before {
+      animation: pulse-dot 2s infinite, softPulse 2.5s infinite;
+    }
+
+    /* CTA strip entrance */
+    .cta-strip {
+      animation: fadeUp 0.5s 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+
+    /* Footer subtle entrance */
+    .site-footer {
+      animation: fadeUp 0.6s 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+
+    /* Interactive hover enhancements */
+    .source-card:hover .source-icon {
+      animation: gentleBounce 0.6s ease infinite;
+    }
+    .step:hover .step-number {
+      animation: gentleBounce 0.5s ease infinite;
+    }
+
+    /* Smooth focus transitions */
+    .nav-links a, .mobile-nav-panel a, .footer-links a, .cta-btn, .back-link {
+      will-change: transform, box-shadow, background;
+    }
+
+    /* Brand mark float already present, add subtle glow on hover */
+    .brand:hover .brand-mark {
+      box-shadow: 0 6px 20px rgba(200, 236, 110, 0.5);
+    }
+
+    /* Ensure reduced motion disables all new animations */
+    @media (prefers-reduced-motion: reduce) {
+      .page-header, .eyebrow, h1, .page-header p, .back-link,
+      .section-card, .source-card, .step, .feature-item,
+      .callout, .dev-status, .cta-strip, .site-footer,
+      .brand-mark, .dev-status::before,
+      .source-card:hover .source-icon, .step:hover .step-number {
+        animation: none !important;
+        transition: none !important;
+      }
     }
   </style>
 </head>
