@@ -4,14 +4,20 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
   <meta name="theme-color" content="#0e1f1a">
-  <meta name="description" content="Find UK jobs with visa sponsorship evidence. Search current vacancies from public sources, check sponsor register matches and apply directly. Fast, modern and mobile-friendly.">
-  <meta name="keywords" content="UK jobs, sponsorship jobs, visa sponsorship, UK work visa, sponsored jobs, job search UK">
-  <meta name="author" content="Anto Kochumon">
-  <meta property="og:title" content="SponsorshipJobsUK – Find UK jobs with sponsorship evidence">
-  <meta property="og:description" content="Search current UK vacancies with sponsorship evidence and original application links. Modern, fast and mobile-friendly.">
+  <meta name="description" content="Search UK visa sponsorship jobs by job title, location, category and date. Explore current vacancies, check employer sponsor-register evidence and apply through original job links.">
+  <meta name="keywords" content="UK visa sponsorship jobs, visa sponsorship jobs UK, jobs with visa sponsorship UK, Skilled Worker visa jobs, UK sponsored jobs, UK work visa jobs, care assistant sponsorship jobs, healthcare sponsorship jobs UK, IT sponsorship jobs UK, engineering sponsorship jobs UK, licensed sponsor employers UK, jobs for international applicants UK">
+  <meta name="author" content="SponsorshipJobsUK">
+  <meta name="application-name" content="SponsorshipJobsUK">
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+  <meta property="og:site_name" content="SponsorshipJobsUK">
+  <meta property="og:title" content="UK Visa Sponsorship Jobs | SponsorshipJobsUK">
+  <meta property="og:description" content="Search UK visa sponsorship job opportunities by role, location and date. Review vacancy details, sponsor-register evidence and original application links.">
   <meta property="og:type" content="website">
-  <meta name="twitter:card" content="summary_large_image">
-  <title>SponsorshipJobsUK — Find UK jobs with sponsorship evidence</title>
+  <meta property="og:locale" content="en_GB">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="UK Visa Sponsorship Jobs | SponsorshipJobsUK">
+  <meta name="twitter:description" content="Search UK sponsorship job opportunities and explore employer sponsor-register evidence.">
+  <title>UK Visa Sponsorship Jobs | Search Sponsored Vacancies | SponsorshipJobsUK</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
@@ -1117,6 +1123,123 @@
       opacity: 0.6;
     }
 
+    /* ===== SEO CONTENT ===== */
+    .seo-content {
+      margin: 26px 0 12px;
+      padding: clamp(20px, 3vw, 34px);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.96);
+      box-shadow: var(--shadow);
+      color: #33483d;
+    }
+    .seo-content h2 {
+      margin: 0 0 12px;
+      color: var(--ink);
+      font-size: clamp(21px, 2.5vw, 28px);
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+    }
+    .seo-content h3 {
+      margin: 22px 0 7px;
+      color: var(--forest-deep);
+      font-size: 16px;
+      line-height: 1.4;
+    }
+    .seo-content p {
+      max-width: 900px;
+      margin: 0 0 12px;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+    .seo-content ul {
+      margin: 8px 0 14px 20px;
+      padding: 0;
+      font-size: 13px;
+      line-height: 1.85;
+    }
+    .seo-content a {
+      color: var(--forest);
+      font-weight: 700;
+      text-underline-offset: 3px;
+    }
+
+    /* ===== FAQ ACCORDION ===== */
+    .faq-accordion {
+      margin: 20px 0 8px;
+    }
+    .faq-item {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      margin-bottom: 10px;
+      background: #fbfdfb;
+      overflow: hidden;
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .faq-item:hover {
+      border-color: #b8d0c0;
+      box-shadow: 0 4px 12px rgba(18, 40, 28, 0.06);
+    }
+    .faq-question {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+      padding: 16px 18px;
+      background: transparent;
+      border: none;
+      color: var(--ink-soft);
+      font-size: 14px;
+      font-weight: 700;
+      text-align: left;
+      cursor: pointer;
+      line-height: 1.5;
+      letter-spacing: -0.01em;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+    .faq-question:hover {
+      background: #f2f9f4;
+      color: var(--forest);
+    }
+    .faq-question[aria-expanded="true"] {
+      background: #f2f9f4;
+      color: var(--forest);
+    }
+    .faq-icon {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--forest);
+      background: #e6f3ea;
+      border-radius: 6px;
+      transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.2s ease;
+      line-height: 1;
+    }
+    .faq-question[aria-expanded="true"] .faq-icon {
+      transform: rotate(45deg);
+      background: var(--lime-soft);
+    }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease;
+      padding: 0 18px;
+    }
+    .faq-answer.open {
+      padding: 0 18px 18px;
+    }
+    .faq-answer p {
+      margin: 0;
+      color: #4f6359;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
     /* ===== RESPONSIVE ===== */
     @media (max-width: 1080px) {
       .summary { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -1179,6 +1302,9 @@
       .mobile-nav-panel a { font-size: 16px; padding: 14px 18px; }
       .mobile-nav-panel .mobile-nav-brand { font-size: 14px; left: 18px; top: 26px; }
       .mobile-nav-panel .mobile-nav-close { right: 18px; }
+      .faq-question { font-size: 13px; padding: 14px 14px; }
+      .faq-answer { padding: 0 14px; }
+      .faq-answer.open { padding: 0 14px 14px; }
     }
     @media (max-width: 400px) {
       .summary { grid-template-columns: 1fr 1fr; }
@@ -1274,8 +1400,8 @@
     <section class="intro">
       <div class="intro-left">
         <span class="free-tag">Free UK sponsorship job finder — no signup needed</span>
-        <h1>Find the next role.<br><em>Check the evidence.</em></h1>
-        <p>Search current UK vacancies from public job sources. Sponsorship claims are checked against advert wording and the official sponsor register.</p>
+        <h1>UK Visa Sponsorship Jobs<br><em>Find vacancies. Check the evidence.</em></h1>
+        <p>Search UK job vacancies by role, location and posting date. Review sponsorship evidence from job-advert wording and available official sponsor-register matches, then follow the original application link.</p>
       </div>
       <div class="freshness" id="feedStamp">Connecting to the live feed</div>
     </section>
@@ -1364,6 +1490,58 @@
       <span class="page-label" id="pageLabel"></span>
       <button class="button" id="nextBtn" type="button">Next</button>
     </nav>
+
+    <section class="seo-content" aria-labelledby="seo-guide-title">
+      <h2 id="seo-guide-title">Find UK Visa Sponsorship Jobs</h2>
+      <p>SponsorshipJobsUK helps job seekers explore UK vacancies that may be relevant to people who need employer sponsorship. Search by job title, town or city, job category, posting date and other available filters. Listings link to their original sources so you can review the employer's requirements before applying.</p>
+
+      <h3>Search jobs by role and sector</h3>
+      <p>Use the job search to explore opportunities across sectors such as healthcare, care, information technology, engineering, education, hospitality and business services. Availability changes over time, and not every vacancy or employer offers visa sponsorship. Always read the original advert and confirm eligibility directly with the employer.</p>
+
+      <h3>Check employer sponsorship evidence</h3>
+      <p>Where available, this website compares employer information with the UK Register of Licensed Sponsors and reviews wording found in job adverts. A register match is not a guarantee that a specific vacancy offers sponsorship, that the employer will sponsor every applicant, or that an applicant qualifies for a visa. Check current official guidance and the employer's own recruitment information before making a decision.</p>
+
+      <h3>How to search effectively</h3>
+      <ul>
+        <li>Enter a specific role, such as care assistant, nurse, software engineer or data analyst.</li>
+        <li>Add a UK town, city or postcode to narrow your search.</li>
+        <li>Use the posting-date and job-type filters to refine available results.</li>
+        <li>Open the original vacancy to confirm salary, duties, closing date and sponsorship conditions.</li>
+      </ul>
+
+      <h3>Frequently asked questions</h3>
+      <div class="faq-accordion">
+        <div class="faq-item">
+          <button class="faq-question" type="button" aria-expanded="false">
+            Does every listed job provide visa sponsorship?
+            <span class="faq-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>No. Review the sponsorship evidence shown for each result and confirm the position directly with the employer.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" type="button" aria-expanded="false">
+            Does being on the licensed sponsor register guarantee sponsorship?
+            <span class="faq-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>No. A licence does not mean an employer sponsors every role or applicant. Check the individual vacancy and current UK government immigration guidance.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" type="button" aria-expanded="false">
+            How can I find recent UK sponsorship vacancies?
+            <span class="faq-icon" aria-hidden="true">+</span>
+          </button>
+          <div class="faq-answer">
+            <p>Search by role and location, then use the posting-date filter. Check the original advert for the latest details because vacancies can close or change.</p>
+          </div>
+        </div>
+      </div>
+
+      <p>Explore our <a href="licensed-sponsors.html">UK licensed sponsor directory</a> to research employers, or visit our <a href="About.html">About page</a> to learn more about this service.</p>
+    </section>
   </main>
 
   <!-- ===== FOOTER (REDESIGNED) ===== -->
@@ -1471,6 +1649,39 @@
       link.addEventListener("click", () => {
         // allow navigation; just close the panel
         closeMobileMenu();
+      });
+    });
+
+    /* ===== FAQ ACCORDION ===== */
+    document.querySelectorAll(".faq-question").forEach(button => {
+      button.addEventListener("click", () => {
+        const expanded = button.getAttribute("aria-expanded") === "true";
+        // Close all other open items
+        document.querySelectorAll(".faq-question").forEach(otherBtn => {
+          if (otherBtn !== button) {
+            otherBtn.setAttribute("aria-expanded", "false");
+            const otherAnswer = otherBtn.nextElementSibling;
+            if (otherAnswer) {
+              otherAnswer.classList.remove("open");
+              otherAnswer.style.maxHeight = "0px";
+            }
+            const otherIcon = otherBtn.querySelector(".faq-icon");
+            if (otherIcon) otherIcon.textContent = "+";
+          }
+        });
+        // Toggle current
+        button.setAttribute("aria-expanded", !expanded);
+        const answer = button.nextElementSibling;
+        const icon = button.querySelector(".faq-icon");
+        if (!expanded) {
+          answer.classList.add("open");
+          answer.style.maxHeight = answer.scrollHeight + "px";
+          if (icon) icon.textContent = "+";
+        } else {
+          answer.classList.remove("open");
+          answer.style.maxHeight = "0px";
+          if (icon) icon.textContent = "+";
+        }
       });
     });
 
