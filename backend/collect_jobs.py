@@ -56,6 +56,13 @@ class CollectorConfig:
             request_delay_seconds=_float_env("REQUEST_DELAY_SECONDS", 2.0, minimum=0),
         )
 
+    @classmethod
+    def from_env_with_max_age(cls, max_age_days: int) -> "CollectorConfig":
+        """Load normal collector settings while overriding the requested date window."""
+        config = cls.from_env()
+        config.max_age_days = max_age_days
+        return config
+
 
 @dataclass
 class CollectionResult:
