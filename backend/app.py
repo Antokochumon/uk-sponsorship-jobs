@@ -1,3 +1,4 @@
+
 """Local website/API for the JobSpy UK job collector."""
 
 from __future__ import annotations
