@@ -1,4 +1,3 @@
-
 """Local website/API for the JobSpy UK job collector."""
 
 from __future__ import annotations
@@ -19,7 +18,7 @@ from flask_cors import CORS
 from werkzeug.security import check_password_hash
 
 from apps_script_import import AppsScriptClient, AppsScriptImportError
-from collect_jobs import collect_jobs
+from collect_jobs import CollectorConfig, collect_jobs
 from job_search import search_live_jobs
 
 load_dotenv()
@@ -258,16 +257,16 @@ def _admin_required():
     return None
 
 
-def _run_collection(max_jobs: int | None = None, lock_acquired: bool = False) -> None:
+def _run_collection(max_jobs: int | None = None, lock_acquired: bool = False, days: int = 28) -> None:
     global collection_state
     if not lock_acquired:
         collection_lock.acquire()
     try:
         collection_state.update({"running": True, "phase": "collecting", "logs": ["Collection started."], "result": None, "startedAt": datetime.now(timezone.utc).isoformat(), "finishedAt": None})
         try:
-            result = collect_jobs()
+            result = collect_jobs(config=CollectorConfig.from_env_with_max_age(days))
             jobs = result.jobs[:max_jobs] if max_jobs else result.jobs
-            collection_state["logs"].append(f"Collected {len(jobs)} valid recent jobs; {result.duplicate_count} duplicates skipped.")
+            collection_state["logs"].append(f"Collected {len(jobs)} valid jobs from the last {days} day(s); {result.duplicate_count} duplicates skipped.")
             if not jobs:
                 collection_state["phase"] = "complete"
                 collection_state["result"] = {**result.as_dict(), "import": {"confirmed": False, "counts": {"submitted": 0, "imported": 0}, "errors": [{"error": "No valid recent listings collected."}]}}
@@ -457,12 +456,18 @@ def admin_collect():
         max_jobs = max(1, min(500, int(payload.get("maxJobs", 50))))
     except (TypeError, ValueError):
         return jsonify({"error": "Maximum jobs must be a whole number from 1 to 500."}), 400
+    try:
+        days = int(payload.get("days", 28))
+    except (TypeError, ValueError):
+        return jsonify({"error": "Date range must be 1, 3, 7, 14, or 28 days."}), 400
+    if days not in {1, 3, 7, 14, 28}:
+        return jsonify({"error": "Date range must be 1, 3, 7, 14, or 28 days."}), 400
     if not _apps_script_client().configured:
         return jsonify({"error": "Configure the Apps Script import URL and backend token first."}), 503
     if collection_state["running"] or not collection_lock.acquire(blocking=False):
         return jsonify({"error": "A collection run is already in progress."}), 409
-    threading.Thread(target=_run_collection, args=(max_jobs, True), daemon=True, name="job-collection").start()
-    return jsonify({"started": True}), 202
+    threading.Thread(target=_run_collection, args=(max_jobs, True, days), daemon=True, name="job-collection").start()
+    return jsonify({"started": True, "days": days}), 202
 
 
 @app.post("/api/admin/schedule")
