@@ -21,3 +21,5 @@ services:
         sync: false
       - key: SESSION_COOKIE_SECURE
         value: "1"
+      - key: SHEET_CACHE_SECONDS
+        value: "300"
