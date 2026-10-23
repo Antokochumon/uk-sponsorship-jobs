@@ -48,6 +48,150 @@ login_failures: dict[str, list[float]] = {}
 collection_state: dict[str, Any] = {"running": False, "phase": "idle", "logs": [], "result": None, "startedAt": None, "finishedAt": None}
 schedule_state: dict[str, Any] = {"hours": None, "nextRun": None}
 
+# Process-local cache for public Google Sheets feeds. Render Free supports this
+# in memory; entries are intentionally disposable and are rebuilt after restart.
+try:
+    SHEET_CACHE_SECONDS = min(3600, max(30, int(os.getenv("SHEET_CACHE_SECONDS", "300"))))
+except ValueError:
+    SHEET_CACHE_SECONDS = 300
+_sheet_cache_lock = threading.Lock()
+_sheet_cache: dict[str, dict[str, Any]] = {}
+_sheet_cache_refreshing: set[str] = set()
+_sheet_cache_events: dict[str, threading.Event] = {}
+_sheet_cache_errors: dict[str, tuple[float, str, int]] = {}
+_sheet_cache_retry_after: dict[str, float] = {}
+
+
+def _fetch_sheet_payload(cache_key: str, action: str | None, required_array: str) -> None:
+    """Fetch and validate one public sheet feed, retaining the last good copy."""
+    params: dict[str, Any] = {"_": int(time.time() * 1000)}
+    if action:
+        params["action"] = action
+    try:
+        if not APP_SCRIPT_READ_URL:
+            raise RuntimeError("The Google Sheets feed is not configured.")
+        response = requests.get(
+            APP_SCRIPT_READ_URL,
+            params=params,
+            headers={"Accept": "application/json"},
+            timeout=(10, 45),
+        )
+        response.raise_for_status()
+        payload: Any = response.json()
+        if not isinstance(payload, dict) or not isinstance(payload.get(required_array), list):
+            raise ValueError(f"Apps Script feed does not contain a {required_array} array.")
+        with _sheet_cache_lock:
+            _sheet_cache[cache_key] = {"payload": payload, "cached_at": time.monotonic()}
+            _sheet_cache_errors.pop(cache_key, None)
+            _sheet_cache_retry_after.pop(cache_key, None)
+    except requests.Timeout:
+        with _sheet_cache_lock:
+            failed_at = time.monotonic()
+            _sheet_cache_errors[cache_key] = (failed_at, "The Google Sheets feed timed out.", 502)
+            _sheet_cache_retry_after[cache_key] = failed_at + 60
+    except requests.RequestException:
+        with _sheet_cache_lock:
+            failed_at = time.monotonic()
+            _sheet_cache_errors[cache_key] = (failed_at, "The Google Sheets feed is temporarily unavailable.", 502)
+            _sheet_cache_retry_after[cache_key] = failed_at + 60
+    except ValueError:
+        with _sheet_cache_lock:
+            failed_at = time.monotonic()
+            _sheet_cache_errors[cache_key] = (failed_at, "Apps Script feed did not return valid data.", 502)
+            _sheet_cache_retry_after[cache_key] = failed_at + 60
+    except RuntimeError as exc:
+        with _sheet_cache_lock:
+            failed_at = time.monotonic()
+            _sheet_cache_errors[cache_key] = (failed_at, str(exc), 503)
+            _sheet_cache_retry_after[cache_key] = failed_at + 60
+    finally:
+        with _sheet_cache_lock:
+            _sheet_cache_refreshing.discard(cache_key)
+            event = _sheet_cache_events.get(cache_key)
+            if event:
+                event.set()
+
+
+def _get_sheet_payload(cache_key: str, action: str | None, required_array: str) -> tuple[dict[str, Any] | None, str | None, int]:
+    """Return a cached feed; coalesce cold requests and refresh stale data safely."""
+    now = time.monotonic()
+    with _sheet_cache_lock:
+        entry = _sheet_cache.get(cache_key)
+        if entry and now - entry["cached_at"] < SHEET_CACHE_SECONDS:
+            return entry["payload"], None, 200
+        if entry and now < _sheet_cache_retry_after.get(cache_key, 0):
+            return entry["payload"], None, 200
+        if cache_key in _sheet_cache_refreshing:
+            event = _sheet_cache_events[cache_key]
+            owner = False
+        else:
+            event = threading.Event()
+            _sheet_cache_events[cache_key] = event
+            _sheet_cache_refreshing.add(cache_key)
+            owner = True
+        has_stale = entry is not None
+
+    if has_stale:
+        # Serve the last good data immediately while refreshing in the background.
+        if owner:
+            threading.Thread(
+                target=_fetch_sheet_payload,
+                args=(cache_key, action, required_array),
+                name=f"sheet-cache-{cache_key}-refresh",
+                daemon=True,
+            ).start()
+        return entry["payload"], None, 200
+
+    if owner:
+        _fetch_sheet_payload(cache_key, action, required_array)
+    else:
+        # On a cold start, wait for the single in-flight fetch rather than
+        # making every simultaneous visitor hit Apps Script independently.
+        event.wait(timeout=50)
+
+    with _sheet_cache_lock:
+        entry = _sheet_cache.get(cache_key)
+        if entry:
+            return entry["payload"], None, 200
+        error = _sheet_cache_errors.get(cache_key)
+        if error:
+            return None, error[1], error[2]
+    return None, "The Google Sheets feed is temporarily unavailable.", 502
+
+
+def _invalidate_sheet_cache(*keys: str) -> None:
+    """Invalidate after an admin write so the next public request fetches updates."""
+    with _sheet_cache_lock:
+        selected = keys or tuple(_sheet_cache.keys())
+        for key in selected:
+            _sheet_cache.pop(key, None)
+            _sheet_cache_errors.pop(key, None)
+            _sheet_cache_retry_after.pop(key, None)
+
+
+def _sheet_cache_refresh_loop() -> None:
+    """Refresh previously loaded feeds while the Render web process is awake."""
+    feed_specs = {"jobs": (None, "jobs"), "sponsors": ("sponsors", "companies")}
+    while True:
+        time.sleep(15)
+        if not APP_SCRIPT_READ_URL:
+            continue
+        now = time.monotonic()
+        with _sheet_cache_lock:
+            due_keys = [
+                key for key, entry in _sheet_cache.items()
+                if key in feed_specs
+                and now - entry["cached_at"] >= SHEET_CACHE_SECONDS
+                and now >= _sheet_cache_retry_after.get(key, 0)
+                and key not in _sheet_cache_refreshing
+            ]
+        for key in due_keys:
+            action, required_array = feed_specs[key]
+            # This returns the last good payload immediately and starts one
+            # background refresh, so visitors don't wait for a scheduled fetch.
+            _get_sheet_payload(key, action, required_array)
+
+
 app = Flask(__name__, static_folder=None)
 
 CORS(
@@ -132,6 +276,7 @@ def _run_collection(max_jobs: int | None = None, lock_acquired: bool = False) ->
             if not client.configured:
                 raise AppsScriptImportError("Apps Script import is not configured.")
             imported = client.import_jobs(jobs, batch_size=IMPORT_BATCH_SIZE)
+            _invalidate_sheet_cache("jobs", "sponsors")
             collection_state["logs"].append(f"Import completed: {imported['counts'].get('imported', 0)} imported.")
             collection_state["result"] = {**result.as_dict(), "import": imported}
             collection_state["phase"] = "complete" if imported.get("confirmed") else "failed"
@@ -266,7 +411,9 @@ def admin_refresh_sponsors():
     if not collection_lock.acquire(blocking=False):
         return jsonify({"error": "Another sheet operation is already in progress."}), 409
     try:
-        return jsonify(_apps_script_client().admin_action("refreshSponsors"))
+        result = _apps_script_client().admin_action("refreshSponsors")
+        _invalidate_sheet_cache("jobs", "sponsors")
+        return jsonify(result)
     except AppsScriptImportError as exc:
         return jsonify({"error": str(exc)}), 502
     finally:
@@ -290,7 +437,9 @@ def admin_delete():
     if not collection_lock.acquire(blocking=False):
         return jsonify({"error": "Another sheet operation is already in progress."}), 409
     try:
-        return jsonify(_apps_script_client().admin_action("deleteJobs", mode=mode, id=job_id, confirm=payload.get("confirm") is True))
+        result = _apps_script_client().admin_action("deleteJobs", mode=mode, id=job_id, confirm=payload.get("confirm") is True)
+        _invalidate_sheet_cache("jobs", "sponsors")
+        return jsonify(result)
     except AppsScriptImportError as exc:
         return jsonify({"error": str(exc)}), 502
     finally:
@@ -352,17 +501,9 @@ def status():
 def jobs():
     if not APP_SCRIPT_READ_URL:
         return jsonify({"error": "The jobs feed is not configured."}), 503
-    try:
-        response = requests.get(APP_SCRIPT_READ_URL, params={"_": int(time.time() * 1000)}, timeout=(10, 45))
-        response.raise_for_status()
-        payload: Any = response.json()
-    except requests.RequestException:
-        return jsonify({"error": "The jobs feed is temporarily unavailable."}), 502
-    except ValueError:
-        return jsonify({"error": "Apps Script feed did not return valid JSON."}), 502
-
-    if not isinstance(payload, dict) or not isinstance(payload.get("jobs"), list):
-        return jsonify({"error": "Apps Script response does not contain a jobs array."}), 502
+    payload, error, status_code = _get_sheet_payload("jobs", None, "jobs")
+    if payload is None:
+        return jsonify({"error": error or "The jobs feed is temporarily unavailable."}), status_code
     return jsonify(payload)
 
 
@@ -370,14 +511,9 @@ def jobs():
 def sponsors():
     if not APP_SCRIPT_READ_URL:
         return jsonify({"error": "The sponsor directory is not configured."}), 503
-    try:
-        response = requests.get(APP_SCRIPT_READ_URL, params={"action": "sponsors", "_": int(time.time() * 1000)}, timeout=(10, 45))
-        response.raise_for_status()
-        payload: Any = response.json()
-    except (requests.RequestException, ValueError):
-        return jsonify({"error": "The sponsor directory is temporarily unavailable."}), 502
-    if not isinstance(payload, dict) or not isinstance(payload.get("companies"), list):
-        return jsonify({"error": "The sponsor directory returned an invalid response."}), 502
+    payload, error, status_code = _get_sheet_payload("sponsors", "sponsors", "companies")
+    if payload is None:
+        return jsonify({"error": error or "The sponsor directory is temporarily unavailable."}), status_code
     return jsonify(payload)
 
 
@@ -463,6 +599,7 @@ def import_test():
             }), 422
         test_job = result.jobs[0]
         verification = client.test_one_real_job(test_job)
+        _invalidate_sheet_cache("jobs", "sponsors")
         import_test_verified = bool(verification["confirmed"])
         return jsonify({
             "confirmed": import_test_verified,
@@ -513,6 +650,7 @@ def collect():
             })
         try:
             import_result = client.import_jobs(result.jobs, batch_size=IMPORT_BATCH_SIZE)
+            _invalidate_sheet_cache("jobs", "sponsors")
         except AppsScriptImportError as exc:
             import_result = {
                 "confirmed": False,
@@ -536,6 +674,10 @@ def _scheduler_loop() -> None:
             threading.Thread(target=_run_collection, args=(None, True), daemon=True, name="scheduled-collection").start()
         schedule_state["nextRun"] = time.time() + hours * 3600
 
+
+# Gunicorn (Render) imports this module rather than running it as __main__, so
+# start the lightweight cache refresher at import time as well as local runs.
+threading.Thread(target=_sheet_cache_refresh_loop, daemon=True, name="sheet-cache-scheduler").start()
 
 if __name__ == "__main__":
     threading.Thread(target=_scheduler_loop, daemon=True, name="collection-scheduler").start()
