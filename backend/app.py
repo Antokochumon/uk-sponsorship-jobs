@@ -19,7 +19,7 @@ from werkzeug.security import check_password_hash
 
 from apps_script_import import AppsScriptClient, AppsScriptImportError
 from collect_jobs import CollectorConfig, collect_jobs
-from job_search import search_live_jobs
+from job_search import _employer_key, search_live_jobs, sponsorship_evidence
 
 load_dotenv()
 
@@ -257,19 +257,70 @@ def _admin_required():
     return None
 
 
-def _run_collection(max_jobs: int | None = None, lock_acquired: bool = False, days: int = 28) -> None:
+COLLECTION_CATEGORIES = {
+    "all": "All jobs",
+    "licensed_sponsors_offering_sponsorship": "Licensed sponsors offering sponsorship",
+    "no_sponsorship_mentioned": "Jobs with no sponsorship mentioned",
+}
+
+
+def _filter_collection_category(jobs: list[dict[str, Any]], category: str) -> list[dict[str, Any]]:
+    """Filter collected vacancies using the selected admin category."""
+    if category == "all":
+        return jobs
+    if category == "no_sponsorship_mentioned":
+        return [
+            job for job in jobs
+            if sponsorship_evidence(str(job.get("description", "")))[1] == "Sponsorship not stated"
+        ]
+    if category == "licensed_sponsors_offering_sponsorship":
+        payload, error, status = _get_sheet_payload("sponsors", "sponsors", "companies")
+        if error or not payload:
+            raise RuntimeError(error or f"Unable to load the licensed sponsor register (HTTP {status}).")
+        sponsor_names = {
+            _employer_key(str(row.get("employerName", "")))
+            for row in payload.get("companies", [])
+            if isinstance(row, dict) and row.get("employerName")
+        }
+        sponsor_names.discard("")
+        if not sponsor_names:
+            raise RuntimeError("The licensed sponsor register returned no company names; no jobs were imported.")
+        matches = []
+        for job in jobs:
+            employer = _employer_key(str(job.get("employer", "")))
+            evidence_status = sponsorship_evidence(str(job.get("description", "")))[1]
+            if employer in sponsor_names and evidence_status == "Sponsorship confirmed":
+                matches.append(job)
+        return matches
+    raise ValueError("Choose a valid job category.")
+
+
+def _run_collection(
+    max_jobs: int | None = None,
+    lock_acquired: bool = False,
+    days: int = 28,
+    category: str = "all",
+) -> None:
     global collection_state
     if not lock_acquired:
         collection_lock.acquire()
     try:
         collection_state.update({"running": True, "phase": "collecting", "logs": ["Collection started."], "result": None, "startedAt": datetime.now(timezone.utc).isoformat(), "finishedAt": None})
         try:
-            result = collect_jobs(config=CollectorConfig.from_env_with_max_age(days))
-            jobs = result.jobs[:max_jobs] if max_jobs else result.jobs
-            collection_state["logs"].append(f"Collected {len(jobs)} valid jobs from the last {days} day(s); {result.duplicate_count} duplicates skipped.")
+            result = collect_jobs(
+                config=CollectorConfig.from_env_with_max_age(days),
+                fetch_description=category != "all",
+            )
+            categorized_jobs = _filter_collection_category(result.jobs, category)
+            jobs = categorized_jobs[:max_jobs] if max_jobs else categorized_jobs
+            category_label = COLLECTION_CATEGORIES.get(category, COLLECTION_CATEGORIES["all"])
+            collection_state["logs"].append(
+                f"Category: {category_label}. Collected {len(jobs)} matching jobs from the last {days} day(s); "
+                f"{result.duplicate_count} duplicates skipped."
+            )
             if not jobs:
                 collection_state["phase"] = "complete"
-                collection_state["result"] = {**result.as_dict(), "import": {"confirmed": False, "counts": {"submitted": 0, "imported": 0}, "errors": [{"error": "No valid recent listings collected."}]}}
+                collection_state["result"] = {**result.as_dict(), "import": {"confirmed": False, "counts": {"submitted": 0, "imported": 0}, "errors": [{"error": f"No recent listings matched the selected category: {category_label}."}]}}
                 return
             collection_state["phase"] = "importing"
             client = _apps_script_client()
@@ -462,12 +513,15 @@ def admin_collect():
         return jsonify({"error": "Date range must be 1, 3, 7, 14, or 28 days."}), 400
     if days not in {1, 3, 7, 14, 28}:
         return jsonify({"error": "Date range must be 1, 3, 7, 14, or 28 days."}), 400
+    category = str(payload.get("category", "all")).strip()
+    if category not in COLLECTION_CATEGORIES:
+        return jsonify({"error": "Choose a valid job category."}), 400
     if not _apps_script_client().configured:
         return jsonify({"error": "Configure the Apps Script import URL and backend token first."}), 503
     if collection_state["running"] or not collection_lock.acquire(blocking=False):
         return jsonify({"error": "A collection run is already in progress."}), 409
-    threading.Thread(target=_run_collection, args=(max_jobs, True, days), daemon=True, name="job-collection").start()
-    return jsonify({"started": True, "days": days}), 202
+    threading.Thread(target=_run_collection, args=(max_jobs, True, days, category), daemon=True, name="job-collection").start()
+    return jsonify({"started": True, "days": days, "category": category}), 202
 
 
 @app.post("/api/admin/schedule")
