@@ -1123,40 +1123,44 @@
       opacity: 0.6;
     }
 
-    /* ===== SEO CONTENT ===== */
+    /* ===== SEO CONTENT (LIGHT GREEN ACCENT) ===== */
     .seo-content {
       margin: 26px 0 12px;
       padding: clamp(20px, 3vw, 34px);
-      border: 1px solid var(--line);
+      border: 1px solid #cfe0d4;
+      border-left: 6px solid var(--lime);
       border-radius: var(--radius);
-      background: rgba(255,255,255,0.96);
+      background: linear-gradient(145deg, #f2fbf5 0%, #e6f4ea 100%);
       box-shadow: var(--shadow);
-      color: #33483d;
+      color: #1e3a2e;
     }
     .seo-content h2 {
       margin: 0 0 12px;
-      color: var(--ink);
+      color: var(--forest-deep);
       font-size: clamp(21px, 2.5vw, 28px);
       line-height: 1.25;
       letter-spacing: -0.02em;
     }
     .seo-content h3 {
       margin: 22px 0 7px;
-      color: var(--forest-deep);
+      color: var(--forest);
       font-size: 16px;
       line-height: 1.4;
+      font-weight: 700;
     }
     .seo-content p {
       max-width: 900px;
       margin: 0 0 12px;
       font-size: 13px;
       line-height: 1.8;
+      color: #2b4638;
     }
     .seo-content ul {
       margin: 8px 0 14px 20px;
       padding: 0;
       font-size: 13px;
       line-height: 1.85;
+      color: #2b4638;
     }
     .seo-content a {
       color: var(--forest);
@@ -1164,20 +1168,20 @@
       text-underline-offset: 3px;
     }
 
-    /* ===== FAQ ACCORDION ===== */
+    /* ===== FAQ ACCORDION (within SEO content) ===== */
     .faq-accordion {
       margin: 20px 0 8px;
     }
     .faq-item {
-      border: 1px solid var(--line);
+      border: 1px solid #cfe0d4;
       border-radius: var(--radius-sm);
       margin-bottom: 10px;
-      background: #fbfdfb;
+      background: #ffffff;
       overflow: hidden;
       transition: box-shadow 0.2s ease, border-color 0.2s ease;
     }
     .faq-item:hover {
-      border-color: #b8d0c0;
+      border-color: #a9c9b4;
       box-shadow: 0 4px 12px rgba(18, 40, 28, 0.06);
     }
     .faq-question {
@@ -1491,6 +1495,7 @@
       <button class="button" id="nextBtn" type="button">Next</button>
     </nav>
 
+    <!-- ===== SEO CONTENT (LIGHT GREEN ACCENT) ===== -->
     <section class="seo-content" aria-labelledby="seo-guide-title">
       <h2 id="seo-guide-title">Find UK Visa Sponsorship Jobs</h2>
       <p>SponsorshipJobsUK helps job seekers explore UK vacancies that may be relevant to people who need employer sponsorship. Search by job title, town or city, job category, posting date and other available filters. Listings link to their original sources so you can review the employer's requirements before applying.</p>
