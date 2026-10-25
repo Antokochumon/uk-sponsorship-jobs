@@ -264,7 +264,7 @@ def _row_dicts(result: Any) -> list[dict[str, Any]]:
     return [dict(row) for row in result]
 
 
-def collect_jobs(config: CollectorConfig | None = None, smoke: bool = False) -> CollectionResult:
+def collect_jobs(config: CollectorConfig | None = None, smoke: bool = False, fetch_description: bool = False) -> CollectionResult:
     try:
         from jobspy import scrape_jobs
     except ImportError as exc:
@@ -298,7 +298,7 @@ def collect_jobs(config: CollectorConfig | None = None, smoke: bool = False) -> 
                 results_wanted=result_limit,
                 hours_old=config.max_age_days * 24,
                 country_indeed="UK",
-                fetch_description=False,
+                fetch_description=fetch_description,
                 verbose=0,
             )
         except Exception as exc:
