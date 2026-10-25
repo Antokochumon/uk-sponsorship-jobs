@@ -2240,7 +2240,7 @@
       $("importNotice").classList.remove("visible");
       setStatus("Searching JobSpy and the official UK Jobs service…");
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(new DOMException("Search timed out", "TimeoutError")), 30000);
+      const timeout = setTimeout(() => controller.abort(new DOMException("Search timed out", "TimeoutError")), 90000);
       try {
         const response = await fetch(apiUrl(`/api/search?${params}`), {
           headers: { Accept: "application/json" },
