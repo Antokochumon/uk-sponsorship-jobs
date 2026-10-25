@@ -23,11 +23,16 @@
   <main id="adminPanel" class="hidden">
     <section><h2>Dashboard</h2><div id="stats">Loading statistics…</div><p id="maintenanceMessage" role="status"></p></section>
     <section><button id="collect">Job Add</button><button id="logout" class="danger">Sign out</button>
+      <label for="category">Job category to add</label><select id="category">
+        <option value="licensed_sponsors_offering_sponsorship">Licensed sponsors offering sponsorship</option>
+        <option value="all" selected>All jobs</option>
+        <option value="no_sponsorship_mentioned">Jobs with no sponsorship mentioned</option>
+      </select>
       <label for="dateRange">Only collect jobs posted within</label><select id="dateRange">
         <option value="1">Last 24 hours</option><option value="3">Last 3 days</option><option value="7">Last 7 days</option><option value="14">Last 14 days</option><option value="28" selected>Last 28 days</option>
       </select>
       <label for="maximum">Maximum jobs to collect</label><input id="maximum" type="number" min="1" max="500" value="50">
-      <p><small>Only jobs within the selected posting-date window are eligible to be saved to Google Sheets and shown on the website.</small></p>
+      <p><small>Only jobs matching the selected category and posting-date window are eligible to be saved to Google Sheets and shown on the website. “Licensed sponsors offering sponsorship” requires both a sponsor-register match and explicit sponsorship wording in the advert.</small></p>
       <p id="runStatus">Idle</p><pre id="logs">No run yet.</pre></section>
     <section><h2>Automatic collection</h2><label for="schedule">Run every</label>
       <select id="schedule"><option value="">Off</option><option>1</option><option>3</option><option>6</option><option>12</option><option>24</option></select> hours
@@ -48,7 +53,7 @@
     function showAdmin() { $("loginPanel").classList.add("hidden"); $("adminPanel").classList.remove("hidden"); refresh(); loadStats(); }
     async function refresh() { try { const data = await call("/api/admin/status"); const run=data.collection; $("runStatus").textContent=`${run.phase} · ${run.running ? "running" : "stopped"}`; $("logs").textContent=(run.logs||[]).join("\n") || "No run yet."; $("nextRun").textContent=data.schedule.nextRun ? `Next run: ${new Date(data.schedule.nextRun*1000).toLocaleString()}` : "Automatic collection is off."; if (data.schedule.hours) $("schedule").value=String(data.schedule.hours); if (run.running) poll=setTimeout(refresh,1500); } catch (error) { $("runStatus").textContent=error.message; } }
     $("loginForm").addEventListener("submit", async event => { event.preventDefault(); try { const data = await call("/api/admin/login", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:$("username").value,password:$("password").value})}); csrfToken = data.csrfToken || ""; showAdmin(); } catch(error) { $("loginMessage").textContent=error.message; $("loginMessage").className="error"; } });
-    $("collect").addEventListener("click", async () => { try { await call("/api/admin/collect", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({maxJobs:$("maximum").value, days:$("dateRange").value})}); $("runStatus").textContent="started"; refresh(); } catch(error) { $("runStatus").textContent=error.message; } });
+    $("collect").addEventListener("click", async () => { try { await call("/api/admin/collect", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({maxJobs:$("maximum").value, days:$("dateRange").value, category:$("category").value})}); $("runStatus").textContent="started"; refresh(); } catch(error) { $("runStatus").textContent=error.message; } });
     $("saveSchedule").addEventListener("click", async () => { try { await call("/api/admin/schedule", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({hours:$("schedule").value || null})}); refresh(); } catch(error) { $("nextRun").textContent=error.message; } });
     async function loadStats() { try { const data = await call("/api/admin/stats"); const s = data.stats || {}; $("stats").textContent = "Stored jobs: " + (s.storedJobs ?? 0) + " · Last 28 days: " + (s.recentJobs ?? 0) + " · Licensed employers: " + (s.licensedSponsorJobs ?? 0) + " · Advert evidence: " + (s.advertEvidenceJobs ?? 0) + " · Both requirements: " + (s.verifiedJobs ?? 0) + " · Unavailable: " + (s.unavailableJobs ?? 0) + " · Licensed companies: " + (s.licensedSponsors ?? 0); } catch (error) { $("stats").textContent = error.message; } }
     $("refreshSponsors").addEventListener("click", async () => { try { $("registerRefresh").textContent="Refreshing…"; const data=await call("/api/admin/refresh-sponsors",{method:"POST"}); $("registerRefresh").textContent="Updated " + (data.count ?? 0) + " companies."; loadStats(); } catch(error) { $("registerRefresh").textContent=error.message; } });
