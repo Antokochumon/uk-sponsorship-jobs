@@ -75,15 +75,21 @@
     img, svg { display: block; max-width: 100%; }
     .shell { width: min(1280px, calc(100% - 32px)); margin: 0 auto; }
 
-    /* ===== MASTHEAD ===== */
+    /* ===== MASTHEAD (now sticky) ===== */
     .masthead {
-      position: relative;
+      position: sticky;
+      top: 0;
+      z-index: 100;
       padding: 18px 0;
       color: #fff;
       background: linear-gradient(135deg, var(--forest-deep) 0%, #1c3f32 100%);
       border-bottom: 4px solid var(--lime);
       box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-      z-index: 100;
+      transition: box-shadow 0.25s ease, padding 0.25s ease;
+    }
+    .masthead.scrolled {
+      padding: 12px 0;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.22);
     }
     .masthead-inner {
       display: flex;
@@ -508,6 +514,28 @@
       box-shadow: 0 0 0 3px rgba(26, 77, 62, 0.1);
       outline: none;
     }
+
+    /* ---- highlighted sponsorship field ---- */
+    .field.sponsorship-highlight label {
+      color: #7a5a17;
+    }
+    .field.sponsorship-highlight select {
+      border-color: #d9b85a;
+      background: linear-gradient(180deg, #fffcf3 0%, #fdf4dd 100%);
+      box-shadow: 0 0 0 3px rgba(240, 185, 80, 0.12);
+      font-weight: 600;
+      color: #6b4e10;
+    }
+    .field.sponsorship-highlight select:hover {
+      border-color: #caa63e;
+      background: linear-gradient(180deg, #fff8e4 0%, #fbeecb 100%);
+    }
+    .field.sponsorship-highlight select:focus {
+      border-color: #b8922f;
+      background: #fffdf5;
+      box-shadow: 0 0 0 3px rgba(240, 185, 80, 0.25);
+    }
+
     .filter-actions {
       display: flex;
       justify-content: space-between;
@@ -1300,6 +1328,7 @@
     @media (max-width: 680px) {
       .shell { width: calc(100% - 20px); }
       .masthead { padding: 14px 0; }
+      .masthead.scrolled { padding: 10px 0; }
       .masthead-inner { flex-direction: row; align-items: center; gap: 12px; }
       .brand-note { font-size: 9.5px; }
       .intro { display: block; padding: 26px 0 18px; }
@@ -1395,8 +1424,8 @@
 </head>
 <body>
 
-  <!-- ===== MASTHEAD ===== -->
-  <header class="masthead">
+  <!-- ===== MASTHEAD (sticky) ===== -->
+  <header class="masthead" id="siteMasthead">
     <div class="shell masthead-inner">
       <div class="brand">
         <div class="brand-mark" aria-hidden="true">SJ</div>
@@ -1461,7 +1490,7 @@
         <div class="field"><label for="query">Job title</label><input id="query" type="search" placeholder="e.g. care assistant, data analyst" autocomplete="off"></div>
         <div class="field"><label for="location">Town, city or UK location</label><input id="location" type="search" placeholder="City, region or postcode" autocomplete="postal-code"></div>
         <div class="field"><label for="category">Job category</label><select id="category"><option value="all">All categories</option></select></div>
-        <div class="field"><label for="sponsorship">Sponsorship</label><select id="sponsorship"><option value="verified" selected>Licensed sponsors offering sponsorship</option><option value="none">No sponsorship offered</option><option value="all">All jobs</option></select></div>
+        <div class="field sponsorship-highlight"><label for="sponsorship">Sponsorship</label><select id="sponsorship"><option value="verified" selected>Licensed sponsors offering sponsorship</option><option value="none">No sponsorship offered</option><option value="all">All jobs</option></select></div>
       </div>
       <div class="filter-grid secondary">
         <div class="field"><label for="postcode">UK postcode (optional)</label><input id="postcode" type="text" placeholder="e.g. EH21 7AB" autocomplete="postal-code"></div>
@@ -1644,6 +1673,20 @@
     let liveSearchActive = false;
     let nearMeCoordinates = null;
     const postcodeCache = new Map();
+
+    /* ===== STICKY MASTHEAD SCROLL EFFECT ===== */
+    const siteMasthead = $("siteMasthead");
+    let lastScrollTop = 0;
+    window.addEventListener("scroll", () => {
+      if (!siteMasthead) return;
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      if (scrollTop > 10) {
+        siteMasthead.classList.add("scrolled");
+      } else {
+        siteMasthead.classList.remove("scrolled");
+      }
+      lastScrollTop = scrollTop;
+    }, { passive: true });
 
     /* ===== MOBILE SLIDE-DOWN MENU ===== */
     const menuToggle = $("menuToggle");
@@ -2262,7 +2305,7 @@
       $("nextBtn").disabled = page >= pageCount;
     }
 
-    /* ===== LIVE SEARCH (only triggered by button) ===== */
+    /* ===== LIVE SEARCH (only triggered by button) — increased limit ===== */
     async function searchLiveJobs() {
       const queryText = $("query").value.trim();
       const locationText = $("postcode").value.trim() || $("location").value.trim();
@@ -2276,6 +2319,8 @@
       params.set("radius", $("radius").value);
       params.set("days", $("age").value);
       params.set("jobType", $("jobType").value);
+      // Increased live search limit (previously not explicitly set, now requesting more results)
+      params.set("limit", "100");
       if ($("salaryMin").value) params.set("salaryMin", $("salaryMin").value);
       if ($("salaryMax").value) params.set("salaryMax", $("salaryMax").value);
       if (nearMeCoordinates) {
@@ -2288,7 +2333,7 @@
       $("importNotice").classList.remove("visible");
       setStatus("Searching JobSpy and the official UK Jobs service…");
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(new DOMException("Search timed out", "TimeoutError")), 90000);
+      const timeout = setTimeout(() => controller.abort(new DOMException("Search timed out", "TimeoutError")), 120000); // increased timeout
       try {
         const response = await fetch(apiUrl(`/api/search?${params}`), {
           headers: { Accept: "application/json" },
