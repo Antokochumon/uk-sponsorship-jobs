@@ -781,6 +781,27 @@
       from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
+    .job-card.new-today {
+      border-color: var(--lime);
+      box-shadow: 0 0 0 3px rgba(200, 236, 110, 0.25), var(--shadow);
+      position: relative;
+    }
+    .job-card.new-today::before {
+      content: "NEW TODAY";
+      position: absolute;
+      top: -10px;
+      right: 16px;
+      background: var(--forest-deep);
+      color: var(--lime);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      padding: 3px 10px;
+      border-radius: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+      border: 1px solid rgba(200, 236, 110, 0.5);
+      z-index: 2;
+    }
     .job-head {
       display: flex;
       justify-content: space-between;
@@ -891,6 +912,16 @@
       white-space: pre-line;
       font-weight: 500;
       letter-spacing: 0.01em;
+      background: #f3f8f4;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border-left: 3px solid #b8dac3;
+    }
+    .date.today-highlight {
+      color: #1d4d31;
+      background: #e6f8c4;
+      border-left-color: var(--forest-deep);
+      font-weight: 700;
     }
     .apply {
       display: inline-flex;
@@ -1756,6 +1787,8 @@
     function normaliseJob(raw) {
       const applicationUrl = validUrl(field(raw, ["applicationUrl", "Application URL", "directApplyUrl", "applyUrl", "url", "job_url", "jobUrl", "link"]));
       let description = text(field(raw, ["description", "Description", "snippet", "summary"]));
+      // Remove only asterisks from description
+      description = description.replace(/\*/g, "");
       const embeddedSource = description.match(/^Source listing URL:\s*(https?:\/\/\S+)\s*/i);
       const sourceUrl = validUrl(field(raw, ["sourceUrl", "Source URL", "originalUrl", "listingUrl"])) || (embeddedSource ? validUrl(embeddedSource[1]) : "") || applicationUrl;
       if (embeddedSource) description = description.slice(embeddedSource[0].length).trim();
@@ -1792,6 +1825,14 @@
       if (!date) return false;
       const age = Date.now() - date.getTime();
       return age >= 0 && age <= days * 86400000;
+    }
+    function isToday(value) {
+      const date = parsedDate(value);
+      if (!date) return false;
+      const now = new Date();
+      return date.getFullYear() === now.getFullYear() &&
+             date.getMonth() === now.getMonth() &&
+             date.getDate() === now.getDate();
     }
     function sponsorVerified(job) {
       const match = job.sponsorRegisterMatch.toLowerCase();
@@ -2139,6 +2180,9 @@
     }
     function createCard(job) {
       const card = node("article", "job-card");
+      if (isToday(job.date)) {
+        card.classList.add("new-today");
+      }
       const head = node("div", "job-head");
       const textBlock = node("div");
       textBlock.append(node("div", "company", job.employer), node("h2", "job-title", job.title));
@@ -2160,7 +2204,11 @@
       const dateText = date
         ? `Posted ${date.toLocaleDateString()}${job.dateType ? `\n${job.dateType}` : ""}`
         : "Posting date unavailable";
-      foot.append(node("div", "date", dateText));
+      const dateNode = node("div", "date", dateText);
+      if (isToday(job.date)) {
+        dateNode.classList.add("today-highlight");
+      }
+      foot.append(dateNode);
       const actions = node("div", "actions");
       const apply = node("a", "apply", "Apply Directly ↗");
       if (job.applicationUrl) {
