@@ -1384,6 +1384,84 @@
       .footer-brand-row { flex-direction: column; gap: 8px; }
     }
 
+    /* ===== EXTRA SMALL SCREEN (≤ 363px) – navigation responsiveness ===== */
+    @media (max-width: 363px) {
+      .masthead { padding: 10px 0; }
+      .masthead.scrolled { padding: 8px 0; }
+      .masthead-inner {
+        justify-content: space-between;
+        gap: 8px;
+        flex-wrap: nowrap;
+      }
+      .brand {
+        gap: 8px;
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+      .brand-mark {
+        width: 34px;
+        height: 34px;
+        font-size: 16px;
+        border-radius: 9px;
+        flex-shrink: 0;
+        animation: none;
+      }
+      .brand-text { min-width: 0; }
+      .brand-name {
+        font-size: 14px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .brand-note {
+        font-size: 8px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 160px;
+      }
+      .menu-toggle {
+        width: 26px;
+        height: 20px;
+        flex-shrink: 0;
+      }
+      .menu-toggle span { height: 2.5px; }
+      .mobile-nav-panel.open { padding: 76px 14px 22px; }
+      .mobile-nav-panel a { font-size: 15px; padding: 13px 16px; }
+      .mobile-nav-panel .mobile-nav-brand { font-size: 12.5px; left: 14px; top: 22px; }
+      .mobile-nav-panel .mobile-nav-close { right: 14px; top: 18px; width: 40px; height: 40px; font-size: 30px; }
+      .shell { width: calc(100% - 14px); }
+      h1 { font-size: clamp(25px, 6.5vw, 29px); }
+      .intro p { font-size: 12.5px; }
+      .free-tag { font-size: 10px; padding: 4px 10px; }
+      .summary { grid-template-columns: 1fr 1fr; gap: 6px; }
+      .metric { padding: 10px 8px; min-height: 70px; }
+      .metric strong { font-size: 18px; }
+      .metric span { font-size: 9px; }
+      .filters { padding: 12px; }
+      .filter-grid, .filter-grid.secondary { grid-template-columns: 1fr; gap: 8px; }
+      .action-group { grid-template-columns: 1fr; gap: 7px; }
+      .action-group .action-btn { min-height: 42px; padding: 9px 12px; font-size: 11px; }
+      .action-group .action-btn.search-primary { grid-column: auto; }
+      .job-card { padding: 13px; }
+      .job-title { font-size: 15px; }
+      .footer-inner { padding: 28px 0 24px; }
+      .footer-brand-mark { width: 32px; height: 32px; font-size: 14px; border-radius: 8px; }
+      .footer-brand-name { font-size: 14px; }
+      .footer-credit { font-size: 12px; }
+      .footer-links a { font-size: 11px; padding: 8px 14px; }
+      .footer-bottom { font-size: 9.5px; padding: 14px 0 20px; }
+      .seo-content { padding: 16px; border-left-width: 4px; }
+      .seo-content h2 { font-size: 19px; }
+      .seo-content h3 { font-size: 14.5px; }
+      .seo-content p, .seo-content ul { font-size: 12px; }
+      .faq-question { font-size: 12px; padding: 12px 12px; }
+      .faq-answer { padding: 0 12px; }
+      .faq-answer.open { padding: 0 12px 12px; }
+      .pagination .button { min-height: 38px; padding: 8px 14px; font-size: 11px; }
+      .page-label { font-size: 10.5px; }
+    }
+
     /* ===== REDUCED MOTION ===== */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
@@ -1427,7 +1505,7 @@
   <!-- ===== MASTHEAD (sticky) ===== -->
   <header class="masthead" id="siteMasthead">
     <div class="shell masthead-inner">
-      <div class="brand">
+      <div class="brand" id="brandLink" role="button" tabindex="0" aria-label="Go to top of page">
         <div class="brand-mark" aria-hidden="true">SJ</div>
         <div class="brand-text">
           <div class="brand-name">Sponsorship<span>Jobs</span>UK</div>
@@ -1673,6 +1751,23 @@
     let liveSearchActive = false;
     let nearMeCoordinates = null;
     const postcodeCache = new Map();
+
+    /* ===== BRAND CLICK – SCROLL TO TOP (no other changes) ===== */
+    const brandLink = $("brandLink");
+    if (brandLink) {
+      brandLink.addEventListener("click", (event) => {
+        // Do not prevent default if the user is clicking a link inside the brand (none currently)
+        // This is a div with role="button"; just scroll to top smoothly.
+        event.preventDefault();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+      brandLink.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+      });
+    }
 
     /* ===== STICKY MASTHEAD SCROLL EFFECT ===== */
     const siteMasthead = $("siteMasthead");
