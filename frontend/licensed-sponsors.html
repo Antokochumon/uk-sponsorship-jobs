@@ -55,6 +55,8 @@
         linear-gradient(#e9f0e9 1px, transparent 1px) 0 0 / 48px 48px,
         var(--paper);
       line-height: 1.5;
+      /* sticky header offset */
+      padding-top: 76px;
     }
     button, input { font: inherit; }
     button, a, input { -webkit-tap-highlight-color: transparent; }
@@ -116,19 +118,29 @@
     }
     .loader-sub { font-size: 10.5px; color: var(--muted); margin-top: -10px; }
 
-    /* ===== MASTHEAD ===== */
+    /* ===== MASTHEAD — STICKY ===== */
     .masthead {
-      position: relative; padding: 18px 0; color: #fff;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 12px 0;
+      color: #fff;
       background: linear-gradient(135deg, var(--forest-deep) 0%, #1c3f32 100%);
       border-bottom: 4px solid var(--lime);
       box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-      z-index: 100;
+      z-index: 1000;
+      transition: box-shadow 0.25s ease, background 0.25s ease;
+    }
+    .masthead.scrolled {
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+      background: linear-gradient(135deg, #0b261e 0%, #173a2d 100%);
     }
     .masthead-inner {
       display: flex; justify-content: space-between; align-items: center;
-      gap: 18px; flex-wrap: wrap;
+      gap: 18px; flex-wrap: nowrap;
     }
-    .brand { display: flex; align-items: center; gap: 13px; }
+    .brand { display: flex; align-items: center; gap: 13px; flex-shrink: 0; }
     .brand-mark {
       display: grid; place-items: center; width: 42px; height: 42px;
       color: var(--forest-deep); background: var(--lime); border-radius: 12px;
@@ -166,7 +178,8 @@
       border: none;
       cursor: pointer;
       padding: 0;
-      z-index: 110;
+      z-index: 1100;
+      flex-shrink: 0;
     }
     .menu-toggle span {
       display: block;
@@ -225,7 +238,7 @@
       top: 0;
       left: 0;
       right: 0;
-      z-index: 105;
+      z-index: 1050;
       background: linear-gradient(160deg, var(--forest-deep) 0%, #173d2f 100%);
       backdrop-filter: blur(16px);
       padding: 0 24px;
@@ -324,7 +337,7 @@
       opacity: 0;
       visibility: hidden;
       transition: opacity 0.35s ease, visibility 0.35s ease;
-      z-index: 104;
+      z-index: 1040;
     }
     .mobile-nav-overlay.open { opacity: 1; visibility: visible; }
 
@@ -711,10 +724,14 @@
     }
 
     @media (max-width: 680px) {
+      body { padding-top: 68px; }
       .shell { width: calc(100% - 20px); }
-      .masthead { padding: 14px 0; }
-      .masthead-inner { flex-direction: row; align-items: center; gap: 12px; }
-      .brand-note { font-size: 9.5px; }
+      .masthead { padding: 10px 0; }
+      .masthead-inner { flex-direction: row; align-items: center; gap: 10px; }
+      .brand { gap: 9px; }
+      .brand-mark { width: 36px; height: 36px; font-size: 17px; border-radius: 10px; }
+      .brand-name { font-size: 15px; }
+      .brand-note { font-size: 9px; }
       .page-header { padding: 26px 0 6px; }
       h1 { font-size: clamp(26px, 7vw, 32px); }
       .search-card { padding: 16px; }
@@ -729,7 +746,15 @@
       .mobile-nav-panel .mobile-nav-brand { font-size: 14px; left: 18px; top: 26px; }
       .mobile-nav-panel .mobile-nav-close { right: 18px; }
     }
+    /* Extra fix for very small screens like 363px */
     @media (max-width: 400px) {
+      body { padding-top: 64px; }
+      .masthead { padding: 8px 0; }
+      .brand-mark { width: 32px; height: 32px; font-size: 15px; border-radius: 8px; }
+      .brand-name { font-size: 13.5px; }
+      .brand-note { font-size: 8px; }
+      .menu-toggle { width: 26px; height: 20px; }
+      .menu-toggle span { height: 2.5px; }
       .footer-links { flex-direction: column; width: 100%; gap: 9px; }
       .footer-links a { width: 100%; justify-content: center; }
       .footer-brand-row { flex-direction: column; gap: 8px; }
@@ -763,8 +788,8 @@
     </div>
   </div>
 
-  <!-- ===== MASTHEAD ===== -->
-  <header class="masthead">
+  <!-- ===== MASTHEAD — STICKY ===== -->
+  <header class="masthead" id="masthead">
     <div class="shell masthead-inner">
       <div class="brand">
         <div class="brand-mark" aria-hidden="true">SJ</div>
@@ -883,6 +908,19 @@
     const search = document.getElementById("search");
     const searchBtn = document.getElementById("searchBtn");
 
+    /* ===== STICKY HEADER SHADOW EFFECT ON SCROLL ===== */
+    const masthead = document.getElementById("masthead");
+    let lastScrollY = 0;
+    window.addEventListener("scroll", () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > 20) {
+        masthead.classList.add("scrolled");
+      } else {
+        masthead.classList.remove("scrolled");
+      }
+      lastScrollY = currentScrollY;
+    }, { passive: true });
+
     /* ===== MOBILE SLIDE-DOWN MENU ===== */
     const menuToggle = document.getElementById("menuToggle");
     const mobileNavPanel = document.getElementById("mobileNavPanel");
@@ -895,6 +933,9 @@
       menuToggle.classList.add("active");
       menuToggle.setAttribute("aria-expanded", "true");
       document.body.style.overflow = "hidden";
+      // Ensure the panel starts below the sticky header (top offset)
+      const headerHeight = masthead.offsetHeight;
+      mobileNavPanel.style.paddingTop = (headerHeight + 16) + "px";
     }
     function closeMobileMenu() {
       mobileNavPanel.classList.remove("open");
