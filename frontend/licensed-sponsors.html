@@ -724,14 +724,14 @@
     }
 
     @media (max-width: 680px) {
-      body { padding-top: 68px; }
+      body { padding-top: 76px; }
       .shell { width: calc(100% - 20px); }
-      .masthead { padding: 10px 0; }
-      .masthead-inner { flex-direction: row; align-items: center; gap: 10px; }
-      .brand { gap: 9px; }
-      .brand-mark { width: 36px; height: 36px; font-size: 17px; border-radius: 10px; }
-      .brand-name { font-size: 15px; }
-      .brand-note { font-size: 9px; }
+      .masthead { padding: 12px 0; }
+      .masthead-inner { flex-direction: row; align-items: center; gap: 10px; flex-wrap: nowrap; }
+      .brand { gap: 10px; }
+      .brand-mark { width: 40px; height: 40px; font-size: 18px; border-radius: 11px; }
+      .brand-name { font-size: 16px; }
+      .brand-note { font-size: 10px; }
       .page-header { padding: 26px 0 6px; }
       h1 { font-size: clamp(26px, 7vw, 32px); }
       .search-card { padding: 16px; }
@@ -741,23 +741,34 @@
       .grid { grid-template-columns: 1fr; gap: 10px; }
       .loader-card { padding: 30px 34px; }
       .footer-inner { padding: 34px 0 28px; }
-      .mobile-nav-panel.open { padding: 84px 18px 28px; }
+      .mobile-nav-panel.open { padding: 88px 18px 28px; }
       .mobile-nav-panel a { font-size: 16px; padding: 14px 18px; }
       .mobile-nav-panel .mobile-nav-brand { font-size: 14px; left: 18px; top: 26px; }
       .mobile-nav-panel .mobile-nav-close { right: 18px; }
     }
-    /* Extra fix for very small screens like 363px */
+    /* Extra fix for very small screens like 363px — keep nav size same */
     @media (max-width: 400px) {
-      body { padding-top: 64px; }
-      .masthead { padding: 8px 0; }
-      .brand-mark { width: 32px; height: 32px; font-size: 15px; border-radius: 8px; }
-      .brand-name { font-size: 13.5px; }
-      .brand-note { font-size: 8px; }
-      .menu-toggle { width: 26px; height: 20px; }
-      .menu-toggle span { height: 2.5px; }
+      body { padding-top: 76px; }
+      .masthead { padding: 12px 0; }
+      .masthead-inner { gap: 8px; flex-wrap: nowrap; }
+      .brand { gap: 9px; flex-shrink: 1; min-width: 0; }
+      .brand-mark { width: 40px; height: 40px; font-size: 18px; border-radius: 11px; flex-shrink: 0; }
+      .brand-text { min-width: 0; overflow: hidden; }
+      .brand-name { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .brand-note { font-size: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .menu-toggle { width: 30px; height: 22px; flex-shrink: 0; }
+      .menu-toggle span { height: 3px; }
       .footer-links { flex-direction: column; width: 100%; gap: 9px; }
       .footer-links a { width: 100%; justify-content: center; }
       .footer-brand-row { flex-direction: column; gap: 8px; }
+    }
+    /* Very tiny screens — keep nav stable, allow brand to wrap gracefully */
+    @media (max-width: 360px) {
+      .brand-mark { width: 36px; height: 36px; font-size: 16px; border-radius: 9px; }
+      .brand-name { font-size: 14px; }
+      .brand-note { font-size: 8px; }
+      .menu-toggle { width: 26px; height: 20px; }
+      .menu-toggle span { height: 2.5px; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
