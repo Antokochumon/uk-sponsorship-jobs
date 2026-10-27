@@ -395,7 +395,7 @@
     main { padding-bottom: 40px; }
     .summary {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(6, minmax(0, 1fr));
       gap: 10px;
       margin-bottom: 16px;
     }
@@ -415,6 +415,7 @@
     .metric:nth-child(3) { animation-delay: 0.1s; }
     .metric:nth-child(4) { animation-delay: 0.15s; }
     .metric:nth-child(5) { animation-delay: 0.2s; }
+    .metric:nth-child(6) { animation-delay: 0.25s; }
     .metric::after {
       content: "";
       position: absolute;
@@ -1307,7 +1308,7 @@
     }
 
     /* ===== RESPONSIVE ===== */
-    @media (max-width: 1080px) {
+    @media (max-width: 1180px) {
       .summary { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
     @media (max-width: 900px) {
@@ -1553,8 +1554,9 @@
 
     <section class="summary" aria-label="Job summary">
       <div class="metric"><strong id="totalStat">—</strong><span>Listings matching filters</span></div>
-      <div class="metric"><strong id="verifiedStat">—</strong><span>Verified register match &amp; advert evidence</span></div>
+      <div class="metric"><strong id="verifiedStat">—</strong><span>Verified register match &amp; advert evidence Sponsorship jobs</span></div>
       <div class="metric"><strong id="sourceStat">2</strong><span>Live job sources</span></div>
+      <div class="metric"><strong id="allJobsStat">—</strong><span>All Jobs</span></div>
       <div class="metric"><strong id="licensedStat">—</strong><span>Licensed sponsor employers</span></div>
       <div class="metric"><strong id="sponsorCountStat">—</strong><span>Licensed sponsor companies</span></div>
     </section>
@@ -2120,6 +2122,7 @@
         $("licensedStat").textContent = Number(stats.licensedSponsorJobs ?? allJobs().filter(job => job.sponsorRegisterMatch.toLowerCase().startsWith("matched:")).length).toLocaleString();
         $("verifiedStat").textContent = Number(stats.verifiedJobs ?? allJobs().filter(sponsorVerified).length).toLocaleString();
         $("sponsorCountStat").textContent = Number(stats.licensedSponsors ?? register.rowCount ?? 0).toLocaleString();
+        $("allJobsStat").textContent = allJobs().length.toLocaleString();
         if (!liveSearchActive) await applyFilters();
         setStatus(`Loaded ${sheetJobs.length.toLocaleString()} records from the jobs feed.`);
         saveCache();
@@ -2175,6 +2178,7 @@
         $("licensedStat").textContent = Number(stats.licensedSponsorJobs ?? allJobs().filter(job => job.sponsorRegisterMatch.toLowerCase().startsWith("matched:")).length).toLocaleString();
         $("verifiedStat").textContent = Number(stats.verifiedJobs ?? allJobs().filter(sponsorVerified).length).toLocaleString();
         $("sponsorCountStat").textContent = Number(stats.licensedSponsors ?? register.rowCount ?? 0).toLocaleString();
+        $("allJobsStat").textContent = allJobs().length.toLocaleString();
         if (!liveSearchActive) await applyFilters();
         setStatus(`Loaded ${sheetJobs.length.toLocaleString()} records from the jobs feed.`);
         setInlinePercent(100);
@@ -2374,6 +2378,7 @@
     }
     function renderJobs() {
       $("totalStat").textContent = visibleJobs.length.toLocaleString();
+      $("allJobsStat").textContent = allJobs().length.toLocaleString();
       $("sourceStat").textContent = new Set(visibleJobs.map(job => job.source).filter(Boolean)).size.toLocaleString();
       const root = $("jobs");
       root.replaceChildren();
@@ -2428,7 +2433,7 @@
       $("importNotice").classList.remove("visible");
       setStatus("Searching JobSpy and the official UK Jobs service…");
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(new DOMException("Search timed out", "TimeoutError")), 120000); // increased timeout
+      const timeout = setTimeout(() => controller.abort(new DOMException("Search timed out", "TimeoutError")), 180000); // increased live search timeout to 180 seconds
       try {
         const response = await fetch(apiUrl(`/api/search?${params}`), {
           headers: { Accept: "application/json" },
