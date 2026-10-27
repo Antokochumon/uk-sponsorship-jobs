@@ -90,7 +90,7 @@
       gap: 18px;
       flex-wrap: wrap;
     }
-    .brand { display: flex; align-items: center; gap: 13px; }
+    .brand { display: flex; align-items: center; gap: 13px; text-decoration: none; color: inherit; }
     .brand-mark {
       display: grid;
       place-items: center;
@@ -725,6 +725,8 @@
       gap: 12px;
       justify-content: center;
       flex-wrap: wrap;
+      text-decoration: none;
+      color: inherit;
     }
     .footer-brand-mark {
       display: grid;
@@ -1068,13 +1070,13 @@
   <!-- ===== MASTHEAD (STICKY) ===== -->
   <header class="masthead">
     <div class="shell masthead-inner">
-      <div class="brand">
+      <a class="brand" href="index.html" aria-label="SponsorshipJobsUK home">
         <div class="brand-mark" aria-hidden="true">SJ</div>
         <div class="brand-text">
           <div class="brand-name">Sponsorship<span>Jobs</span>UK</div>
           <div class="brand-note">Recent vacancies · sponsorship evidence · direct links</div>
         </div>
-      </div>
+      </a>
 
       <!-- Desktop nav links -->
       <div class="nav-links">
@@ -1240,10 +1242,10 @@
   <footer class="site-footer">
     <div class="shell">
       <div class="footer-inner">
-        <div class="footer-brand-row">
+        <a class="footer-brand-row" href="index.html" aria-label="SponsorshipJobsUK home">
           <div class="footer-brand-mark" aria-hidden="true">SJ</div>
           <div class="footer-brand-name">Sponsorship<span>Jobs</span>UK</div>
-        </div>
+        </a>
         <div class="footer-credit">
           Designed &amp; developed by <a href="https://antokochumon.github.io/Portfolio/" target="_blank" rel="noopener noreferrer">Anto Kochumon</a>
           <span class="footer-copyright">© 2026 SponsorshipJobsUK. All rights reserved.</span>
