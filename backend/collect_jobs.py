@@ -38,7 +38,7 @@ UK_POSTCODE = re.compile(r"\b[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}\b", re.IGNORECASE
 class CollectorConfig:
     search_terms: list[str] = field(default_factory=lambda: DEFAULT_SEARCH_TERMS.copy())
     locations: list[str] = field(default_factory=lambda: DEFAULT_LOCATIONS.copy())
-    sites: list[str] = field(default_factory=lambda: ["indeed"])
+    sites: list[str] = field(default_factory=lambda: ["linkedin", "indeed", "glassdoor"])
     results_per_search: int = 15
     max_searches_per_run: int = 20
     max_age_days: int = 28
@@ -49,9 +49,9 @@ class CollectorConfig:
         return cls(
             search_terms=_csv_env("SEARCH_TERMS", DEFAULT_SEARCH_TERMS),
             locations=_csv_env("SEARCH_LOCATIONS", DEFAULT_LOCATIONS),
-            sites=_csv_env("JOBSPY_SITES", ["indeed"]),
-            results_per_search=_int_env("RESULTS_PER_SEARCH", 15, minimum=1),
-            max_searches_per_run=_int_env("MAX_SEARCHES_PER_RUN", 20, minimum=1),
+            sites=_csv_env("JOBSPY_SITES", ["linkedin", "indeed", "glassdoor"]),
+            results_per_search=_int_env("RESULTS_PER_SEARCH", 50, minimum=1),
+            max_searches_per_run=_int_env("MAX_SEARCHES_PER_RUN", 30, minimum=1),
             max_age_days=_int_env("MAX_AGE_DAYS", 28, minimum=1),
             request_delay_seconds=_float_env("REQUEST_DELAY_SECONDS", 2.0, minimum=0),
         )
