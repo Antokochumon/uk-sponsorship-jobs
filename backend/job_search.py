@@ -455,3 +455,4 @@ def search_live_jobs(query: str, location: str, radius: int, days: int, salary_m
                             **({"error": register_error} if register_error else {})},
         "errors": errors,
     }
+
