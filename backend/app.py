@@ -504,9 +504,9 @@ def admin_collect():
         return denied
     payload = request.get_json(silent=True) or {}
     try:
-        max_jobs = max(1, min(500, int(payload.get("maxJobs", 50))))
+        max_jobs = max(1, min(1500, int(payload.get("maxJobs", 50))))
     except (TypeError, ValueError):
-        return jsonify({"error": "Maximum jobs must be a whole number from 1 to 500."}), 400
+        return jsonify({"error": "Maximum jobs must be a whole number from 1 to 1500."}), 400
     try:
         days = int(payload.get("days", 28))
     except (TypeError, ValueError):
