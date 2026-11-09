@@ -2384,7 +2384,7 @@
       // For verified jobs, show only wording extracted from that job's own advert.
       // If no exact sentence is present, do not substitute generic evidence text.
       const evidence = verified
-        ? (actualSponsorshipWording ? node("p", "evidence", `“${actualSponsorshipWording}”`) : null)
+        ? (actualSponsorshipWording ? node("p", "evidence", `Positive sponsorship wording found in advert: “${actualSponsorshipWording}”`) : null)
         : node("p", "evidence", job.sponsorshipEvidence);
       if (job.sponsorRegisterMatch) {
         const match = node("p", `evidence${verified ? " match" : ""}`, job.sponsorRegisterMatch);
