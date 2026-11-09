@@ -1981,8 +1981,8 @@
              date.getDate() === now.getDate();
     }
     function sponsorVerified(job) {
-      const match = job.sponsorRegisterMatch.toLowerCase();
-      const status = job.sponsorshipStatus.toLowerCase();
+      const match = String(job.sponsorRegisterMatch || "").trim().toLowerCase();
+      const status = String(job.sponsorshipStatus || "").trim().toLowerCase();
       return status === "sponsorship confirmed" && match.startsWith("matched:") && !advertSaysUnavailable(job);
     }
     function advertSaysUnavailable(job) {
@@ -2328,20 +2328,27 @@
     }
 
     function extractSponsorshipWording(description) {
-      // The Google Sheet description may contain HTML line breaks. Convert them
-      // to readable text before looking for the original sponsorship sentence.
+      // Descriptions can arrive from Google Sheets as HTML, escaped HTML,
+      // or plain text containing Markdown bullets. Normalize all three forms.
+      let source = String(description || "");
+      source = source
+        .replace(/&lt;br\s*\/?&gt;/gi, "\n")
+        .replace(/<br\s*\/?\s*>/gi, "\n")
+        .replace(/&amp;/gi, "&");
+
       const container = document.createElement("div");
-      container.innerHTML = String(description || "").replace(/<br\s*\/?\s*>/gi, "\n");
-      const plainText = (container.textContent || container.innerText || "")
+      container.innerHTML = source;
+      const plainText = (container.textContent || container.innerText || source)
         .replace(/\r/g, "")
+        .replace(/\u00a0/g, " ")
         .replace(/[ \t]+/g, " ");
 
       const chunks = plainText
         .split(/\n+|(?<=[.!?])\s+(?=[A-Z*])/)
-        .map(part => part.replace(/^\s*[*•\-]+\s*/, "").trim())
+        .map(part => part.replace(/^\s*(?:[*•\-]+\s*)+/, "").trim())
         .filter(Boolean);
 
-      const sponsorshipPattern = /\b(?:visa sponsorship|work visa sponsorship|skilled worker sponsorship|sponsorship|certificate of sponsorship|\bCoS\b)\b/i;
+      const sponsorshipPattern = /\b(?:visa sponsorship|work visa sponsorship|skilled worker sponsorship|sponsorship|certificate of sponsorship|CoS)\b/i;
       const positivePattern = /\b(?:available|offer(?:ed|ing)?|provid(?:e|ed|ing)|support(?:ed|ing)?|sponsor(?:ed|ing)?|consider(?:ed|ing)?)\b/i;
       const negativePattern = /\b(?:not available|unavailable|not offered|not provided|cannot sponsor|can't sponsor|do not sponsor|does not sponsor|no sponsorship|unable to sponsor|not considered)\b/i;
 
@@ -2349,6 +2356,12 @@
         if (sponsorshipPattern.test(chunk) && positivePattern.test(chunk) && !negativePattern.test(chunk)) {
           return chunk.slice(0, 600);
         }
+      }
+      // Fallback: capture the sentence containing the exact positive phrase,
+      // even if the job board has flattened the original line breaks.
+      const match = plainText.match(/[^.!?\n]*\b(?:visa sponsorship|work visa sponsorship|skilled worker sponsorship)\b[^.!?\n]*/i);
+      if (match && positivePattern.test(match[0]) && !negativePattern.test(match[0])) {
+        return match[0].replace(/^\s*(?:[*•\-]+\s*)+/, "").trim().slice(0, 600);
       }
       return "";
     }
