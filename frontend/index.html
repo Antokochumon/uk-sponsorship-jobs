@@ -2326,6 +2326,33 @@
       if (value !== undefined) element.textContent = value;
       return element;
     }
+
+    function extractSponsorshipWording(description) {
+      // The Google Sheet description may contain HTML line breaks. Convert them
+      // to readable text before looking for the original sponsorship sentence.
+      const container = document.createElement("div");
+      container.innerHTML = String(description || "").replace(/<br\s*\/?\s*>/gi, "\n");
+      const plainText = (container.textContent || container.innerText || "")
+        .replace(/\r/g, "")
+        .replace(/[ \t]+/g, " ");
+
+      const chunks = plainText
+        .split(/\n+|(?<=[.!?])\s+(?=[A-Z*])/)
+        .map(part => part.replace(/^\s*[*•\-]+\s*/, "").trim())
+        .filter(Boolean);
+
+      const sponsorshipPattern = /\b(?:visa sponsorship|work visa sponsorship|skilled worker sponsorship|sponsorship|certificate of sponsorship|\bCoS\b)\b/i;
+      const positivePattern = /\b(?:available|offer(?:ed|ing)?|provid(?:e|ed|ing)|support(?:ed|ing)?|sponsor(?:ed|ing)?|consider(?:ed|ing)?)\b/i;
+      const negativePattern = /\b(?:not available|unavailable|not offered|not provided|cannot sponsor|can't sponsor|do not sponsor|does not sponsor|no sponsorship|unable to sponsor|not considered)\b/i;
+
+      for (const chunk of chunks) {
+        if (sponsorshipPattern.test(chunk) && positivePattern.test(chunk) && !negativePattern.test(chunk)) {
+          return chunk.slice(0, 600);
+        }
+      }
+      return "";
+    }
+
     function createCard(job) {
       const card = node("article", "job-card");
       if (isToday(job.date)) {
@@ -2339,12 +2366,21 @@
       head.append(textBlock, badgeNode);
       const tags = node("div", "tags");
       [job.location, job.salary, job.jobType, job.workplaceType].filter(Boolean).forEach(value => tags.append(node("span", "tag", value)));
-      const evidence = node("p", "evidence", job.sponsorshipEvidence);
+      const verified = sponsorVerified(job);
+      const actualSponsorshipWording = verified ? extractSponsorshipWording(job.description) : "";
+      // For verified jobs, show only wording extracted from that job's own advert.
+      // If no exact sentence is present, do not substitute generic evidence text.
+      const evidence = verified
+        ? (actualSponsorshipWording ? node("p", "evidence", `“${actualSponsorshipWording}”`) : null)
+        : node("p", "evidence", job.sponsorshipEvidence);
       if (job.sponsorRegisterMatch) {
-        const match = node("p", `evidence${sponsorVerified(job) ? " match" : ""}`, job.sponsorRegisterMatch);
-        card.append(head, tags, evidence, match);
+        const match = node("p", `evidence${verified ? " match" : ""}`, job.sponsorRegisterMatch);
+        card.append(head, tags);
+        if (evidence) card.append(evidence);
+        card.append(match);
       } else {
-        card.append(head, tags, evidence);
+        card.append(head, tags);
+        if (evidence) card.append(evidence);
       }
       card.append(node("p", "description", job.description || "No description supplied by the job board."));
       const foot = node("div", "job-foot");
